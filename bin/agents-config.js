@@ -15,8 +15,20 @@ module.exports = {
       type: 'skill-dir'
     },
     {
-      id: 'antigravity',
-      name: 'Google Antigravity / Gemini CLI',
+      id: 'antigravity-cli',
+      name: 'Antigravity CLI Global (~/.gemini/antigravity-cli/skills)',
+      targetDir: path.join(home, '.gemini', 'antigravity-cli', 'skills'),
+      type: 'skill-dir'
+    },
+    {
+      id: 'gemini-skills',
+      name: 'Gemini CLI Global (~/.gemini/skills)',
+      targetDir: path.join(home, '.gemini', 'skills'),
+      type: 'skill-dir'
+    },
+    {
+      id: 'antigravity-config',
+      name: 'Google Antigravity Config (~/.gemini/config/skills)',
       targetDir: path.join(home, '.gemini', 'config', 'skills'),
       type: 'skill-dir'
     },
