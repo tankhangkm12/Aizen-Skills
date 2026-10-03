@@ -9,6 +9,12 @@ module.exports = {
   // Cấu hình Toàn cục (Global Agent Directories)
   global: [
     {
+      id: 'universal-agents',
+      name: 'Universal Agent Skills (~/.agents/skills)',
+      targetDir: path.join(home, '.agents', 'skills'),
+      type: 'skill-dir'
+    },
+    {
       id: 'antigravity',
       name: 'Google Antigravity / Gemini CLI',
       targetDir: path.join(home, '.gemini', 'config', 'skills'),

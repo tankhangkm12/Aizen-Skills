@@ -123,8 +123,18 @@ function createLink(source, destination) {
       // Nếu trỏ sai đường dẫn hoặc bị đứt link, xóa để tạo lại
       safeRemoveLink(resolvedDest);
     } else if (destLstat.isDirectory()) {
-      // Nếu là thư mục thật của người dùng, không xóa để bảo vệ dữ liệu
-      return { status: 'directory-exists', type: 'directory' };
+      // Nếu là thư mục tĩnh cũ (ví dụ do skills.sh copy trước đó), tự động nâng cấp sang Junction/Symlink để kích hoạt Live-Sync!
+      const destSkillMd = path.join(resolvedDest, 'SKILL.md');
+      const hasGit = fs.existsSync(path.join(resolvedDest, '.git'));
+      if (fs.existsSync(destSkillMd) && !hasGit) {
+        try {
+          fs.rmSync(resolvedDest, { recursive: true, force: true });
+        } catch (e) {
+          return { status: 'directory-exists', type: 'directory' };
+        }
+      } else {
+        return { status: 'directory-exists', type: 'directory' };
+      }
     } else {
       try {
         fs.unlinkSync(resolvedDest);
