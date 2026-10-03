@@ -1,0 +1,17 @@
+{
+  "name": "cecilia-design",
+  "agent_type": "{{agent_type}}",
+  "kind": "{{kind}}",
+  "description": "{{description}}",
+  "default_on": "{{default_on}}",
+  "model": "{{model}}",
+  "consumes": "{{consumes}}",
+  "produces": "{{produces}}",
+  "lane": "{{lane}}",
+  "report": "tensura/reports/<TASK>/design.md",
+  "review_guide": "{{review_guide}}",
+  "rules_slot": "rules/roles/design.md",
+  "lenses": "{{lenses}}",
+  "overrides": {"claude": {"tools": null, "disallowedTools": null}, "antigravity": {"tools": null}}
+}
+
