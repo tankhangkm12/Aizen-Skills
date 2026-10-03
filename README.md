@@ -1,6 +1,52 @@
 # 🌟 Aizen Skills
 
+[![skills.sh](https://skills.sh/b/tankhangkm12/Aizen-Skills)](https://skills.sh/tankhangkm12/Aizen-Skills)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 > Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho tất cả các AI Agent phổ biến: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, **Cline / Roo Code**, và **Copilot**.
+
+---
+
+## 🚀 Cài Đặt (Installation)
+
+Bạn có thể cài đặt theo nhiều cách linh hoạt:
+
+### Cách 1: Cài đặt trực tiếp qua `skills.sh` (Hỗ trợ toàn bộ Agent)
+Sử dụng công cụ chính thức của hệ sinh thái **skills.sh**:
+
+```bash
+# Xem danh sách skills có sẵn trong repo:
+npx skills add tankhangkm12/Aizen-Skills --list
+
+# Cài đặt tất cả skills:
+npx skills add tankhangkm12/Aizen-Skills
+
+# Hoặc chỉ cài đặt một skill cụ thể (ví dụ database-table-design):
+npx skills add tankhangkm12/Aizen-Skills --skill database-table-design
+```
+
+### Cách 2: Cài đặt toàn cục cho cả máy kèm Live-Sync (Khuyến nghị)
+Tự động quét và liên kết toàn bộ kỹ năng vào tất cả AI Agent trên máy tính của bạn:
+
+```bash
+npm install -g aizen-skills
+```
+*(Nếu bạn đã clone repository này về máy, chỉ cần chạy `npm install` ngay tại thư mục repo)*.
+
+### Cách 3: Cài đặt cho một dự án cụ thể (Project-level)
+Tạo thư mục `.agents/skills/`, `.cursor/rules/`, và cập nhật file `AGENTS.md` cho dự án:
+
+```bash
+npm install --save-dev aizen-skills
+# Hoặc chạy lệnh:
+npx aizen-skills install --project
+```
+
+### Cách 4: Chạy trực tiếp qua NPX (Không cần cài đặt trước)
+
+```bash
+npx aizen-skills sync
+```
 
 ---
 
@@ -24,35 +70,6 @@ Thư mục gốc được tối giản gọn gàng, toàn bộ kỹ năng đư�
 ├── tests/                      # Bộ kiểm thử tự động (Unit & Integration tests)
 ├── package.json                # Cấu hình NPM với hook postinstall tự động
 └── README.md                   # Hướng dẫn sử dụng
-```
-
----
-
-## 🚀 Cài Đặt (Installation)
-
-Chỉ cần một lệnh duy nhất:
-
-### Cách 1: Cài đặt toàn cục cho cả máy (Khuyến nghị)
-Tự động quét và liên kết toàn bộ kỹ năng vào tất cả AI Agent trên máy tính của bạn:
-
-```bash
-npm install -g aizen-skills
-```
-*(Nếu bạn đã clone repository này về máy, chỉ cần chạy `npm install` ngay tại thư mục repo)*.
-
-### Cách 2: Cài đặt cho một dự án cụ thể (Project-level)
-Tạo thư mục `.agents/skills/`, `.cursor/rules/`, và cập nhật file `AGENTS.md` cho dự án:
-
-```bash
-npm install --save-dev aizen-skills
-# Hoặc chạy lệnh:
-npx aizen-skills install --project
-```
-
-### Cách 3: Chạy trực tiếp qua NPX (Không cần cài đặt trước)
-
-```bash
-npx aizen-skills sync
 ```
 
 ---
