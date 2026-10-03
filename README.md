@@ -84,6 +84,8 @@ Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông 
 - **`video-to-skill`**: Trích xuất tri thức từ YouTube thành Agent Skill.
 - **`agent-skill-tester`**: Công cụ kiểm thử tự động các Agent Skills.
 - **`tech-learning-tree`**: Xây dựng lộ trình học công nghệ.
+- **`skill-cloner`**: Nhân bản, tinh chỉnh và test một skill từ Github vào workspace.
+- **`skill-creator`**: Tạo và cải thiện skill mới với chuẩn cấu trúc Aizen, test A/B qua Artifacts.
 
 ### Kỹ năng Chiến lược (Master Skill)
 - **`cecilia-coding-skills`**: Một Siêu kỹ năng (Super-Agent) tự động điều phối toàn bộ vòng đời phần mềm. Nó được trang bị sẵn 11 Sub-agents bên trong thư mục `agents/` của nó, bao gồm:
