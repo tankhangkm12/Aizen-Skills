@@ -7,10 +7,10 @@ description: Cecilia's discovery role (v20). Onboard turns a codebase into label
 
 The foundation of `tensura/docs/` and of every task's `scope.json`: the truth about what exists and what is needed.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-discovery/workflow.md` (K0/Q0 on STANDARD/CONTROLLED: full rules and steps) ·
-mode guide below · `knowledge/cecilia/cecilia-discovery/onboard/confidence-labels.md` · `knowledge/cecilia/cecilia-discovery/traceability.md` ·
-`knowledge/cecilia/cecilia-discovery/decision-log.md` · templates in `knowledge/cecilia/cecilia-discovery/` · `tools/cecilia/capacity.py`.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/workflow.md` (K0/Q0 on STANDARD/CONTROLLED: full rules and steps) ·
+mode guide below · `references/onboard/confidence-labels.md` · `references/traceability.md` ·
+`references/decision-log.md` · templates in `assets/` · `scripts/capacity.py`.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -29,12 +29,12 @@ Reading source is free. **Touching a running system never is.**
 | Cecilia says | Mode | Guide |
 |---|---|---|
 | a one-line task (orchestrator O0) | **Scope** | S0–S2 → `tensura/tasks/<TASK>/scope.json`; facts measured, never asked (`workflow.md` §Scope) |
-| "onboard repo này", "hệ thống cũ", "dựng tài liệu từ code", legacy handover | **Onboard** | K0–K7 + `knowledge/cecilia/cecilia-discovery/onboard/` |
+| "onboard repo này", "hệ thống cũ", "dựng tài liệu từ code", legacy handover | **Onboard** | K0–K7 + `references/onboard/` |
 | "chỉ luồng thanh toán", "document service order" | **Onboard (slice)** | K0–K7 on one service/flow; the rest stated out of scope |
 | "hệ thống này là gì", need to understand before deciding | **Map only** | K0–K2 + system map |
-| "tài liệu cũ không khớp code" | **Reconcile** | K0–K2 → `knowledge/cecilia/cecilia-discovery/onboard/reconcile.md` |
-| "quy ước dự án", conventions, trước khi cho agent code repo lạ | **Conventions** | K0 + K2 → `knowledge/cecilia/cecilia-discovery/onboard/conventions.md` |
-| new idea, "viết SRS", "phân tích yêu cầu" | **Requirements** | Q0–Q6 + `knowledge/cecilia/cecilia-discovery/requirements/` |
+| "tài liệu cũ không khớp code" | **Reconcile** | K0–K2 → `references/onboard/reconcile.md` |
+| "quy ước dự án", conventions, trước khi cho agent code repo lạ | **Conventions** | K0 + K2 → `references/onboard/conventions.md` |
+| new idea, "viết SRS", "phân tích yêu cầu" | **Requirements** | Q0–Q6 + `references/requirements/` |
 
 Prefix every message: `[cecilia-discovery · K3 · order-svc]`.
 
@@ -61,8 +61,3 @@ ACs with a negative case) · Q4 CORE pass (failure paths in full) · Q5 quality 
 failing requirement is never counted as passing · Q6 report 🛑 G1.
 **Report:** full report → `tensura/reports/<TASK>/discovery.md`; chat ≤ 15 lines; update
 `tensura/tasks/<TASK>/state.md` at each stop. Handover contents per role (design, test, plan, review): `workflow.md`.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

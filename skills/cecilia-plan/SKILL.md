@@ -7,10 +7,10 @@ description: Cecilia's planning role (v20). From STANDARD 3 planners compete, cr
 
 Planning exists to reduce uncertainty, not to create paperwork.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-plan/workflow.md` (P0 on STANDARD/CONTROLLED: full rules, steps, §Consensus) ·
-`knowledge/cecilia/cecilia-plan/planning-method.md` (CONTROLLED plans) · `knowledge/cecilia/cecilia-plan/tracking.md` (Track) · `knowledge/cecilia/cecilia-plan/plan-template.md`
-(complex plans; not mandatory for daily work) · `knowledge/cecilia/common/{workspace,parallel,git,decisions,challenge,evidence,numbers}.md`.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/workflow.md` (P0 on STANDARD/CONTROLLED: full rules, steps, §Consensus) ·
+`references/planning-method.md` (CONTROLLED plans) · `references/tracking.md` (Track) · `assets/plan-template.md`
+(complex plans; not mandatory for daily work) · `references/common/{workspace,parallel,git,decisions,challenge,evidence,numbers}.md`.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -54,8 +54,3 @@ review + db/ui when on, before G2) · P4 handoff — STANDARD to the orchestrato
 G2 🛑 with the exact `cecilia mode controlled` / `cecilia approve tensura/plans/<plan>.md --all` commands,
 which the agent never runs · P5 report (file + ≤ 15 lines, `state.md`).
 **Track:** measured status; STANDARD "done / failing / next". **Adjust:** before → after; CONTROLLED → new G2 🛑.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

@@ -8,10 +8,10 @@ description: Cecilia's frontend developer (v20) — builds screens and component
 Build what `<app>-frontend.md` specifies against `<unit>-api.yaml` — without waiting for the backend or guessing
 what it returns. FAST/STANDARD inside Cecilia's task; CONTROLLED inside the approved scope.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-dev-fe/workflow.md` (F0 on STANDARD/CONTROLLED: full rules) · guides below
-(`visual-check.md` at F6, guidelines at F5) · `knowledge/cecilia/cecilia-dev-fe/style/<ui.style>.md` (when `ui.style` ≠ `none`) ·
-`tools/cecilia/uikit.py` (contrast, tokens, pixel diff) · `knowledge/cecilia/common/*.md` as `core-min.md` routes.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/workflow.md` (F0 on STANDARD/CONTROLLED: full rules) · guides below
+(`visual-check.md` at F6, guidelines at F5) · `references/style/<ui.style>.md` (when `ui.style` ≠ `none`) ·
+`scripts/uikit.py` (contrast, tokens, pixel diff) · `references/common/*.md` as `core-min.md` routes.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -46,14 +46,14 @@ CONTROLLED without scope → read/draft only.
 
 | When | Read |
 |---|---|
-| Always | `knowledge/cecilia/cecilia-dev-fe/code/principles.md` (§10) |
-| React / Next | `knowledge/cecilia/cecilia-dev-fe/stacks/frontend-react.md` |
-| API calls, errors, requestId, token refresh | `knowledge/cecilia/cecilia-dev-fe/code/api-contract.md` |
-| DOM/log secrets, token storage | `knowledge/cecilia/cecilia-dev-fe/code/security-logging.md` |
-| Before the PR | `knowledge/cecilia/cecilia-dev-fe/code/checklist.md` + `knowledge/cecilia/cecilia-dev-fe/web-interface-guidelines.md` |
-| Spec is a screenshot/mockup/sketch | `knowledge/cecilia/cecilia-dev-fe/image-to-code.md` |
-| Seeing the result per state, breakpoint | `knowledge/cecilia/cecilia-dev-fe/visual-check.md` |
-| Bug / refactor / scaffold / open choices / out of plan | `knowledge/cecilia/cecilia-dev-fe/workflows/` |
+| Always | `references/code/principles.md` (§10) |
+| React / Next | `references/stacks/frontend-react.md` |
+| API calls, errors, requestId, token refresh | `references/code/api-contract.md` |
+| DOM/log secrets, token storage | `references/code/security-logging.md` |
+| Before the PR | `references/code/checklist.md` + `references/web-interface-guidelines.md` |
+| Spec is a screenshot/mockup/sketch | `references/image-to-code.md` |
+| Seeing the result per state, breakpoint | `references/visual-check.md` |
+| Bug / refactor / scaffold / open choices / out of plan | `references/workflows/` |
 
 Repo conventions and the design system win.
 
@@ -63,12 +63,7 @@ Repo conventions and the design system win.
 challenge, open behaviours as questions · F3 brief (short plan; CONTROLLED scope → G2 🛑) ·
 F4 build on the generated mock, own port, commit each green step · F5 quality gate + budgets · F6 browser verify
 per `SCR` (≤ 3 fix rounds/screen; mock vs real API = findings) · F7 hand off 🛑: rebase, re-run F5,
-`tools/cecilia/cecilia_check.py --task <TASK>` (quote summary), PR body → `tensura/reports/<TASK>/pr-body.md`, report →
+`scripts/cecilia_check.py --task <TASK>` (quote summary), PR body → `tensura/reports/<TASK>/pr-body.md`, report →
 `tensura/reports/<TASK>/dev-fe.md` with `cecilia push` + `gh pr create --draft … --body-file` for Cecilia
 · F8 feedback one by one. **FAST lane:** tiny obvious UI change → minimal edit, focused check
 (+1 screenshot), self-review, report.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

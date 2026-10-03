@@ -9,11 +9,11 @@ Correct is not enough: an API can pass every contract test and still make each s
 sequential calls or reject every second checkout. Find those costs **with numbers**, before code when
 possible, and route each fix to its owner. Cecilia decides every contract change.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-api-ux/method.md` (always, at A1) · `knowledge/cecilia/cecilia-api-ux/consumer-journeys.md` (A3) ·
-`knowledge/cecilia/cecilia-api-ux/contention.md` (any lock, unique slot, stock, quota, reservation, rate limit) ·
-`knowledge/cecilia/cecilia-api-ux/dx-checklist.md` (A4) · `knowledge/cecilia/cecilia-api-ux/latency-failure.md` (A5) · `knowledge/cecilia/cecilia-api-ux/evolution.md`
-(contract change) · `tools/cecilia/apikit.py` · `tools/cecilia/capacity.py contention|throughput` · `knowledge/cecilia/common/numbers.md`.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/method.md` (always, at A1) · `references/consumer-journeys.md` (A3) ·
+`references/contention.md` (any lock, unique slot, stock, quota, reservation, rate limit) ·
+`references/dx-checklist.md` (A4) · `references/latency-failure.md` (A5) · `references/evolution.md`
+(contract change) · `scripts/apikit.py` · `scripts/capacity.py contention|throughput` · `references/common/numbers.md`.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -52,14 +52,9 @@ critical path, N+1, over/under-fetch.
 **A4 — DX.** `dx-checklist.md`: errors a client can act on, idempotency, pagination, formats, auth steps.
 **A5 — Contention & failure.** `contention.md` + `capacity.py contention` for every hot key; `latency-failure.md`
 for timeouts, partial failure, async work, cross-service consistency.
-**A6 — Report · 🛑.** `knowledge/cecilia/cecilia-api-ux/api-ux-report-template.md`: scorecard per task, `AUX-nn` findings ranked by
+**A6 — Report · 🛑.** `assets/api-ux-report-template.md`: scorecard per task, `AUX-nn` findings ranked by
 user impact, owner, acceptance. Chat reply ≤ 15 lines: verdict, top three, file path.
 **A7 — Re-check** after fixes: each `AUX-nn` → resolved (number) / not resolved / Cecilia accepted.
 
 Severity: **BLOCKER** (users lose money/data or a core task fails under expected load) · **SHOULD-FIX** ·
 **SUGGESTION** · **QUESTION**.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

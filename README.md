@@ -4,7 +4,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho tất cả các AI Agent phổ biến: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, **Cline / Roo Code**, và **Copilot**. 
-> Đặc biệt, toàn bộ kho lưu trữ này hoạt động như một **Native Antigravity Plugin** và đã được tích hợp sức mạnh siêu phân tách của hệ điều hành **Cecilia v20.2.0**.
+> Đặc biệt, toàn bộ kho lưu trữ này hoạt động như một **Native Antigravity Plugin** và đã được tích hợp sức mạnh của hệ điều hành **Cecilia v20.2.0**.
 
 ---
 
@@ -24,7 +24,7 @@ npx skills add tankhangkm12/Aizen-Skills
 ```
 
 ### Cách 2: Cài đặt toàn cục cho cả máy kèm Live-Sync (Khuyến nghị)
-Tự động quét đệ quy và liên kết toàn bộ kỹ năng, copy rules, đồng thời **đăng ký Aizen-Skills như một Plugin gốc** cho Antigravity trên máy tính của bạn:
+Tự động quét và liên kết toàn bộ kỹ năng, copy rules, đồng thời **đăng ký Aizen-Skills như một Plugin gốc** cho Antigravity trên máy tính của bạn:
 
 ```bash
 npm install -g aizen-skills
@@ -33,21 +33,32 @@ npm install -g aizen-skills
 
 ---
 
-## 📁 Kiến Trúc Phân Tách Siêu Rời (Decoupled Architecture)
+## 📁 Kiến Trúc Phẳng & Độc Lập (Self-Contained Anthropics Standard)
 
-Thư mục gốc được thiết kế theo cấu trúc cây chuyên biệt. Chúng tôi đã tách biệt hoàn toàn **Quy trình (Skills)**, **Công cụ (Tools)**, và **Tri thức (Knowledge)** để tối đa hóa khả năng mở rộng và giảm tải Context Window cho Agent:
+Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến trúc mở của **[anthropics/skills](https://github.com/anthropics/skills)**. Không có sự phụ thuộc chéo. Không có cấu trúc rườm rà. Mọi thứ là các Module độc lập (Self-contained).
 
 ```text
 .
-├── skills/                     # Quy trình làm việc (Chứa trực tiếp 18 folders độc lập theo chuẩn Anthropics)
-├── tools/                      # Các script thực thi (Python/JS) dùng chung cho Agent
-├── knowledge/                  # Cơ sở Tri thức (Kiến thức Domain, Code Standards, DB Rules)
+├── skills/                     # Thư mục cốt lõi chứa 18 skills độc lập
+│   ├── adversarial-code-reviewer/
+│   │   ├── SKILL.md            # Não bộ: Lệnh điều khiển (Prompt) của skill
+│   │   ├── scripts/            # Cơ bắp: Các công cụ thực thi nội bộ của riêng skill này
+│   │   └── references/         # Tri thức: Tài liệu, chuẩn mực của riêng skill này
+│   ├── cecilia-orchestrator/
+│   ├── cecilia-dev-be/
+│   ├── database-table-design/
+│   └── ... (Các skill khác với cấu trúc tương tự)
 ├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
 ├── plugin.json                 # Manifest khai báo Aizen-Skills là một Antigravity Plugin
 ├── bin/                        # Bộ cài đặt & CLI đa nền tảng
 ├── package.json                # Cấu hình NPM
 └── README.md                   # Hướng dẫn sử dụng
 ```
+
+**Tại sao lại là Self-Contained?**
+- **Dễ mang vác (Portable):** Bạn có thể copy đúng 1 thư mục skill (VD: `skills/cecilia-dev-be`) ném sang máy khác và nó sẽ chạy hoàn hảo vì mọi tri thức (`references/`) và công cụ (`scripts/`) đã nằm gọn bên trong nó.
+- **Tiến trình hiển vi (Progressive Disclosure):** Agent chỉ nạp tài liệu và công cụ của đúng Skill nó đang gọi. Không bao giờ bị quá tải bộ nhớ.
+- **Tính đóng gói (Encapsulation):** Gọn gàng, rõ ràng và là tiêu chuẩn công nghiệp của Anthropic.
 
 ---
 
@@ -56,47 +67,33 @@ Thư mục gốc được thiết kế theo cấu trúc cây chuyên biệt. Ch�
 Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông minh tại `rules/continuous-improvement.md`. Khi được đồng bộ vào máy, nó ép buộc mọi AI Agent phải tuân thủ:
 1. **Self-Evaluate**: Đánh giá độ hiệu quả của code/prompt ngay sau khi thực hiện xong task.
 2. **Proposal**: Tự động phát hiện điểm yếu, đề xuất cập nhật Công cụ, Kiến thức hoặc Quy trình.
-3. **Execution**: Nắm quyền tự cập nhật file, gọi script `sync` và `git push` lên nhánh `main` khi được bạn phê duyệt.
+3. **Execution**: Nắm quyền tự cập nhật file (trong `scripts/` hoặc `references/` của skill tương ứng), gọi lệnh `sync` và `git push` lên nhánh `main`.
 
 ---
 
 ## 📦 Danh Sách Kỹ Năng Sẵn Có (18 Skills)
 
-Các skills được phân loại khoa học vào từng nhóm chuyên môn:
+### Kỹ năng Chiến thuật (Aizen Native)
+- **`database-table-design`**: Thiết kế DB chuẩn 9 nguyên tắc Enterprise.
+- **`devsecops-pipeline-flow`**: Xây dựng CI/CD bảo mật đa nền tảng.
+- **`adversarial-code-reviewer`**: Đóng vai Hacker/Reviewer bắt lỗi logic và bảo mật.
+- **`video-to-skill`**: Trích xuất tri thức từ YouTube thành Agent Skill.
+- **`agent-skill-tester`**: Công cụ kiểm thử tự động các Agent Skills.
+- **`tech-learning-tree`**: Xây dựng lộ trình học công nghệ.
 
-### 💻 1. Lập Trình & Kỹ Thuật (`programming/`)
-| Kỹ năng | Mô tả |
-| :--- | :--- |
-| **`cecilia-dev-be`** | Lập trình viên Backend (Cecilia). Code logic, API, kết nối DB đảm bảo tính toàn vẹn và sạch sẽ. |
-| **`cecilia-dev-fe`** | Lập trình viên Frontend (Cecilia). Xây dựng UI Component và màn hình chính xác theo thiết kế. |
-| **`cecilia-ui`** | Designer UI (Cecilia). Phác thảo giao diện, hệ thống màu sắc và layout trước khi code. |
-| **`cecilia-api-ux`** | Chuyên gia review trải nghiệm API (Consumer role). Đánh giá tính thân thiện và bảo mật của API. |
-| **`cecilia-db`** | Chuyên gia CSDL (Cecilia). Tối ưu schema, index, và truy vấn chậm. |
-| **`database-table-design`** | Thiết kế bảng MySQL/RDBMS theo 9 nguyên tắc cốt lõi (tối ưu index, audit, partition). |
-| **`cecilia-devops`** | Kỹ sư DevOps (Cecilia). Viết CI/CD, Dockerfiles, compose, và giám sát hạ tầng. |
-| **`devsecops-pipeline-flow`** | Tự động lập kế hoạch và triển khai DevSecOps pipeline bảo mật đa nền tảng, 5 cổng kiểm soát. |
-| **`cecilia-review`** | Reviewer độc lập (Cecilia). Phân tích mã nguồn không thiên vị, bầu chọn duyệt code. |
-| **`adversarial-code-reviewer`** | Đóng vai reviewer phản biện độc lập, rà soát lỗ hổng logic, bảo mật và hiệu năng. |
-
-### 🔄 2. Quy Trình & Kiến Trúc (`workflow/`)
-| Kỹ năng | Mô tả |
-| :--- | :--- |
-| **`cecilia-orchestrator`** | Trái tim điều phối của Cecilia. Phân chia task, gọi agent phụ, quản lý quy trình. |
-| **`cecilia-plan`** | Kỹ sư quy hoạch (Planning). Cạnh tranh chéo giữa 3 agent để đưa ra kế hoạch code tối ưu nhất. |
-| **`cecilia-discovery`** | Kỹ sư khảo sát dự án (Discovery). Dựng bản đồ dự án hiện tại (as-built) làm cơ sở dữ liệu. |
-| **`cecilia-design`** | Kỹ sư thiết kế kiến trúc (Design). Chuyển hóa yêu cầu thành HLD, LLD, sequence diagrams. |
-
-### 🛠️ 3. Công Cụ & Kiểm Thử (`tools/`)
-| Kỹ năng | Mô tả |
-| :--- | :--- |
-| **`cecilia-test`** | Kỹ sư kiểm thử độc lập (Cecilia). Chạy test functional, integration, API dựa trên tiêu chuẩn. |
-| **`agent-skill-tester`** | Bộ công cụ kiểm thử độ chính xác, an toàn, và bảo mật của các AI Agent Skills. |
-| **`video-to-skill`** | Trích xuất tri thức từ YouTube/video thành một Agent Skill theo format chuẩn. |
-
-### 🎓 4. Học Tập (`education/`)
-| Kỹ năng | Mô tả |
-| :--- | :--- |
-| **`tech-learning-tree`** | Xây dựng lộ trình học tập công nghệ dạng cây phân cấp (Learning Tree) có cấu trúc. |
+### Kỹ năng Chiến lược (Cecilia OS)
+- **`cecilia-orchestrator`**: Giám đốc điều hành. Quản lý toàn bộ vòng đời phần mềm.
+- **`cecilia-plan`**: Lập kế hoạch kiến trúc.
+- **`cecilia-design`**: Thiết kế hệ thống (HLD, LLD).
+- **`cecilia-discovery`**: Đọc hiểu và phân tích dự án cũ (As-built).
+- **`cecilia-dev-be`**: Kỹ sư Backend.
+- **`cecilia-dev-fe`**: Kỹ sư Frontend.
+- **`cecilia-ui`**: Kỹ sư thiết kế giao diện (UI/UX).
+- **`cecilia-api-ux`**: Kiểm thử viên trải nghiệm API.
+- **`cecilia-db`**: Kỹ sư tối ưu Database.
+- **`cecilia-devops`**: Kỹ sư hạ tầng.
+- **`cecilia-review`**: Hội đồng đánh giá và bầu chọn mã nguồn.
+- **`cecilia-test`**: Kỹ sư kiểm thử tự động.
 
 ---
 

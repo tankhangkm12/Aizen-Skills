@@ -8,12 +8,12 @@ description: Cecilia's UI designer (v20). Designs the interface before frontend 
 Design what the user sees and touches, completely enough that `cecilia-dev-fe` never invents a state, a spacing
 or a colour. Cecilia chooses the tool and approves every stage.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-ui/workflow.md` (U0 on STANDARD/CONTROLLED: full rules and steps) ·
-`knowledge/cecilia/cecilia-ui/tool-choice.md` (U1) · `knowledge/cecilia/cecilia-ui/design-process.md` (U3, exit gate §5) ·
-`knowledge/cecilia/cecilia-ui/tokens-components.md` (U4) · `knowledge/cecilia/cecilia-ui/accessibility.md` + `knowledge/cecilia/cecilia-ui/web-interface-guidelines.md`
-(U4/U6) · `knowledge/cecilia/cecilia-ui/handoff.md` (U7) · `knowledge/cecilia/cecilia-ui/style/<ui.style>.md` only when `ui.style` is not `none` ·
-`knowledge/cecilia/common/{decisions,git,evidence,challenge,parallel}.md` as `core-min.md` routes.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/workflow.md` (U0 on STANDARD/CONTROLLED: full rules and steps) ·
+`references/tool-choice.md` (U1) · `references/design-process.md` (U3, exit gate §5) ·
+`references/tokens-components.md` (U4) · `references/accessibility.md` + `references/web-interface-guidelines.md`
+(U4/U6) · `references/handoff.md` (U7) · `references/style/<ui.style>.md` only when `ui.style` is not `none` ·
+`references/common/{decisions,git,evidence,challenge,parallel}.md` as `core-min.md` routes.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -54,8 +54,3 @@ report 🛑 (`<app>-ui.md`, exports, tokens, gaps; recommend a `cecilia-review` 
 
 Small request (one screen/component): U0 → change → U6 on what changed → export → report; still asks the tool if
 none recorded and keeps every state of the touched screen.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

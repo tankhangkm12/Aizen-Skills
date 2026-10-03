@@ -7,9 +7,9 @@ description: Cecilia's independent reviewer (v20), read-only; a panel lens, vote
 
 Find what is wrong, missing or risky, precisely enough to act on. Read-only; independence host-enforced.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when needed:** `knowledge/cecilia/cecilia-review/workflow.md` (R0) ·
-`knowledge/cecilia/cecilia-review/panel.md` (lens, vote, minutes) · `knowledge/cecilia/cecilia-review/` templates.
+**Read first:** `references/common/core-min.md`.
+**Open when needed:** `references/workflow.md` (R0) ·
+`references/panel.md` (lens, vote, minutes) · `assets/` templates.
 
 ## Authority
 
@@ -33,7 +33,7 @@ Find what is wrong, missing or risky, precisely enough to act on. Read-only; ind
 Severity: BLOCKER · SHOULD-FIX · SUGGESTION · QUESTION (security Critical/High = BLOCKER, Medium = SHOULD-FIX,
 Low = SUGGESTION). Verdict: PASS · CHANGES_REQUIRED · INCOMPLETE.
 
-## Modes and guides (`knowledge/cecilia/cecilia-review/`)
+## Modes and guides (`references/`)
 
 | Reviewing | mode | Guide |
 |---|---|---|
@@ -55,26 +55,21 @@ Low = SUGGESTION). Verdict: PASS · CHANGES_REQUIRED · INCOMPLETE.
 
 | Role | Output | Guide(s) |
 |---|---|---|
-| cecilia-discovery | requirements, as-built | `knowledge/cecilia/cecilia-review/review-design.md`, `review-asbuilt.md` |
-| cecilia-design | architecture, contract, FE, security | `knowledge/cecilia/cecilia-review/review-design.md`, `review-frontend.md` §1, `security/threat-model.md`, `security/authz-matrix.md` |
-| cecilia-plan | plan | `knowledge/cecilia/cecilia-review/review-plan.md` |
-| cecilia-db | DB doc, migrations, perf | `knowledge/cecilia/cecilia-review/review-database.md` |
-| cecilia-dev-be | backend code | `knowledge/cecilia/cecilia-review/review-code.md`, `code-standards.md`, `security/review-code-security.md` |
-| cecilia-dev-fe | frontend code | `knowledge/cecilia/cecilia-review/review-code.md`, `review-frontend.md` §2 |
-| cecilia-ui | UI doc, tokens | `knowledge/cecilia/cecilia-review/review-ui.md` |
-| cecilia-test | tests, runs | `knowledge/cecilia/cecilia-review/review-tests.md` |
-| cecilia-devops | pipelines, IaC, incidents, release | `knowledge/cecilia/cecilia-review/review-infra.md`, `review-release.md` |
-| cecilia-api-ux | API UX report | `knowledge/cecilia/cecilia-review/review-design.md`, `verify/verification-method.md` |
-| cecilia-orchestrator | briefings, packets | `knowledge/cecilia/cecilia-review/verify/verification-method.md` |
-| cecilia-extend | role/flow/lens proposals | `knowledge/cecilia/cecilia-review/review-design.md`, `verify/verification-method.md` |
+| cecilia-discovery | requirements, as-built | `references/review-design.md`, `review-asbuilt.md` |
+| cecilia-design | architecture, contract, FE, security | `references/review-design.md`, `review-frontend.md` §1, `security/threat-model.md`, `security/authz-matrix.md` |
+| cecilia-plan | plan | `references/review-plan.md` |
+| cecilia-db | DB doc, migrations, perf | `references/review-database.md` |
+| cecilia-dev-be | backend code | `references/review-code.md`, `code-standards.md`, `security/review-code-security.md` |
+| cecilia-dev-fe | frontend code | `references/review-code.md`, `review-frontend.md` §2 |
+| cecilia-ui | UI doc, tokens | `references/review-ui.md` |
+| cecilia-test | tests, runs | `references/review-tests.md` |
+| cecilia-devops | pipelines, IaC, incidents, release | `references/review-infra.md`, `review-release.md` |
+| cecilia-api-ux | API UX report | `references/review-design.md`, `verify/verification-method.md` |
+| cecilia-orchestrator | briefings, packets | `references/verify/verification-method.md` |
+| cecilia-extend | role/flow/lens proposals | `references/review-design.md`, `verify/verification-method.md` |
 
 ## Workflow (summary)
 
 `[cecilia-review · R2 · <TASK> @sha]` — R0 locate · R1 pin (target+SHA, oracle, depth) ·
 R2 read scope · R3 judge · R4 cross-check · R5 report 🛑 · re-review = delta since last
 reviewed SHA. Verify: dropped bad news = BLOCKER. Ends `Rules: <hash> (PR-ids applied)`.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

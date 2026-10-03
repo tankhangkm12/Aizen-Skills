@@ -7,10 +7,10 @@ description: Cecilia's design role (v20). Turns approved requirements into HLD, 
 
 Turn requirements into a design nobody has to guess from, and a contract FE and BE build against in parallel.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when the step needs it:** `knowledge/cecilia/cecilia-design/workflow.md` (step 1 on STANDARD/CONTROLLED) · stage guide below ·
-`knowledge/cecilia/cecilia-design/traceability.md` · `knowledge/cecilia/cecilia-design/decision-log.md` · `knowledge/cecilia/cecilia-design/backend/{architecture-options,core-flow-options,design-standards}.md`
-· `knowledge/cecilia/cecilia-design/frontend/fe-options.md` · `tools/cecilia/capacity.py` · `knowledge/cecilia/common/*.md` as `core-min.md` routes.
+**Read first:** `references/common/core-min.md`.
+**Open when the step needs it:** `references/workflow.md` (step 1 on STANDARD/CONTROLLED) · stage guide below ·
+`references/traceability.md` · `references/decision-log.md` · `references/backend/{architecture-options,core-flow-options,design-standards}.md`
+· `references/frontend/fe-options.md` · `scripts/capacity.py` · `references/common/*.md` as `core-min.md` routes.
 
 **Brief · lane · rules:** start from the `[cecilia-brief …]` header (none in STANDARD/CONTROLLED → ask the
 orchestrator) · obey `## Rules (must follow)` · outside your lane stop: `HANDOFF: needs <role> — <what>` · report
@@ -48,12 +48,12 @@ Forced jump → "Assumptions & risks" · prefix `[cecilia-design · S-LLD · ord
 
 | Stage | Output (path per `docs_layout`) | Guide · template |
 |---|---|---|
-| S-HLD | `architecture.md` (+ `<svc>-overview.md`) | `knowledge/cecilia/cecilia-design/backend/stage-hld.md` · `knowledge/cecilia/cecilia-design/architecture.md` |
-| S-LLD | `<module>-design.md` | `knowledge/cecilia/cecilia-design/backend/stage-lld.md` · `knowledge/cecilia/cecilia-design/module-design.md` |
-| S-DB | `<unit>-database.md`, while cecilia-db is off | `knowledge/cecilia/cecilia-design/backend/stage-db.md` · `knowledge/cecilia/cecilia-design/database.md` |
-| S-API | `<unit>-api.md` + `.yaml` | `knowledge/cecilia/cecilia-design/backend/stage-api.md` · `knowledge/cecilia/cecilia-design/api.md` |
-| S-FE | `<app>-frontend.md` | `knowledge/cecilia/cecilia-design/frontend/frontend-design.md` · `knowledge/cecilia/cecilia-design/frontend.md` |
-| S-SEC | `security.md` | `knowledge/cecilia/cecilia-design/security/threat-model.md`, `authz-matrix.md` · `knowledge/cecilia/cecilia-design/security.md` |
+| S-HLD | `architecture.md` (+ `<svc>-overview.md`) | `references/backend/stage-hld.md` · `assets/architecture.md` |
+| S-LLD | `<module>-design.md` | `references/backend/stage-lld.md` · `assets/module-design.md` |
+| S-DB | `<unit>-database.md`, while cecilia-db is off | `references/backend/stage-db.md` · `assets/database.md` |
+| S-API | `<unit>-api.md` + `.yaml` | `references/backend/stage-api.md` · `assets/api.md` |
+| S-FE | `<app>-frontend.md` | `references/frontend/frontend-design.md` · `assets/frontend.md` |
+| S-SEC | `security.md` | `references/security/threat-model.md`, `authz-matrix.md` · `assets/security.md` |
 
 **S-API done** = every endpoint has every error (code + status), auth + ownership, pagination, idempotency;
 valid `.yaml` → mock for dev-fe; challenged once by dev-fe; versioned. Then `cecilia-api-ux` reviews it as
@@ -66,8 +66,3 @@ consumers meet it → `AUX-nn`; contract changes stay Cecilia's.
 1 Locate (≤ 15 lines) · 2 Challenge upstream (2–4) · 3 Interview 🛑 · 4 Write (template) ·
 5 Exit gate: every row + evidence, never "all consistent" · 6 Report → `tensura/reports/<TASK>/design.md`,
 chat ≤ 15 lines, update `tensura/docs/README.md` · 7 Stop 🛑 — Cecilia approves (G1 for HIGH-risk). `state.md` at each stop.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

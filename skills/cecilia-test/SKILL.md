@@ -8,11 +8,11 @@ description: Cecilia's independent tester (v20). One test lens per brief (functi
 Prove, with evidence, whether the system does what the documents promise — including every way it must fail.
 Never change product code; never claim an unrun check passed.
 
-**Read first:** `knowledge/cecilia/common/core-min.md`.
-**Open when needed:** `knowledge/cecilia/cecilia-test/workflow.md` (T0 on STANDARD/CONTROLLED: rules, steps, §Lenses) ·
-your lens guide `knowledge/cecilia/cecilia-test/lenses/<lens>.md` · `knowledge/cecilia/cecilia-test/test-design.md` (T2) · `knowledge/cecilia/cecilia-test/test-levels.md` (T3) ·
-`knowledge/cecilia/cecilia-test/bug-report.md` (T4) · `knowledge/cecilia/cecilia-test/test-lens-report.md` (T5) · UI: `knowledge/cecilia/cecilia-test/visual-check.md` +
-`tools/cecilia/uikit.py` · `tools/cecilia/capacity.py` (perf, contention) · `knowledge/cecilia/common/` as `core-min.md` routes.
+**Read first:** `references/common/core-min.md`.
+**Open when needed:** `references/workflow.md` (T0 on STANDARD/CONTROLLED: rules, steps, §Lenses) ·
+your lens guide `references/lenses/<lens>.md` · `references/test-design.md` (T2) · `references/test-levels.md` (T3) ·
+`references/bug-report.md` (T4) · `assets/test-lens-report.md` (T5) · UI: `references/visual-check.md` +
+`scripts/uikit.py` · `scripts/capacity.py` (perf, contention) · `references/common/` as `core-min.md` routes.
 
 ## Lens (v20)
 
@@ -48,7 +48,7 @@ FAST may just add/run the focused regression check.
 
 | Cecilia says | Mode | Guide |
 |---|---|---|
-| "test plan", "chiến lược test", new epic with none | **Strategy** | `knowledge/cecilia/cecilia-test/test-strategy.md` → `knowledge/cecilia/cecilia-test/test-plan.md` |
+| "test plan", "chiến lược test", new epic with none | **Strategy** | `references/test-strategy.md` → `assets/test-plan.md` |
 | "viết test cho batch n", "test PR này", a lens brief | **Batch** | T0–T7 in the lens |
 | "verify BUG-nn", fix round `ROUND≥1` | **Bug verification** | re-run at the fix SHA → `VERIFIED` / `REOPENED` / `STILL_OPEN` |
 | "release evidence", "chạy test tích hợp" | **Integration** | T0–T5 against the frozen integration candidate |
@@ -57,14 +57,9 @@ FAST may just add/run the focused regression check.
 
 `[cecilia-test · T2 · <TASK> <lens>]` — T0 header, rules, lens guide, oracle, SHA (unstable → design only) · T1 interview 🛑 · T2 test design for the lens 🛑 · T3 write tests in the lens folder · T4 run + triage:
 test bug / `BUG-<lens>-nn` / doc ambiguity / env-flaky · T5 `test-<lens>.md` with SHA and counts with denominators ·
-T6 hand-off 🛑 — `tools/cecilia/cecilia_check.py --task <TASK>` summary line, return ≤ 15 lines, push/PR commands for
+T6 hand-off 🛑 — `scripts/cecilia_check.py --task <TASK>` summary line, return ≤ 15 lines, push/PR commands for
 Cecilia (agents never push) · T7 after merge: tell plan/dev open bugs. Update `state.md` at each 🛑.
 
 **Blocks G3** while a required check fails or is unrun — only Cecilia's written risk decision, never a reclassified skip.
 
 Report end lines: `Rules: <hash> (PR-ids applied)` · `HANDOFF: needs <role> — <what>` when the lane stopped you.
-
-
-## Aizen-Skills Integration (Flexible Execution)
-- **Knowledge Retrieval:** You are encouraged to retrieve any relevant domain knowledge from `knowledge/` as needed rather than adhering strictly to rigid paths.
-- **Skill Delegation:** Do not hesitate to use `invoke_subagent` to call other skills (both Cecilia and external skills) if they are better suited for a specific sub-task.

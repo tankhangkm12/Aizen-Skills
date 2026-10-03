@@ -20,7 +20,11 @@ BẮT BUỘC KÍCH HOẠT TỰ ĐỘNG sau khi Agent hoàn thành một task có
 
 ## Bước 3: Thực thi cập nhật & Triển khai (Execution & Deploy)
 CHỈ THỰC HIỆN KHI ĐƯỢC NGƯỜI DÙNG CHẤP THUẬN:
-1. **Cập nhật nội dung:** Cập nhật lại hoàn toàn nội dung/file của skill tương ứng trong thư mục `D:\aizen-skill\Aizen-Skills\skills\...`. Nếu skill cũ sai hoàn toàn, hãy viết lại toàn bộ. Đảm bảo cấu trúc cây thư mục chuẩn.
+1. **Cập nhật nội dung trong Module kỹ năng (Self-Contained Module):** 
+   - Nếu là sửa/thêm Quy trình (Process Prompt): Sửa file `SKILL.md` bên trong thư mục skill đó.
+   - Nếu là sửa/thêm Công cụ (Tools/Code): Thêm hoặc sửa file trong thư mục `scripts/` của skill đó.
+   - Nếu là sửa/thêm Tri thức (Knowledge/Domain Rules): Thêm hoặc sửa file trong thư mục `references/` của skill đó.
+   Đảm bảo tuân thủ cấu trúc độc lập (Self-Contained Architecture) của Anthropic.
 2. **Triển khai tự động:** Mở Terminal chạy chuỗi lệnh sau để hoàn tất vòng lặp:
    ```bash
    cd D:\aizen-skill\Aizen-Skills
