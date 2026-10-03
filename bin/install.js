@@ -280,6 +280,33 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
   }
 }
 
+// Cài đặt system-rules toàn cục cho Antigravity (Nếu có)
+function installGlobalRules(verbose = true) {
+  const rulesDir = path.join(rootDir, 'system-rules');
+  if (!fs.existsSync(rulesDir)) return;
+
+  const homedir = os.homedir();
+  const targetRulesDir = path.join(homedir, '.gemini', 'config', 'rules');
+
+  try {
+    fs.mkdirSync(targetRulesDir, { recursive: true });
+    const rules = fs.readdirSync(rulesDir).filter(f => f.endsWith('.md'));
+    
+    let count = 0;
+    for (const rule of rules) {
+      const src = path.join(rulesDir, rule);
+      const dest = path.join(targetRulesDir, rule);
+      fs.copyFileSync(src, dest);
+      count++;
+    }
+    if (verbose && count > 0) {
+      console.log(`  ✓ [Antigravity Rules] Đã sao chép ${count} system rules -> ${targetRulesDir}`);
+    }
+  } catch (err) {
+    if (verbose) console.warn(`  ! [Antigravity Rules] Lỗi: ${err.message}`);
+  }
+}
+
 // Entrypoint chính
 function runInstall(options = {}) {
   const isAuto = options.auto || process.argv.includes('--auto');
@@ -302,6 +329,7 @@ function runInstall(options = {}) {
   if (isGlobal) {
     console.log('[2] Đang tự động liên kết vào các AI Agent trên máy (Global Mode):');
     installGlobal(skills, true);
+    installGlobalRules(true);
   }
 
   if (isProject) {
