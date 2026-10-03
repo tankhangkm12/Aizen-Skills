@@ -1,8 +1,0 @@
-{
-  "name": "{{name}}",
-  "summary": "{{summary}}",
-  "rules_slot": "rules/flows/{{name}}.md",
-  "guide": "{{guide}}",
-  "steps": ["intake", "plan", "approve", "dispatch", "review", "handoff", "finish"],
-  "settings": {}
-}
