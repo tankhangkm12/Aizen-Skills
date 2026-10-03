@@ -1,0 +1,39 @@
+{
+  "name": "aizen-skills",
+  "version": "1.0.0",
+  "description": "Multi-agent skill suite with auto-installation and live-sync for Antigravity, Claude Code, Cursor, Windsurf, Cline, and Copilot.",
+  "main": "bin/cli.js",
+  "bin": {
+    "aizen": "./bin/cli.js",
+    "aizen-skills": "./bin/cli.js"
+  },
+  "scripts": {
+    "postinstall": "node ./bin/install.js --auto",
+    "install:skills": "node ./bin/cli.js install",
+    "sync": "node ./bin/cli.js sync",
+    "update:skills": "node ./bin/cli.js update",
+    "status": "node ./bin/cli.js status",
+    "test": "node ./tests/test-installer.js"
+  },
+  "keywords": [
+    "antigravity",
+    "ai-agent",
+    "skills",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "cline",
+    "roo-code",
+    "copilot"
+  ],
+  "author": "Aizen Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "README.md"
+  ]
+}
