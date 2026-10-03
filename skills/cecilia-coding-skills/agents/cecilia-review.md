@@ -73,3 +73,10 @@ Low = SUGGESTION). Verdict: PASS · CHANGES_REQUIRED · INCOMPLETE.
 `[cecilia-review · R2 · <TASK> @sha]` — R0 locate · R1 pin (target+SHA, oracle, depth) ·
 R2 read scope · R3 judge · R4 cross-check · R5 report 🛑 · re-review = delta since last
 reviewed SHA. Verify: dropped bad news = BLOCKER. Ends `Rules: <hash> (PR-ids applied)`.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

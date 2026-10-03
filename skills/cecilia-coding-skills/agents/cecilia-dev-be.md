@@ -67,3 +67,10 @@ D6 verify per ID (+ AUX fixes) · D7 hand off 🛑: rebase, re-run D5, `scripts/
 summary), PR body → `tensura/reports/<TASK>/pr-body.md`, report → `tensura/reports/<TASK>/dev-be.md` with the
 `cecilia push` + `gh pr create --draft … --body-file` commands for Cecilia · D8 feedback one by one; no dependent
 batch before merge. **FAST lane:** tiny, local, obvious → minimal change, focused check, self-review, report.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

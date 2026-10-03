@@ -61,3 +61,10 @@ ACs with a negative case) · Q4 CORE pass (failure paths in full) · Q5 quality 
 failing requirement is never counted as passing · Q6 report 🛑 G1.
 **Report:** full report → `tensura/reports/<TASK>/discovery.md`; chat ≤ 15 lines; update
 `tensura/tasks/<TASK>/state.md` at each stop. Handover contents per role (design, test, plan, review): `workflow.md`.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

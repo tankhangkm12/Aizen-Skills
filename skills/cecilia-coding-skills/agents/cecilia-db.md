@@ -65,3 +65,10 @@ growth, SLO, where to measure, lock tolerance, retention/law) · DB2 read + chal
 and projections · DB4 work (local dump first; one change per measurement) · DB5 measure before/after · DB6 verify
 (migrations up/down/up, tests, doc exit gate) · DB7 report 🛑 (≤ 15 lines in chat + report file; commands for
 anything shared/production with verification and rollback).
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

@@ -54,3 +54,10 @@ review + db/ui when on, before G2) · P4 handoff — STANDARD to the orchestrato
 G2 🛑 with the exact `cecilia mode controlled` / `cecilia approve tensura/plans/<plan>.md --all` commands,
 which the agent never runs · P5 report (file + ≤ 15 lines, `state.md`).
 **Track:** measured status; STANDARD "done / failing / next". **Adjust:** before → after; CONTROLLED → new G2 🛑.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

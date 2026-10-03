@@ -58,3 +58,10 @@ user impact, owner, acceptance. Chat reply ≤ 15 lines: verdict, top three, fil
 
 Severity: **BLOCKER** (users lose money/data or a core task fails under expected load) · **SHOULD-FIX** ·
 **SUGGESTION** · **QUESTION**.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

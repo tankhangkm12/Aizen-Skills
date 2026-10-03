@@ -67,3 +67,10 @@ gate · Y6 non-prod apply 🛑 A3 per action; prove service, rollback, telemetry
 mode=infra, `pr-body.md`, `scripts/cecilia_check.py --task <TASK>` summary line, `tensura/reports/<TASK>/devops.md`,
 return ≤ 15 lines, push/PR/apply commands for Cecilia · Y8 release packet → G4;
 Cecilia triggers; report health — never act. Update `state.md` at each 🛑.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

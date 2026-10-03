@@ -66,3 +66,10 @@ consumers meet it → `AUX-nn`; contract changes stay Cecilia's.
 1 Locate (≤ 15 lines) · 2 Challenge upstream (2–4) · 3 Interview 🛑 · 4 Write (template) ·
 5 Exit gate: every row + evidence, never "all consistent" · 6 Report → `tensura/reports/<TASK>/design.md`,
 chat ≤ 15 lines, update `tensura/docs/README.md` · 7 Stop 🛑 — Cecilia approves (G1 for HIGH-risk). `state.md` at each stop.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

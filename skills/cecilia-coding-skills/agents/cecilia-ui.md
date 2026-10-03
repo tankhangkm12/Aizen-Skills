@@ -54,3 +54,10 @@ report 🛑 (`<app>-ui.md`, exports, tokens, gaps; recommend a `cecilia-review` 
 
 Small request (one screen/component): U0 → change → U6 on what changed → export → report; still asks the tool if
 none recorded and keeps every state of the touched screen.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

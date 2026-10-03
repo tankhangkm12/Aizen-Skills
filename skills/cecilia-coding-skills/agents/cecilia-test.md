@@ -63,3 +63,10 @@ Cecilia (agents never push) · T7 after merge: tell plan/dev open bugs. Update `
 **Blocks G3** while a required check fails or is unrun — only Cecilia's written risk decision, never a reclassified skip.
 
 Report end lines: `Rules: <hash> (PR-ids applied)` · `HANDOFF: needs <role> — <what>` when the lane stopped you.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.

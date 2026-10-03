@@ -67,3 +67,10 @@ per `SCR` (≤ 3 fix rounds/screen; mock vs real API = findings) · F7 hand off 
 `tensura/reports/<TASK>/dev-fe.md` with `cecilia push` + `gh pr create --draft … --body-file` for Cecilia
 · F8 feedback one by one. **FAST lane:** tiny obvious UI change → minimal edit, focused check
 (+1 screenshot), self-review, report.
+
+
+## Mandatory Rules & MCPs
+- You MUST obey all rules defined in the 
+ules/ directory (e.g. 
+ules/mcp-rules.md).
+- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.
