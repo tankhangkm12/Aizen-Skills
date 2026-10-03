@@ -114,6 +114,7 @@ Hệ thống được thiết kế để hoạt động hoàn hảo 100% trên c
 | **`video-to-skill`** | Trích xuất tri thức từ video YouTube hoặc file video/audio local thành một Agent Skill tái sử dụng theo chuẩn. |
 | **`adversarial-code-reviewer`** | Đóng vai reviewer phản biện độc lập, rà soát lỗ hổng logic, bảo mật và hiệu năng. |
 | **`agent-skill-tester`** | Bộ công cụ tự động kiểm thử và đánh giá độ chính xác, an toàn của các Agent Skills. |
+| **`devsecops-pipeline-flow`** | Tự động lập kế hoạch và triển khai DevSecOps pipeline đa nền tảng (GitHub Actions, GitLab CI, Jenkins, ArgoCD), bảo mật secret, quét Gitleaks/Trivy/Semgrep, Docker Hub, Cloudflare và quy trình 5 cổng kiểm soát. |
 | **`tech-learning-tree`** | Xây dựng lộ trình học tập công nghệ dạng cây phân cấp (Learning Tree) có cấu trúc cho lập trình viên. |
 
 ---
