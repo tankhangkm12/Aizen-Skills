@@ -39,15 +39,15 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 
 ```text
 .
-├── skills/                     # Thư mục cốt lõi chứa 18 skills độc lập
+├── skills/                     # Thư mục cốt lõi chứa 7 skills độc lập
+│   ├── cecilia-coding-skills/  # (Master Skill) Tổ hợp 12 roles lập trình của Cecilia
+│   │   ├── SKILL.md            # Não bộ: Lệnh điều khiển của Orchestrator
+│   │   ├── agents/             # Các Sub-agents (Backend, Frontend, Tester, Planner...)
+│   │   ├── scripts/            # Cơ bắp: Công cụ điều phối (workflow.py, capacity.py...)
+│   │   └── references/         # Tri thức: Các chuẩn mực lập trình
 │   ├── adversarial-code-reviewer/
-│   │   ├── SKILL.md            # Não bộ: Lệnh điều khiển (Prompt) của skill
-│   │   ├── scripts/            # Cơ bắp: Các công cụ thực thi nội bộ của riêng skill này
-│   │   └── references/         # Tri thức: Tài liệu, chuẩn mực của riêng skill này
-│   ├── cecilia-orchestrator/
-│   ├── cecilia-dev-be/
-│   ├── database-table-design/
-│   └── ... (Các skill khác với cấu trúc tương tự)
+│   ├── devsecops-pipeline-flow/
+│   └── ... (Các skill chiến thuật khác)
 ├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
 ├── plugin.json                 # Manifest khai báo Aizen-Skills là một Antigravity Plugin
 ├── bin/                        # Bộ cài đặt & CLI đa nền tảng
@@ -81,19 +81,12 @@ Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông 
 - **`agent-skill-tester`**: Công cụ kiểm thử tự động các Agent Skills.
 - **`tech-learning-tree`**: Xây dựng lộ trình học công nghệ.
 
-### Kỹ năng Chiến lược (Cecilia OS)
-- **`cecilia-orchestrator`**: Giám đốc điều hành. Quản lý toàn bộ vòng đời phần mềm.
-- **`cecilia-plan`**: Lập kế hoạch kiến trúc.
-- **`cecilia-design`**: Thiết kế hệ thống (HLD, LLD).
-- **`cecilia-discovery`**: Đọc hiểu và phân tích dự án cũ (As-built).
-- **`cecilia-dev-be`**: Kỹ sư Backend.
-- **`cecilia-dev-fe`**: Kỹ sư Frontend.
-- **`cecilia-ui`**: Kỹ sư thiết kế giao diện (UI/UX).
-- **`cecilia-api-ux`**: Kiểm thử viên trải nghiệm API.
-- **`cecilia-db`**: Kỹ sư tối ưu Database.
-- **`cecilia-devops`**: Kỹ sư hạ tầng.
-- **`cecilia-review`**: Hội đồng đánh giá và bầu chọn mã nguồn.
-- **`cecilia-test`**: Kỹ sư kiểm thử tự động.
+### Kỹ năng Chiến lược (Master Skill)
+- **`cecilia-coding-skills`**: Một Siêu kỹ năng (Super-Agent) tự động điều phối toàn bộ vòng đời phần mềm. Nó được trang bị sẵn 11 Sub-agents bên trong thư mục `agents/` của nó, bao gồm:
+  - Lập kế hoạch & Thiết kế (`cecilia-plan`, `cecilia-design`)
+  - Lập trình (`cecilia-dev-be`, `cecilia-dev-fe`, `cecilia-ui`, `cecilia-db`)
+  - Kiểm thử & Triển khai (`cecilia-test`, `cecilia-api-ux`, `cecilia-devops`)
+  - Hội đồng duyệt (`cecilia-review`, `cecilia-discovery`)
 
 ---
 
