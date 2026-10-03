@@ -93,3 +93,9 @@ Ensure data integrity while balancing performance:
 - Do not create single-column indexes on boolean or small-range status flags; combine them with selective filters like timestamps or IDs.
 - Do not blindly use `SELECT *` on wide tables; adhere to the vertical partitioning model.
 - Always verify that all status values are documented in the table comment before deploying DDL.
+
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

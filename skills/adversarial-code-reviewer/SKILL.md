@@ -79,3 +79,9 @@ Format the final review using the following concise template:
 - Avoid rubber-stamping PRs that only have passing tests if the tests fail to assert real boundary conditions.
 - Do not let verbose PR summaries mask lack of test coverage or high-risk trunk modifications.
 - Keep review feedback actionable, specific, and grounded in code realities rather than abstract theory.
+
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

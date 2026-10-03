@@ -61,8 +61,8 @@ O0 intake (discovery) · O1 voted plan → options · O2 ONE card 🛑 (CONTROLL
 O3 build waves ‖ → integrate → test wave ‖ · O4 voted review → fix loop (≤ 3) · O5 A3 relay, push/PR 🛑 · O6 finish.
 
 
-## Mandatory Rules & MCPs
-- You MUST obey all rules defined in the 
-ules/ directory (e.g. 
-ules/mcp-rules.md).
-- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

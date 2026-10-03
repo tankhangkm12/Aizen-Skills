@@ -63,8 +63,8 @@ failing requirement is never counted as passing · Q6 report 🛑 G1.
 `tensura/tasks/<TASK>/state.md` at each stop. Handover contents per role (design, test, plan, review): `workflow.md`.
 
 
-## Mandatory Rules & MCPs
-- You MUST obey all rules defined in the 
-ules/ directory (e.g. 
-ules/mcp-rules.md).
-- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

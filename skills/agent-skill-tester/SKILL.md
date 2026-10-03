@@ -90,3 +90,9 @@ Based on evaluation results, apply targeted fixes:
 - Omitting negative controls: A skill that triggers too aggressively wastes context tokens on unrelated tasks.
 - Masked flaws due to smart models: Capable LLMs often work around broken skill instructions. Monitor logs for unnecessary retries and hidden inefficiencies.
 - Version control neglect: Always track skill files and test suites in Git to correlate evaluation changes with prompt modifications.
+
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

@@ -56,8 +56,8 @@ Small request (one screen/component): U0 → change → U6 on what changed → e
 none recorded and keeps every state of the touched screen.
 
 
-## Mandatory Rules & MCPs
-- You MUST obey all rules defined in the 
-ules/ directory (e.g. 
-ules/mcp-rules.md).
-- You MUST ALWAYS use the context7 and sequentialthinking MCP tools for technical projects and complex reasoning.
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.

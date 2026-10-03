@@ -75,3 +75,9 @@ Structure the resulting knowledge base in Notion using a strict hierarchical tre
 - Surface-level learning: Do not stop at basic CLI commands. Always uncover internal state management and execution flows.
 - Flat documentation: Avoid long unbroken walls of text. Preserve the tree hierarchy so dependencies and extensions branch logically from the core architecture.
 - Ignoring AI/MCP security boundaries: Always assess security implications such as credential leaks or unbounded tool execution when integrating with AI agents.
+
+
+## Mandatory Global Rules & Tools
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
+ules/ directory, if it exists.
+- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.
