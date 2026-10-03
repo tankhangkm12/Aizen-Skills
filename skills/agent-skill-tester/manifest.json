@@ -1,0 +1,6 @@
+{
+  "name": "agent-skill-tester",
+  "version": "1.0.0",
+  "description": "Aizen standardized skill for agent-skill-tester",
+  "framework": "Aizen Universal Structure"
+}

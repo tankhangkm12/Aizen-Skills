@@ -1,0 +1,6 @@
+{
+  "name": "devsecops-pipeline-flow",
+  "version": "1.0.0",
+  "description": "Aizen standardized skill for devsecops-pipeline-flow",
+  "framework": "Aizen Universal Structure"
+}

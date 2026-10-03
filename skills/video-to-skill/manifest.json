@@ -1,0 +1,6 @@
+{
+  "name": "video-to-skill",
+  "version": "1.0.0",
+  "description": "Aizen standardized skill for video-to-skill",
+  "framework": "Aizen Universal Structure"
+}
