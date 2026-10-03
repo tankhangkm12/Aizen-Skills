@@ -282,7 +282,7 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
 
 // Cài đặt system-rules toàn cục cho Antigravity (Nếu có)
 function installGlobalRules(verbose = true) {
-  const rulesDir = path.join(rootDir, 'system-rules');
+  const rulesDir = path.join(rootDir, 'rules');
   if (!fs.existsSync(rulesDir)) return;
 
   const homedir = os.homedir();
@@ -304,6 +304,22 @@ function installGlobalRules(verbose = true) {
     }
   } catch (err) {
     if (verbose) console.warn(`  ! [Antigravity Rules] Lỗi: ${err.message}`);
+  }
+}
+
+
+// Đăng ký toàn bộ repo như một Plugin cho Antigravity
+function installAntigravityPlugin(verbose = true) {
+  const homedir = os.homedir();
+  const pluginTarget = path.join(homedir, '.gemini', 'config', 'plugins', 'aizen-skills');
+  try {
+    fs.mkdirSync(path.dirname(pluginTarget), { recursive: true });
+    const res = createLink(rootDir, pluginTarget);
+    if (verbose && (res.status === 'linked' || res.status === 'already-linked')) {
+      console.log(`  ✓ [Antigravity Plugin] Đã đăng ký toàn bộ Aizen-Skills như một Plugin tại -> ${pluginTarget}`);
+    }
+  } catch (err) {
+    if (verbose) console.warn(`  ! [Antigravity Plugin] Lỗi: ${err.message}`);
   }
 }
 
@@ -330,6 +346,7 @@ function runInstall(options = {}) {
     console.log('[2] Đang tự động liên kết vào các AI Agent trên máy (Global Mode):');
     installGlobal(skills, true);
     installGlobalRules(true);
+    installAntigravityPlugin(true);
   }
 
   if (isProject) {

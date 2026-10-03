@@ -3,7 +3,8 @@
 [![skills.sh](https://skills.sh/b/tankhangkm12/Aizen-Skills)](https://skills.sh/tankhangkm12/Aizen-Skills)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho tất cả các AI Agent phổ biến: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, **Cline / Roo Code**, và **Copilot**.
+> Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho tất cả các AI Agent phổ biến: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, **Cline / Roo Code**, và **Copilot**. 
+> Đặc biệt, toàn bộ kho lưu trữ này hoạt động như một **Native Antigravity Plugin** và đã được tích hợp sức mạnh siêu phân tách của hệ điều hành **Cecilia v20.2.0**.
 
 ---
 
@@ -20,102 +21,96 @@ npx skills add tankhangkm12/Aizen-Skills --list
 
 # Cài đặt tất cả skills:
 npx skills add tankhangkm12/Aizen-Skills
-
-# Hoặc chỉ cài đặt một skill cụ thể (ví dụ database-table-design):
-npx skills add tankhangkm12/Aizen-Skills --skill database-table-design
 ```
 
 ### Cách 2: Cài đặt toàn cục cho cả máy kèm Live-Sync (Khuyến nghị)
-Tự động quét và liên kết toàn bộ kỹ năng vào tất cả AI Agent trên máy tính của bạn:
+Tự động quét đệ quy và liên kết toàn bộ kỹ năng, copy rules, đồng thời **đăng ký Aizen-Skills như một Plugin gốc** cho Antigravity trên máy tính của bạn:
 
 ```bash
 npm install -g aizen-skills
 ```
-*(Nếu bạn đã clone repository này về máy, chỉ cần chạy `npm install` ngay tại thư mục repo)*.
-
-### Cách 3: Cài đặt cho một dự án cụ thể (Project-level)
-Tạo thư mục `.agents/skills/`, `.cursor/rules/`, và cập nhật file `AGENTS.md` cho dự án:
-
-```bash
-npm install --save-dev aizen-skills
-# Hoặc chạy lệnh:
-npx aizen-skills install --project
-```
-
-### Cách 4: Chạy trực tiếp qua NPX (Không cần cài đặt trước)
-
-```bash
-npx aizen-skills sync
-```
+*(Nếu bạn đã clone repository này về máy, chỉ cần chạy `npm install` ngay tại thư mục repo hoặc gõ `node bin/cli.js sync`)*.
 
 ---
 
-## 📁 Cấu Trúc Kho Lưu Trữ (Clean Architecture)
+## 📁 Kiến Trúc Phân Tách Siêu Rời (Decoupled Architecture)
 
-Thư mục gốc được tối giản gọn gàng, toàn bộ kỹ năng được gom riêng vào thư mục `skills/`:
+Thư mục gốc được thiết kế theo cấu trúc cây chuyên biệt. Chúng tôi đã tách biệt hoàn toàn **Quy trình (Skills)**, **Công cụ (Tools)**, và **Tri thức (Knowledge)** để tối đa hóa khả năng mở rộng và giảm tải Context Window cho Agent:
 
 ```text
 .
-├── skills/                     # Thư mục chứa toàn bộ các AI Agent skills
-│   ├── adversarial-code-reviewer
-│   ├── agent-skill-tester
-│   ├── database-table-design
-│   ├── tech-learning-tree
-│   └── video-to-skill
-├── bin/                        # Bộ cài đặt & CLI đa nền tảng (Windows / Linux / macOS)
-│   ├── cli.js
-│   ├── install.js
-│   ├── updater.js
-│   └── agents-config.js
-├── tests/                      # Bộ kiểm thử tự động (Unit & Integration tests)
-├── package.json                # Cấu hình NPM với hook postinstall tự động
+├── skills/                     # Quy trình làm việc (Chỉ chứa file cấu trúc các bước thực thi)
+│   ├── programming/            # Lập trình & Kỹ thuật
+│   ├── workflow/               # Quy trình & Điều phối 
+│   ├── education/              # Học tập & Đào tạo
+│   └── tools/                  # Kiểm thử (Testing & Builders)
+├── tools/                      # Các script thực thi (Python/JS) dùng chung cho Agent
+├── knowledge/                  # Cơ sở Tri thức (Kiến thức Domain, Code Standards, DB Rules)
+├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
+├── plugin.json                 # Manifest khai báo Aizen-Skills là một Antigravity Plugin
+├── bin/                        # Bộ cài đặt & CLI đa nền tảng
+├── package.json                # Cấu hình NPM
 └── README.md                   # Hướng dẫn sử dụng
 ```
 
 ---
 
-## ⚡ Tối Ưu Cho Cả Windows và Linux (Cross-Platform)
+## 🔄 Vòng Lặp Cải Thiện Liên Tục (Continuous Improvement Loop)
 
-Hệ thống được thiết kế để hoạt động hoàn hảo 100% trên cả **Windows** và **Linux / macOS**:
-
-1. **Trên Windows:**
-   - Sử dụng cơ chế **NTFS Directory Junction** (`mklink /J` qua `fs.symlinkSync(..., 'junction')`).
-   - **Ưu điểm vượt trội:** Hoạt động ngay lập tức, **hoàn toàn không cần quyền Administrator**, không yêu cầu bật Windows Developer Mode.
-   - Tự động nhận diện và sửa chữa các broken/dangling junctions.
-
-2. **Trên Linux & macOS:**
-   - Sử dụng **Symbolic Links** (`ln -s` qua `fs.symlinkSync(..., 'dir')`).
-   - Tự động thiết lập quyền thực thi (`chmod 755`) cho các file scripts (.sh, .py, .js) để tránh lỗi `Permission Denied` khi Agent gọi công cụ.
-   - Hỗ trợ tự động cấu hình **crontab** với `process.execPath` cho lịch cập nhật tự động.
-
-3. **Cơ Chế Live-Sync:**
-   - Các Agent đọc trực tiếp từ thư mục nguồn. Khi bạn chạy `git pull` hoặc `npm update`, toàn bộ AI Agent trên máy **lập tức nhận được cập nhật mới nhất ngay tức thì** mà không cần sao chép thủ công.
+Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông minh tại `rules/continuous-improvement.md`. Khi được đồng bộ vào máy, nó ép buộc mọi AI Agent phải tuân thủ:
+1. **Self-Evaluate**: Đánh giá độ hiệu quả của code/prompt ngay sau khi thực hiện xong task.
+2. **Proposal**: Tự động phát hiện điểm yếu, đề xuất cập nhật Công cụ, Kiến thức hoặc Quy trình.
+3. **Execution**: Nắm quyền tự cập nhật file, gọi script `sync` và `git push` lên nhánh `main` khi được bạn phê duyệt.
 
 ---
 
-## 🤖 Các AI Agent Được Hỗ Trợ
+## 📦 Danh Sách Kỹ Năng Sẵn Có (18 Skills)
 
-| AI Agent | Vị trí cài đặt Toàn cục (Global) | Vị trí cài đặt Dự án (Project) |
-| :--- | :--- | :--- |
-| **Google Antigravity / Gemini CLI** | `~/.gemini/config/skills/<skill-name>` | `.agents/skills/<skill-name>` |
-| **Claude Code** | `~/.claude/skills/<skill-name>` | `.claude/skills/<skill-name>` |
-| **Cursor** | `~/.cursor/skills/<skill-name>` | `.cursor/rules/<skill-name>.mdc` |
-| **Windsurf** | `~/.codeium/windsurf/memories/` | `.windsurfrules` |
-| **Cline / Roo Code** | Custom Instructions | `.clinerules` |
-| **Universal Agents** | Standard Agent Path | `AGENTS.md` (Skills Index) |
+Các skills được phân loại khoa học vào từng nhóm chuyên môn:
 
----
-
-## 📦 Danh Sách Kỹ Năng Sẵn Có trong `skills/`
-
+### 💻 1. Lập Trình & Kỹ Thuật (`programming/`)
 | Kỹ năng | Mô tả |
 | :--- | :--- |
-| **`database-table-design`** | Áp dụng 9 nguyên tắc cốt lõi và best practices khi thiết kế bảng MySQL/RDBMS, tối ưu hóa index, phân vùng dọc, và audit columns. |
-| **`video-to-skill`** | Trích xuất tri thức từ video YouTube hoặc file video/audio local thành một Agent Skill tái sử dụng theo chuẩn. |
+| **`cecilia-dev-be`** | Lập trình viên Backend (Cecilia). Code logic, API, kết nối DB đảm bảo tính toàn vẹn và sạch sẽ. |
+| **`cecilia-dev-fe`** | Lập trình viên Frontend (Cecilia). Xây dựng UI Component và màn hình chính xác theo thiết kế. |
+| **`cecilia-ui`** | Designer UI (Cecilia). Phác thảo giao diện, hệ thống màu sắc và layout trước khi code. |
+| **`cecilia-api-ux`** | Chuyên gia review trải nghiệm API (Consumer role). Đánh giá tính thân thiện và bảo mật của API. |
+| **`cecilia-db`** | Chuyên gia CSDL (Cecilia). Tối ưu schema, index, và truy vấn chậm. |
+| **`database-table-design`** | Thiết kế bảng MySQL/RDBMS theo 9 nguyên tắc cốt lõi (tối ưu index, audit, partition). |
+| **`cecilia-devops`** | Kỹ sư DevOps (Cecilia). Viết CI/CD, Dockerfiles, compose, và giám sát hạ tầng. |
+| **`devsecops-pipeline-flow`** | Tự động lập kế hoạch và triển khai DevSecOps pipeline bảo mật đa nền tảng, 5 cổng kiểm soát. |
+| **`cecilia-review`** | Reviewer độc lập (Cecilia). Phân tích mã nguồn không thiên vị, bầu chọn duyệt code. |
 | **`adversarial-code-reviewer`** | Đóng vai reviewer phản biện độc lập, rà soát lỗ hổng logic, bảo mật và hiệu năng. |
-| **`agent-skill-tester`** | Bộ công cụ tự động kiểm thử và đánh giá độ chính xác, an toàn của các Agent Skills. |
-| **`devsecops-pipeline-flow`** | Tự động lập kế hoạch và triển khai DevSecOps pipeline đa nền tảng (GitHub Actions, GitLab CI, Jenkins, ArgoCD), bảo mật secret, quét Gitleaks/Trivy/Semgrep, Docker Hub, Cloudflare và quy trình 5 cổng kiểm soát. |
-| **`tech-learning-tree`** | Xây dựng lộ trình học tập công nghệ dạng cây phân cấp (Learning Tree) có cấu trúc cho lập trình viên. |
+
+### 🔄 2. Quy Trình & Kiến Trúc (`workflow/`)
+| Kỹ năng | Mô tả |
+| :--- | :--- |
+| **`cecilia-orchestrator`** | Trái tim điều phối của Cecilia. Phân chia task, gọi agent phụ, quản lý quy trình. |
+| **`cecilia-plan`** | Kỹ sư quy hoạch (Planning). Cạnh tranh chéo giữa 3 agent để đưa ra kế hoạch code tối ưu nhất. |
+| **`cecilia-discovery`** | Kỹ sư khảo sát dự án (Discovery). Dựng bản đồ dự án hiện tại (as-built) làm cơ sở dữ liệu. |
+| **`cecilia-design`** | Kỹ sư thiết kế kiến trúc (Design). Chuyển hóa yêu cầu thành HLD, LLD, sequence diagrams. |
+
+### 🛠️ 3. Công Cụ & Kiểm Thử (`tools/`)
+| Kỹ năng | Mô tả |
+| :--- | :--- |
+| **`cecilia-test`** | Kỹ sư kiểm thử độc lập (Cecilia). Chạy test functional, integration, API dựa trên tiêu chuẩn. |
+| **`agent-skill-tester`** | Bộ công cụ kiểm thử độ chính xác, an toàn, và bảo mật của các AI Agent Skills. |
+| **`video-to-skill`** | Trích xuất tri thức từ YouTube/video thành một Agent Skill theo format chuẩn. |
+
+### 🎓 4. Học Tập (`education/`)
+| Kỹ năng | Mô tả |
+| :--- | :--- |
+| **`tech-learning-tree`** | Xây dựng lộ trình học tập công nghệ dạng cây phân cấp (Learning Tree) có cấu trúc. |
+
+---
+
+## ⚡ Tối Ưu Cho Cả Windows và Linux (Cross-Platform)
+
+Hệ thống hoạt động hoàn hảo 100% trên mọi HĐH:
+1. **Windows:** Cơ chế **NTFS Directory Junction** cực nhanh, không cần quyền Admin.
+2. **Linux & macOS:** **Symbolic Links** tự động cấp quyền thực thi (`chmod 755`) cho các scripts.
+3. **Native Plugin:** Repo được định nghĩa là một Antigravity Plugin chuẩn.
+4. **Live-Sync:** Sửa file ở repo gốc ➔ Toàn bộ Agent trên máy tự động cập nhật ngay tức thì.
 
 ---
 
@@ -123,7 +118,7 @@ Hệ thống được thiết kế để hoạt động hoàn hảo 100% trên c
 
 ```bash
 aizen status          # Kiểm tra trạng thái liên kết của các Agent
-aizen sync            # Đồng bộ lại toàn bộ skills vào các Agent
+aizen sync            # Đồng bộ đệ quy toàn bộ skills, rules & plugins vào hệ thống
 aizen update          # Kiểm tra và tải bản cập nhật mới nhất
 aizen auto-update     # Bật/tắt lịch cập nhật ngầm hàng ngày (Windows task / Linux cron)
 aizen help            # Xem hướng dẫn chi tiết

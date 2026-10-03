@@ -1,6 +1,6 @@
 ---
 name: adversarial-code-reviewer
-description: Review code, pull requests (PRs), git diffs, or code changes using an independent adversarial reviewer perspective based on blast radius, gating, and agentic validation. Use when the user asks to review code, audit a PR, evaluate AI-generated code, check diffs, or review pull requests.
+description: Review code, pull requests (PRs), git diffs, or code changes using an independent adversarial reviewer perspective based on blast radius, gating, and agentic validation. Use when the user asks to review code, audit a PR, evaluate AI-generated code, check diffs, or review pull requests. DO NOT use when the user is asking you to write new features, scaffold projects, or wants general programming tutorials without providing code to review.
 ---
 
 # Adversarial Code Reviewer
