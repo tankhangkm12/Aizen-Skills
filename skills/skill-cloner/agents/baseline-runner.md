@@ -6,4 +6,3 @@ Do not attempt to fix or improve the skill. Just run it as specified and output 
 ## Mandatory Global Rules & Tools
 - **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
 ules/ directory, if it exists.
-- **MCP Usage:** For any technical task, planning, design, or skill cloning, you MUST ALWAYS use the context7 and sequentialthinking MCP tools. Do not bypass them.
