@@ -39,15 +39,19 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 
 ```text
 .
-├── skills/                     # Thư mục cốt lõi chứa 7 skills độc lập
-│   ├── cecilia-coding-skills/  # (Master Skill) Tổ hợp 12 roles lập trình của Cecilia
-│   │   ├── SKILL.md            # Não bộ: Lệnh điều khiển của Orchestrator
-│   │   ├── agents/             # Các Sub-agents (Backend, Frontend, Tester, Planner...)
-│   │   ├── scripts/            # Cơ bắp: Công cụ điều phối (workflow.py, capacity.py...)
-│   │   └── references/         # Tri thức: Các chuẩn mực lập trình
-│   ├── adversarial-code-reviewer/
-│   ├── devsecops-pipeline-flow/
-│   └── ... (Các skill chiến thuật khác)
+├── skills/                     # Thư mục cốt lõi chứa 8 skills độc lập
+│   ├── cecilia-coding-skills/  # Ví dụ về một Skill chuẩn Aizen
+│   │   ├── SKILL.md            # (Bắt buộc) Não bộ: Lệnh điều khiển chính của Agent
+│   │   ├── manifest.json       # (Bắt buộc) Khai báo Metadata và Version
+│   │   ├── rules/              # (Bắt buộc) Các luật thép (VD: mcp.md ép dùng công cụ)
+│   │   ├── agents/             # (Bắt buộc) Chứa prompt của các Sub-agents con
+│   │   ├── references/         # (Bắt buộc) Kho tri thức, tài liệu chuyên ngành
+│   │   ├── tools/              # (Bắt buộc) Các công cụ (Tool definitions)
+│   │   ├── scripts/            # (Bắt buộc) Các mã nguồn thực thi (Python, JS)
+│   │   └── assets/             # (Bắt buộc) Các file tĩnh, template
+│   ├── skill-cloner/           # (Tương tự, đầy đủ 8 thành phần)
+│   ├── devsecops-pipeline-flow/# (Tương tự, đầy đủ 8 thành phần)
+│   └── ... 
 ├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
 ├── plugin.json                 # Manifest khai báo Aizen-Skills là một Antigravity Plugin
 ├── bin/                        # Bộ cài đặt & CLI đa nền tảng
@@ -55,10 +59,10 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 └── README.md                   # Hướng dẫn sử dụng
 ```
 
-**Tại sao lại là Self-Contained?**
-- **Dễ mang vác (Portable):** Bạn có thể copy đúng 1 thư mục skill (VD: `skills/cecilia-dev-be`) ném sang máy khác và nó sẽ chạy hoàn hảo vì mọi tri thức (`references/`) và công cụ (`scripts/`) đã nằm gọn bên trong nó.
-- **Tiến trình hiển vi (Progressive Disclosure):** Agent chỉ nạp tài liệu và công cụ của đúng Skill nó đang gọi. Không bao giờ bị quá tải bộ nhớ.
-- **Tính đóng gói (Encapsulation):** Gọn gàng, rõ ràng và là tiêu chuẩn công nghiệp của Anthropic.
+**Tại sao phải là Aizen Universal Structure?**
+- **Đồng nhất tuyệt đối (Convention over Configuration):** Mọi skill đều phải có đủ 8 thành phần này dù bên trong trống rỗng. Agent sẽ không bao giờ bị lạc lối khi nhảy từ skill này sang skill khác.
+- **Tiến trình hiển vi (Progressive Disclosure):** Tách bạch rõ ràng giữa lệnh điều khiển (`SKILL.md`), tri thức (`references/`) và luật lệ (`rules/`).
+- **Dễ mang vác (Portable):** Bạn có thể copy đúng 1 thư mục skill ném sang máy khác và nó sẽ chạy hoàn hảo vì nó đã "Tự đóng gói" (Self-contained).
 
 ---
 
