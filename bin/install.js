@@ -52,12 +52,17 @@ function parseSkillMetadata(skillPath) {
 }
 
 // Quét toàn bộ skills hợp lệ (ưu tiên thư mục 'skills/', sau đó là root)
-function discoverSkills() {
-  const baseDir = fs.existsSync(skillsDir) ? skillsDir : rootDir;
+function discoverSkills(currentDir) {
+  const baseDir = currentDir || (fs.existsSync(skillsDir) ? skillsDir : rootDir);
   const ignored = new Set(['.git', '.github', 'bin', 'node_modules', 'tests', 'dist', 'out']);
-  const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+  let entries;
+  try {
+    entries = fs.readdirSync(baseDir, { withFileTypes: true });
+  } catch (e) {
+    return [];
+  }
 
-  const skills = [];
+  let skills = [];
   for (const entry of entries) {
     if (entry.isDirectory() && !ignored.has(entry.name) && !entry.name.startsWith('.')) {
       const skillPath = path.join(baseDir, entry.name);
@@ -69,6 +74,8 @@ function discoverSkills() {
           description: meta ? meta.description : '',
           path: path.resolve(skillPath)
         });
+      } else {
+        skills = skills.concat(discoverSkills(skillPath));
       }
     }
   }
