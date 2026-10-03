@@ -1,6 +1,6 @@
 ---
 name: devsecops-pipeline-flow
-description: Plan, scaffold, and deploy automated DevSecOps CI/CD pipelines (GitHub Actions, GitLab CI, Jenkins, ArgoCD GitOps) with containerization, Docker Hub push, secret protection, security scanning (Gitleaks, Trivy, Semgrep/SonarQube), Cloudflare MCP domain exposure, and strict 5-stage confirmation gates (4.1 to 4.5). Use whenever the user asks to setup CI/CD, deploy DevSecOps pipelines, build Docker container pipelines, configure runner environments, or secure deployment workflows.
+description: Plan, scaffold, and deploy automated DevSecOps CI/CD pipelines (GitHub Actions, GitLab CI, Jenkins, ArgoCD GitOps) with containerization, Docker Hub push, secret protection, security scanning (Gitleaks, Trivy, Semgrep/SonarQube), Cloudflare MCP domain exposure, and strict 5-stage confirmation gates (4.1 to 4.5). Use whenever the user asks to setup, build, configure, or deploy DevSecOps pipelines, Docker container pipelines, runner environments, or secure deployment workflows. Do not trigger for purely conceptual DevOps theory inquiries.
 ---
 
 # DevSecOps Pipeline Flow
@@ -92,8 +92,9 @@ Each of the following sub-steps requires its own explicit confirmation:
 - Generate production-grade, multi-stage `Dockerfile` following `references/dockerhub-guidelines.md`.
 - Generate CI/CD workflow file using helper:
   ```bash
-  python scripts/scaffold_pipeline.py --engine github-actions --app <app-type> --dockerhub <repo>
+  python scripts/scaffold_pipeline.py --engine github-actions --stack <nodejs|python|golang> --dockerhub <repo> --compose
   ```
+  *(Note: `--app` is supported as an alias for `--stack`. Use `--compose` to generate a production `docker-compose.yml` pre-configured with Cloudflare Tunnel).*
 - Identify mandatory secrets using `scripts/secret_helper.py`:
   * `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (Personal Access Token).
   * `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (for VPS) or `KUBECONFIG` (for K8s).
