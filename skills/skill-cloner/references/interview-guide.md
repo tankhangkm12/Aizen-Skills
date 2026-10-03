@@ -9,12 +9,11 @@ Hãy sử dụng cẩm nang phỏng vấn này sau khi đã tải skill gốc v�
 - Nắm bắt được: Nhiệm vụ chính của skill này là gì? Nó đang tuân theo chuẩn mực gì? Đầu ra của nó là gì?
 
 ## 2. Phỏng vấn User (Grill the User)
-Hãy đặt ra tối đa 3-4 câu hỏi sắc bén nhất (không hỏi lan man) để tìm ra khoảng cách giữa "Skill Gốc" và "Nhu cầu của User". Xoáy sâu vào các điểm sau:
-- **Quy trình (Process):** "Skill gốc đang chia làm 3 bước (A -> B -> C). Bạn có muốn thêm bước kiểm duyệt nào không? Hay muốn bỏ bớt bước nào cho nhanh?"
-- **Luật lệ (Rules & Knowledge):** "Skill này yêu cầu tuân thủ chuẩn X. Nhưng trong dự án của bạn, có quy định riêng nào về naming convention, thư viện cấm dùng, hay format đầu ra không?"
-- **Chức năng (Features):** "Bạn có muốn skill này tích hợp thêm công cụ nào (vd: bắt buộc xài Context7, hay tự động gọi lệnh terminal) không?"
-
-*Lưu ý khi hỏi:* Đừng hỏi câu mở kiểu "Bạn muốn gì?". Hãy đưa ra GỢI Ý cụ thể dựa trên việc bạn đã đọc code của skill gốc. VD: "Tôi thấy skill gốc đang dùng Python script để check lỗi. Bạn có muốn đổi sang xài ESLint cho dự án JS của bạn không?"
+Hãy đặt ra tối đa 3-4 câu hỏi sắc bén nhất để tìm ra khoảng cách giữa "Skill Gốc" và "Nhu cầu của User". Xoáy sâu vào các điểm sau:
+- **Quy trình (Process):** "Skill gốc đang chia làm 3 bước. Bạn có muốn thêm/bớt bước nào không?"
+- **Luật lệ (Rules & Knowledge):** "Có quy định riêng nào về naming convention hay thư viện cấm dùng không?"
+- **Chức năng (Features):** "Bạn có muốn skill này tích hợp thêm công cụ nào không?"
+- **ĐẶC BIỆT (Sample Test Case):** "Hãy cung cấp cho tôi một Yêu cầu bài toán mẫu (Ví dụ: 'Hãy dùng skill này để đọc file PDF X và tóm tắt theo format Y'). Tôi sẽ dùng bài toán này để cho 2 con AI thi đấu với nhau (1 con xài skill gốc, 1 con xài skill mới) để chứng minh skill mới xịn hơn."
 
 ## 3. Thực thi Tinh chỉnh (Customization)
 Sau khi User trả lời, hãy sửa đổi nội dung của skill mới:

@@ -26,13 +26,22 @@ You are the `skill-cloner`. Your job is to fetch an existing skill from anywhere
    - DO NOT just ask "what do you want". Propose concrete changes based on the skill's original logic.
    - Wait for the user's response.
 
-4. **Step 4: Execute Customization**
+4. **Step 4: Execute Customization & Backup**
+   - BEFORE changing anything, copy the cloned skill folder to `skills/<dest_skill_name>_baseline` (using `cp -r`).
    - Modify the files inside `skills/<dest_skill_name>` according to the user's answers.
-   - Add/Remove steps in `SKILL.md`.
-   - Update `references/` for domain rules.
-   - Modify `scripts/` if tool logic needs changing.
+   - Update `SKILL.md`, `references/`, and `scripts/`.
 
-5. **Step 5: Sync and Push**
+5. **Step 5: A/B Testing & Evaluation**
+   - Use `invoke_subagent` to spawn TWO subagents simultaneously:
+     - Subagent A (Baseline): Tell it to act as the baseline skill by reading `skills/<dest_skill_name>_baseline/SKILL.md` and executing the user's Sample Test Case.
+     - Subagent B (Improved): Tell it to act as the improved skill by reading `skills/<dest_skill_name>/SKILL.md` and executing the exact same Sample Test Case.
+   - Wait for both to finish. Compare their outputs.
+   - Did Subagent B successfully apply the user's new rules? Is the output genuinely better/more aligned with the user's needs than Subagent A?
+   - If Subagent B fails or produces worse results, go back to Step 4, fix the code/prompt, and re-test.
+   - Once verified, clean up: `rm -rf skills/<dest_skill_name>_baseline`.
+   - Present the comparison (Original vs Improved) to the user as proof of success.
+
+6. **Step 6: Sync and Push**
    - Once the user is satisfied, run:
      ```bash
      cd D:\aizen-skill\Aizen-Skills
