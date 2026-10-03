@@ -39,11 +39,7 @@ Thư mục gốc được thiết kế theo cấu trúc cây chuyên biệt. Ch�
 
 ```text
 .
-├── skills/                     # Quy trình làm việc (Chỉ chứa file cấu trúc các bước thực thi)
-│   ├── programming/            # Lập trình & Kỹ thuật
-│   ├── workflow/               # Quy trình & Điều phối 
-│   ├── education/              # Học tập & Đào tạo
-│   └── tools/                  # Kiểm thử (Testing & Builders)
+├── skills/                     # Quy trình làm việc (Chứa trực tiếp 18 folders độc lập theo chuẩn Anthropics)
 ├── tools/                      # Các script thực thi (Python/JS) dùng chung cho Agent
 ├── knowledge/                  # Cơ sở Tri thức (Kiến thức Domain, Code Standards, DB Rules)
 ├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
