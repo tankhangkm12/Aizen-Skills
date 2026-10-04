@@ -29,8 +29,8 @@ Used by `dev` with `KIND=be`.
   Red already on the base → report, do not fix silently. Self-review the diff with `checklist.md`.
 - **D5 Verify per id.** Happy path, each documented error case, the permission case: request → response →
   expected, in the report.
-- **D6 Hand off.** `python scripts/check.py --task <TASK>`; PR text from `assets/pr-draft-template.md` (with the
-  Rollback block) → `tensura/reports/<TASK>/pr-body.md`; report + push/PR commands for Cecilia.
+- **D6 Hand off.** the quality-gate command from the brief; PR text from `assets/pr-draft-template.md` (with the
+  Rollback block) → `tensura/reports/<TASK>/pr-body-<unit>.md`; report + push/PR commands for Cecilia.
 
 ## Guides (load only what the change touches)
 

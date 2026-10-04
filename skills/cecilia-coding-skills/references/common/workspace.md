@@ -19,8 +19,9 @@ tensura/
 ├── tasks/<TASK>/state.md · run.json      written by scripts/state.py — read first when resuming
 ├── reports/<TASK>/
 │   ├── plan.md · dev-<unit>.md · test.md · review.md · devops.md
-│   ├── pr-body.md                        Draft PR text for `gh pr create --body-file`
-│   └── evidence.json                     written by scripts/check.py
+│   ├── pr-body[-<unit>].md               Draft PR text for `gh pr create --body-file` (one per unit; the
+│   │                                     coordinator merges them into pr-body.md for the final PR)
+│   └── evidence[-<unit>].json            written by scripts/check.py (always in the main checkout)
 └── backups/<TASK>/                       DB dumps and copies taken before a change (git.md §4)
 ```
 

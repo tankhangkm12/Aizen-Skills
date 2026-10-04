@@ -1,24 +1,29 @@
-[cecilia-brief TASK={{TASK}} ROLE={{ROLE}} KIND={{KIND}} UNIT={{UNIT}} LENS={{LENS}} ROUND={{ROUND}} MODE={{MODE}}]
+[cecilia-brief TASK={{TASK}} ROLE={{ROLE}} KIND={{KIND}} UNIT={{UNIT}} STAGE={{STAGE}} LENS={{LENS}} ROUND={{ROUND}} MODE={{MODE}}]
 
-Read `agents/{{ROLE}}.md` and `rules/core.md` in the cecilia-coding-skills skill ({{SKILL_DIR}}) first and follow them.
+Read `agents/{{ROLE}}.md` and `rules/core.md` in the cecilia-coding-skills skill first and follow them.
+Paths: `agents/`, `rules/`, `references/`, `assets/`, `scripts/` are under {{SKILL_DIR}}.
+`tensura/` is always {{ROOT}}/tensura, also when you work in a worktree.
 
 ## Task
 Goal: {{GOAL}}
-Your part: <what this unit must deliver, with requirement/finding ids>
-Done when: <checkable: command + expected result, test names, screens>
+Your part: {{PART}}
+Done when: {{DONE}}
 
 ## Where
 Project root: {{ROOT}}
-Code workdir: <worktree path, or "read-only">  ·  Branch: <branch> @ <start SHA>
-Write set (your lane): <path globs — nothing outside>
-Runtime (yours alone): ports <range> · compose project <TASK-unit> · DB <name> · browser session <TASK-unit>
+Code workdir: {{WORKDIR}}  ·  Branch: {{BRANCH}} @ {{SHA}}
+Write set (your lane): {{WRITE_SET}}
+Runtime (yours alone): ports {{PORTS}} · compose project {{TASK}}-{{UNIT}} · DB {{DB}} · browser session {{TASK}}-{{UNIT}}
 
 ## Inputs
 Plan: tensura/plans/{{TASK}}.md  ·  Decision: tensura/tasks/{{TASK}}/state.md (## Decision)
-<docs, contract version, findings to fix (ROUND > 0), earlier reports>
+{{INPUTS}}
 
 ## Allowed A3
-<none | exact list Cecilia approved>
+{{A3}}
+
+## Commands
+Quality gate: python "{{SKILL_DIR}}/scripts/check.py" --task {{TASK}} --unit {{CHECK_UNIT}} --project "{{WORKDIR_CMD}}"
 
 ## Report
 Full report: tensura/reports/{{TASK}}/{{REPORT}}  ·  Return ≤ 15 lines ending with `Deviations:`.

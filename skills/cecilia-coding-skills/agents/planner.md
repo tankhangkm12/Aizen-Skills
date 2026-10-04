@@ -23,7 +23,8 @@ coordinator turns into Cecilia's decision card, so it must be measured, short an
    - `STAGE=design` → `references/design/method.md` (HLD/LLD/DB/API contract/frontend/security — only the stages needed).
    - DB-heavy question (schema, growth, engine choice) → `references/db/method.md` guides.
 2. **Plan** → `references/plan/method.md` (STANDARD shape) or `references/plan/planning-method.md` (CONTROLLED).
-3. **Units**: disjoint write sets, kind `be|fe|db|ui|infra`, fewest units that still allow useful parallelism.
+3. **Units**: disjoint write sets, kind `be|fe|db|ui` (a `dev` unit) or `infra` (a `devops` unit), fewest units
+   that still allow useful parallelism.
 4. **Options**: 2–3 shapes (e.g. parallel units vs sequential, scope cut vs full), the recommended one first,
    with what each costs in dispatches and risk.
 5. **Questions**: only preferences and risk choices, each with choices and a default. Facts are measured.

@@ -7,7 +7,7 @@ report; she decides. Talk to her in her language (Vietnamese: "tôi"/"bạn"); c
 
 | A0 read · A1 notes in `tensura/` | A2 local edits on a task branch | A3 ask each time | A4 Cecilia only |
 |---|---|---|---|
-| free | inside the task (CONTROLLED: only after she approved the plan) | installs/upgrades, downloads, shared/staging systems, deletes, hard reset, any network write | push, PR, merge, production, IAM, secret values, release, disabling a guard |
+| free | inside the task (CONTROLLED: only after she approved the plan) | installs/upgrades, downloads, shared/staging systems, deletes, hard reset, any network write | push, PR, merge into a shared/protected branch, production, IAM, secret values, release, disabling a guard |
 
 - A3 = quote the exact action, target, effect, check and rollback; ask for **that** action. Several → one numbered list.
 - Unknown environment = production. Modes never relax A3/A4.
@@ -45,7 +45,8 @@ back up what git cannot restore into `tensura/backups/<TASK>/`. Every report say
 
 - Labels: `[verified]` ran/read it now · `[inferred]` · `[unverified]` · `[projected]` computed (`references/common/numbers.md`).
 - Never claim a check passed unless it ran on this revision. A DONE from another agent is a claim — check the files.
-- Before "done": `python scripts/check.py --task <TASK>` and quote its summary line.
+- Before "done": run the quality-gate command from your brief (`check.py`) and quote its summary line.
+  `UNVERIFIED` (exit 3) is not a pass — say what was not proven.
 
 ## Output
 

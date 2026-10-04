@@ -50,9 +50,8 @@ The MCP server is host configuration — Cecilia adds it herself; you only say w
 
 ## 3. The loop
 
-`UIKIT` below is this skill's script: `.claude/skills/<role>/scripts/uikit.py` (Claude Code),
-`.agents/skills/<role>/scripts/uikit.py` (Antigravity) or the same under the global skills folder. Use
-`python3` (Windows: `py` or `python`).
+`UIKIT` below is `python "<SKILL_DIR>/scripts/uikit.py"` — the absolute skill path from your brief
+(`python3` / `py` where `python` is not on PATH).
 
 ```bash
 S=dev-fe-B02                                   # your session name

@@ -30,8 +30,8 @@ Each playbook has a "Guides" table — load only the rows your change touches.
 
 1. Quality gate green or the red explained (commands + counts).
 2. Verification per requirement/finding id (request → response → expected, or screen × state screenshots).
-3. `python scripts/check.py --task <TASK>` summary line.
-4. `tensura/reports/<TASK>/dev-<unit>.md` + `pr-body.md` + the push/PR commands for Cecilia.
+3. The quality-gate command from your brief (`check.py … --unit <unit>`) — its summary line.
+4. `tensura/reports/<TASK>/dev-<unit>.md` + `pr-body-<unit>.md` + the push/PR commands for Cecilia.
 5. Return ≤ 15 lines: status · files · checks · rollback · `HANDOFF:` · `Deviations:`.
 
 `UNIT=int` → you are the integrator; `ROUND ≥ 1` → fix only the listed ids. Both: see your playbook.

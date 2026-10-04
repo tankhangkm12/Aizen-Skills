@@ -36,7 +36,7 @@ A risk outside your lenses → one line `HANDOFF: needs tester LENS=<lens> — <
   ACs covered/uncovered, perf vs NFR, and the BUG table
   `| ID | Title | Severity | Repro | Evidence |` with ids `BUG-<lens>-nn` (stable across rounds).
   Severity: Critical/High → BLOCKER, Medium → SHOULD-FIX, Low → SUGGESTION.
-- **T5** `python scripts/check.py --task <TASK>`; return ≤ 15 lines.
+- **T5** the quality-gate command from the brief; return ≤ 15 lines.
 
 ## Fix rounds (`ROUND ≥ 1`)
 

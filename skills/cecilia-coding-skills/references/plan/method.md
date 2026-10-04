@@ -21,7 +21,7 @@ Plan:
 1. <step>   [unit · after: <step> | parallel]
 2. <step>
 Simpler option: <the simplest approach that would also work; why this plan is not simpler>
-Units:  <id · kind be|fe|db|ui|infra · write set (globs) · seams relied on · after: <unit>>
+Units:  <id · kind be|fe|db|ui (dev) or infra (devops) · write set (globs) · seams relied on · after: <unit>>
 Test lenses: <functional + …>
 Checks: <tests/lint/build commands>
 Backup: <DB dump / none, why>

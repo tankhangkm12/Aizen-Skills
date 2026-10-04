@@ -49,7 +49,7 @@ Merging into a shared branch is A4 — Cecilia does it.
 
 ## 5. Resuming and stopping
 
-- `python scripts/state.py status --task <TASK>` and `state.md` first; check current SHAs and whether files changed.
+- `python "<SKILL_DIR>/scripts/state.py" status --task <TASK>` and `state.md` first; check current SHAs and whether files changed.
 - An action whose result is unknown is checked, never repeated.
 - Never start a replacement writer while the old one might still be writing.
 - Cleanup of worktrees and `int/*` branches is a separate step after Cecilia pushed or abandoned the work (A3 if

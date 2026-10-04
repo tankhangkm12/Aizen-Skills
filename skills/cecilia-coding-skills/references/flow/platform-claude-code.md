@@ -2,11 +2,11 @@
 
 ## Dispatch
 
-- One role instance = one **Agent** tool call. Prompt = the full output of `python scripts/state.py brief …`
-  (header line first), followed by: "Read `agents/<role>.md` and `rules/core.md` in the cecilia-coding-skills
-  skill, then do the brief."
-- `subagent_type`: `general-purpose` for `dev`, `tester`, `devops`; `Plan` (read-only) is acceptable for
-  `planner`; `general-purpose` for `reviewer` with the brief saying READ-ONLY.
+- One role instance = one **Agent** tool call. Prompt = the full output of
+  `python "<SKILL_DIR>/scripts/state.py" brief …` (header line first); it already names the absolute paths of
+  `agents/<role>.md` and `rules/core.md`.
+- `subagent_type`: `general-purpose` for every role — the planner writes its plan file, and the reviewer
+  brief already says READ-ONLY. Never `Plan`/`Explore`: they cannot write their report.
 - A wave = all Agent calls of that wave **in one message** so they run in parallel.
 - Code writers get their own worktree. Either create it yourself (`git worktree add`) and name it in the brief,
   or pass `isolation: "worktree"` and let the harness create it — then read the branch name from the result.

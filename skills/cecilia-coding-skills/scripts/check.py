@@ -1,45 +1,49 @@
 #!/usr/bin/env python3
-"""check — run the repository's own quality checks and record what really happened (v21).
+"""check — run the repository's own quality checks and record what really happened (v22).
 
-    python scripts/check.py --task SHOP-42              # detect, run, write evidence
-    python scripts/check.py --task SHOP-42 --plan       # print the commands only
-    python scripts/check.py --task SHOP-42 --steps test,secrets --base origin/develop
+    python <SKILL_DIR>/scripts/check.py --task SHOP-42 --unit api   # detect, run, write evidence
+    python <SKILL_DIR>/scripts/check.py --task SHOP-42 --plan       # print the commands only
+    python <SKILL_DIR>/scripts/check.py --task SHOP-42 --steps test,secrets --base origin/develop
 
 Steps (each skipped when the repository has nothing for it):
-  lint · typecheck · build · test   the repo's own scripts/tools (package.json scripts, ruff/pytest/mypy,
+  lint · typecheck · build · test   the repo's own scripts and tools (package.json scripts, ruff/pytest/mypy,
                                     mvn/gradle, go, cargo, dotnet) — nothing is installed;
-  secrets   gitleaks on the task's commits + staged + untracked files; without gitleaks a built-in scan of
-            the changed files for high-confidence patterns (weaker — reported as such);
+  secrets   gitleaks on the task's commits + staged files, plus a built-in scan of unstaged and untracked
+            files; without gitleaks the built-in scan of every changed file (weaker — reported as such);
   deps      when a dependency manifest changed: the added packages, whether they exist on the registry, their
             age and licence, names one edit away from a popular package (typosquats, invented names), known
             vulnerabilities (osv-scanner / npm audit / pip-audit when available);
   size      size of the build output (dist/, build/, .next/, out/, target/) and the change since this task's
             first run;
 
-Writes tensura/reports/<TASK>/evidence.json (in the Cecilia workspace when there is one) (sha, branch, base, command, exit code, seconds, status, the
-failing tail) and prints a summary of at most 15 lines. Reports quote this file instead of re-typing
-results; a reviewer can re-run any step. A missing tool is `unverified`, never `pass`.
+Writes <workspace>/tensura/reports/<TASK>/evidence[-<unit>].json (sha, branch, base, command, exit code,
+seconds, status, the failing tail) and prints a summary of at most 15 lines. The workspace is the main
+checkout even when run inside a worktree. Reports quote this file instead of re-typing results; a reviewer
+can re-run any step. A missing tool is `unverified`, never `pass`.
 
-Exit code: 0 all run steps passed (or were skipped), 1 a step failed, 2 usage error.
+Result PASS needs at least one step that ran and passed, and test + secrets not skipped/unverified;
+otherwise UNVERIFIED (a claim nobody proved).
+Exit code: 0 PASS, 1 a step failed, 2 usage error, 3 UNVERIFIED.
 Python ≥ 3.9, standard library only. Network is used only to read public registries (deps step).
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
+import importlib.util
 import json
 import os
-import hashlib
 import re
-import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
-VERSION = "21.0.0"
+VERSION = "22.0.0"
 STEPS = ("lint", "typecheck", "build", "test", "secrets", "deps", "size")
 MANIFESTS = {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb", "requirements.txt",
              "requirements-dev.txt", "pyproject.toml", "poetry.lock", "uv.lock", "Pipfile", "Pipfile.lock", "pom.xml",
@@ -87,16 +91,26 @@ def which(name: str) -> str | None:
 def sh(cmd: list[str], cwd: Path, timeout: int, env=None) -> tuple[int, str, float]:
     exe = which(cmd[0]) or cmd[0]
     t0 = time.time()
+    nt = os.name == "nt"
     try:
-        r = subprocess.run([exe, *cmd[1:]], cwd=str(cwd), capture_output=True, text=True, timeout=timeout,
-                           env=dict(os.environ, CI="1", FORCE_COLOR="0", NO_COLOR="1", **(env or {})),
-                           encoding="utf-8", errors="replace")
-        return r.returncode, (r.stdout or "") + (r.stderr or ""), time.time() - t0
-    except subprocess.TimeoutExpired as e:
-        out = (e.stdout or "") if isinstance(e.stdout, str) else ""
-        return 124, out + f"\n[timeout after {timeout}s]", time.time() - t0
+        p = subprocess.Popen([exe, *cmd[1:]], cwd=str(cwd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                             text=True, encoding="utf-8", errors="replace",
+                             env=dict(os.environ, CI="1", FORCE_COLOR="0", NO_COLOR="1", **(env or {})),
+                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if nt else 0,
+                             start_new_session=not nt)
     except OSError as e:
         return 127, str(e), time.time() - t0
+    try:
+        out, _ = p.communicate(timeout=timeout)
+        return p.returncode, out or "", time.time() - t0
+    except subprocess.TimeoutExpired:
+        # kill the whole tree: npm.cmd -> node grandchildren otherwise keep the pipe open
+        if nt:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(p.pid)], capture_output=True)
+        else:
+            os.killpg(p.pid, signal.SIGKILL)
+        out, _ = p.communicate()
+        return 124, (out or "") + f"\n[timeout after {timeout}s]", time.time() - t0
 
 
 def git(root: Path, *args) -> str:
@@ -120,6 +134,12 @@ def node_pm(root: Path) -> str:
     if (root / "bun.lockb").exists() or (root / "bun.lock").exists():
         return "bun"
     return "npm"
+
+
+def wrapper(root: Path, posix: str, windows: str) -> str:
+    """Absolute path of the repo's build wrapper for this OS, or ''."""
+    name = windows if os.name == "nt" else posix
+    return str(root / name) if (root / name).is_file() else ""
 
 
 def detect(root: Path) -> dict:
@@ -152,13 +172,14 @@ def detect(root: Path) -> dict:
         if which("mypy") and ("mypy" in pyproj or (root / "mypy.ini").exists()):
             plan["typecheck"].append(("mypy", ["mypy", "."]))
         if any((root / d).is_dir() for d in ("tests", "test")) or "pytest" in pyproj:
-            py = which("pytest")
-            plan["test"].append(("pytest", ["pytest", "-q"] if py else [sys.executable, "-m", "pytest", "-q"]))
+            # no pytest anywhere → keep the bare name so the run marks it `unverified`, not `fail`
+            via_module = not which("pytest") and importlib.util.find_spec("pytest")
+            plan["test"].append(("pytest", [sys.executable, "-m", "pytest", "-q"] if via_module else ["pytest", "-q"]))
     if (root / "pom.xml").is_file():
-        mvn = "./mvnw" if (root / "mvnw").exists() else "mvn"
+        mvn = wrapper(root, "mvnw", "mvnw.cmd") or "mvn"
         plan["build"].append(("mvn verify", [mvn, "-q", "-B", "verify"]))
     elif (root / "build.gradle").is_file() or (root / "build.gradle.kts").is_file():
-        gw = "./gradlew" if (root / "gradlew").exists() else "gradle"
+        gw = wrapper(root, "gradlew", "gradlew.bat") or "gradle"
         plan["build"].append(("gradle build", [gw, "build", "-q"]))
     if (root / "go.mod").is_file():
         plan["lint"].append(("go vet", ["go", "vet", "./..."]))
@@ -198,7 +219,7 @@ def default_base(root: Path) -> str:
 def secrets_step(root: Path, base: str, files: list[str], timeout: int) -> dict:
     if which("gitleaks"):
         out_all, findings, cmds = "", 0, []
-        code_help, help_out, _ = sh(["gitleaks", "--help"], root, 30)
+        _, help_out, _ = sh(["gitleaks", "--help"], root, 30)
         modern = " git " in help_out or "\n  git" in help_out
         runs = []
         if modern:
@@ -214,13 +235,15 @@ def secrets_step(root: Path, base: str, files: list[str], timeout: int) -> dict:
             cmds.append(" ".join(argv))
             out_all += out
             if code == 1:
-                findings += max(1, len(re.findall(r"(?im)^\s*(Finding|RuleID):", out)) // 1)
+                findings += max(1, len(re.findall(r"(?im)^\s*(Finding|RuleID):", out)))
             elif code not in (0, 1):
                 return {"status": "unverified", "tool": "gitleaks", "cmd": cmds, "detail": tail(out, 10)}
-        untracked = [f for f in git(root, "ls-files", "--others", "--exclude-standard").splitlines() if f]
-        extra = builtin_scan(root, untracked)
+        # gitleaks sees commits and the index only; unstaged edits and new files get the built-in scan
+        loose = sorted((set(git(root, "ls-files", "--others", "--exclude-standard").splitlines())
+                        | set(git(root, "diff", "--name-only").splitlines())) - {""})
+        extra = builtin_scan(root, loose)
         n = findings + len(extra)
-        return {"status": "fail" if n else "pass", "tool": "gitleaks" + (" + builtin(untracked)" if untracked else ""),
+        return {"status": "fail" if n else "pass", "tool": "gitleaks" + (" + builtin(unstaged/untracked)" if loose else ""),
                 "cmd": cmds, "findings": n, "files": sorted({f["file"] for f in extra}), "detail": tail(out_all, 15)}
     found = builtin_scan(root, files)
     return {"status": "fail" if found else "unverified", "tool": "builtin (weaker than gitleaks)",
@@ -268,21 +291,31 @@ def lev1(a: str, b: str) -> bool:
     return False
 
 
+NOT_FOUND = {"error": "not found"}
+
+
 def fetch_json(url: str, timeout: int = 10):
+    """Parsed JSON, NOT_FOUND on HTTP 404, None when the registry could not be reached."""
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "cecilia-check"}), timeout=timeout) as r:
             return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        return NOT_FOUND if e.code == 404 else None
     except Exception:
         return None
 
 
+def pep503(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
 def npm_added(root: Path, base: str) -> dict:
-    now_pkg = json.loads((root / "package.json").read_text(encoding="utf-8")) if (root / "package.json").is_file() else {}
     old_text = git(root, "show", f"{base}:package.json") if base else ""
     try:
+        now_pkg = json.loads((root / "package.json").read_text(encoding="utf-8")) if (root / "package.json").is_file() else {}
         old_pkg = json.loads(old_text) if old_text else {}
     except ValueError:
-        old_pkg = {}
+        return {}
     added = {}
     for sec in ("dependencies", "devDependencies", "optionalDependencies", "peerDependencies"):
         for name, ver in (now_pkg.get(sec) or {}).items():
@@ -297,7 +330,7 @@ def py_added(root: Path, base: str) -> dict:
     for f in ("requirements.txt", "requirements-dev.txt"):
         cur = (root / f).read_text(encoding="utf-8", errors="ignore") if (root / f).is_file() else ""
         old = git(root, "show", f"{base}:{f}") if base else ""
-        names = lambda t: {re.split(r"[<>=!~\[; ]", l.strip())[0].lower(): l.strip() for l in t.splitlines()  # noqa: E731
+        names = lambda t: {pep503(re.split(r"[<>=!~\[; ]", l.strip())[0]): l.strip() for l in t.splitlines()  # noqa: E731
                            if l.strip() and not l.strip().startswith(("#", "-"))}
         for n, spec in names(cur).items():
             if n and n not in names(old):
@@ -322,7 +355,7 @@ def deps_step(root: Path, base: str, files: list[str], offline: bool, timeout: i
             meta = fetch_json(f"https://registry.npmjs.org/{name.replace('/', '%2F')}")
             if meta is None:
                 item["registry"] = "unverified"
-            elif "error" in meta or "name" not in meta:
+            elif meta is NOT_FOUND or "name" not in meta:
                 item["registry"] = "NOT FOUND"
                 report["flags"].append(f"{name}: not on the npm registry — invented name?")
             else:
@@ -346,15 +379,17 @@ def deps_step(root: Path, base: str, files: list[str], offline: bool, timeout: i
         report["added"].append(item)
     for name, spec in py_new.items():
         item = {"eco": "pypi", "name": name, "spec": spec}
-        close = [p for p in POPULAR_PY if lev1(name, p)]
+        close = [p for p in POPULAR_PY if lev1(name, pep503(p))]
         if close:
             item["typosquat_of"] = close
             report["flags"].append(f"{name}: one edit away from popular '{close[0]}' — typo or typosquat?")
         if not offline:
             meta = fetch_json(f"https://pypi.org/pypi/{name}/json")
             if meta is None:
-                item["registry"] = "NOT FOUND or offline"
-                report["flags"].append(f"{name}: not found on PyPI (or offline) — invented name?")
+                item["registry"] = "unverified"
+            elif meta is NOT_FOUND:
+                item["registry"] = "NOT FOUND"
+                report["flags"].append(f"{name}: not on PyPI — invented name?")
             else:
                 info = meta.get("info") or {}
                 item["license"] = info.get("license") or ""
@@ -380,7 +415,8 @@ def deps_step(root: Path, base: str, files: list[str], offline: bool, timeout: i
     audit = report["audit"] or {}
     if audit.get("critical") or audit.get("high") or audit.get("vulnerabilities"):
         report["flags"].append(f"known vulnerabilities: {json.dumps({k: v for k, v in audit.items() if k != 'tool'})}")
-    if any("NOT FOUND" in f or "typosquat" in f for f in report["flags"]):
+    # a missing package or a known high/critical hole blocks; a name one edit from a popular one is a question
+    if any("not on" in f for f in report["flags"]) or audit.get("critical") or audit.get("high"):
         report["status"] = "fail"
     elif report["flags"]:
         report["status"] = "review"
@@ -414,10 +450,10 @@ def size_step(root: Path, previous: dict | None) -> dict:
 
 # --------------------------------------------------------------------------- main
 
-def locate(project_arg: str) -> tuple[Path, Path]:
-    """(code root, docs home): both the repository given by --project, else the current directory."""
-    code = Path(project_arg or ".").resolve()
-    return code, code
+def main_checkout(root: Path) -> Path:
+    """The main working tree, also from inside a linked worktree (where tensura/ lives)."""
+    common = git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    return Path(common).parent if common else root
 
 
 def main() -> int:
@@ -428,19 +464,22 @@ def main() -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--task", required=True, help="task id; evidence goes to tensura/reports/<TASK>/evidence.json")
-    ap.add_argument("--project", default="", help="repository root (default: the current directory)")
+    ap.add_argument("--project", default="", help="repository or worktree to check (default: the current directory)")
+    ap.add_argument("--workspace", default="", help="where tensura/ lives (default: the main checkout of --project)")
+    ap.add_argument("--unit", default="", help="unit id; evidence goes to evidence-<unit>.json so parallel units never collide")
     ap.add_argument("--steps", default=",".join(STEPS), help="comma list of " + ", ".join(STEPS))
     ap.add_argument("--base", default="", help="base ref for 'what changed' (default: merge-base with develop/main)")
     ap.add_argument("--plan", action="store_true", help="print the detected commands; run nothing")
     ap.add_argument("--offline", action="store_true", help="deps step: no registry look-ups")
     ap.add_argument("--timeout", type=int, default=900, help="seconds per command (default 900)")
-    ap.add_argument("--out", default="", help="evidence path (default tensura/reports/<TASK>/evidence.json)")
+    ap.add_argument("--out", default="", help="evidence path (default <workspace>/tensura/reports/<TASK>/evidence[-<unit>].json)")
     a = ap.parse_args()
-    root, home = locate(a.project)
+    root = Path(a.project or ".").resolve()
     steps = [s.strip() for s in a.steps.split(",") if s.strip()]
     bad = [s for s in steps if s not in STEPS]
-    if bad or not re.match(r"^[A-Za-z0-9._-]+$", a.task):
-        print(f"usage error: unknown steps {bad}" if bad else "usage error: --task must be an id like SHOP-42")
+    ids_ok = all(re.match(r"^[A-Za-z0-9._-]+$", v) for v in (a.task, a.unit or "x"))
+    if bad or not ids_ok:
+        print(f"usage error: unknown steps {bad}" if bad else "usage error: --task/--unit must be ids like SHOP-42")
         return 2
     plan = detect(root)
     if a.plan:
@@ -450,7 +489,9 @@ def main() -> int:
             else:
                 print(f"{s:9} (built-in step)")
         return 0
-    out_file = Path(a.out) if a.out else home / "tensura" / "reports" / a.task / "evidence.json"
+    home = Path(a.workspace).resolve() if a.workspace else main_checkout(root)
+    name = f"evidence-{a.unit}.json" if a.unit else "evidence.json"
+    out_file = Path(a.out) if a.out else home / "tensura" / "reports" / a.task / name
     previous = None
     if out_file.is_file():
         try:
@@ -469,7 +510,7 @@ def main() -> int:
                 ev["steps"].append({"step": s, "status": "skip", "detail": "nothing defined in this repository"})
                 continue
             for label, cmd in plan[s]:
-                if not which(cmd[0]) and not cmd[0].startswith("./") and cmd[0] != sys.executable:
+                if not which(cmd[0]) and not Path(cmd[0]).is_file():
                     ev["steps"].append({"step": s, "label": label, "cmd": " ".join(cmd), "status": "unverified",
                                         "detail": f"{cmd[0]} not installed"})
                     continue
@@ -499,7 +540,12 @@ def main() -> int:
                                 + ("" if "delta_bytes" not in r else " · Δ " + ", ".join(
                                     f"{k} {v // 1024:+} KB" for k, v in r["delta_bytes"].items()))})
     ev["finished"] = now()
-    ev["result"] = "fail" if failed else "pass"
+    status = {st["step"]: st["status"] for st in ev["steps"]}
+    ran_ok = any(v == "pass" for v in status.values())
+    weak = [s for s in ("test", "secrets") if s in status and status[s] in ("skip", "unverified")]
+    ev["result"] = "fail" if failed else "pass" if ran_ok and not weak else "unverified"
+    if ev["result"] == "unverified":
+        ev["unverified_because"] = f"not proven: {', '.join(weak)}" if weak else "no step ran and passed"
     out_file.parent.mkdir(parents=True, exist_ok=True)
     out_file.write_text(json.dumps(ev, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     lines = [f"check {a.task} @ {ev['sha'][:10] or '?'} ({ev['branch'] or '?'}) → {ev['result'].upper()}"]
@@ -508,9 +554,11 @@ def main() -> int:
         if st["step"] == "deps" and st.get("flags"):
             extra = "; ".join(st["flags"][:2])
         lines.append(f"  {st['step']:9} {st['status']:10} {st.get('cmd', st.get('tool', ''))[:50]}  {str(extra)[:70]}")
+    if ev.get("unverified_because"):
+        lines.append(f"  UNVERIFIED — {ev['unverified_because']}; say so in the report, never claim PASS")
     lines.append(f"  evidence: {out_file}")
     print("\n".join(lines[:15]))
-    return 1 if failed else 0
+    return {"pass": 0, "fail": 1, "unverified": 3}[ev["result"]]
 
 
 if __name__ == "__main__":

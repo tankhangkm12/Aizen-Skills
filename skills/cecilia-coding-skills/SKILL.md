@@ -28,7 +28,9 @@ FAST that grows (cause unclear, > ~3 files, a trigger appears) → stop and move
 | `reviewer` | read-only verdict at a pinned SHA; CONTROLLED adds a `redteam` reviewer | 1–2 |
 | `devops` | CI/CD, containers, k8s, IaC, incidents — only when the diff touches them | 0–1 |
 
-Briefs: `python scripts/state.py brief --task <TASK> --role <role> [--kind K] [--unit U] [--lens L]`.
+Tools run from anywhere as `python "<SKILL_DIR>/scripts/<tool>.py"` (`<SKILL_DIR>` = this skill's base
+directory). Briefs: `state.py brief --task <TASK> --role <role> [--kind K --unit U] [--stage S] [--lens L]
+[--sha SHA] [--write-set GLOBS]` — the brief carries absolute paths and the quality-gate command.
 Dispatch mechanics, models and the card: `references/flow/platform-claude-code.md` ·
 `references/flow/platform-antigravity.md`.
 

@@ -29,8 +29,8 @@ Used by `dev` with `KIND=fe`.
 - **F4 Verify per screen in the browser** (`visual-check.md`, `scripts/uikit.py`): each state and breakpoint —
   screenshot, console, diff vs export, contrast. ≤ 3 fix rounds per screen. Against the real API once the
   backend is integrated; mock vs real differences are findings.
-- **F5 Hand off.** `python scripts/check.py --task <TASK>`; PR text with the state table (screenshot paths) →
-  `tensura/reports/<TASK>/pr-body.md`; report + push/PR commands for Cecilia.
+- **F5 Hand off.** the quality-gate command from the brief; PR text with the state table (screenshot paths) →
+  `tensura/reports/<TASK>/pr-body-<unit>.md`; report + push/PR commands for Cecilia.
 
 ## Guides (load only what the change touches)
 

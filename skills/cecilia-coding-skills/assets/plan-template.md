@@ -85,7 +85,7 @@ Approved by Cecilia on the decision card: <date, her quoted words>.
     "tensura/reports/<TASK>/**"
   ],
   "commands": ["npm test -- order", "npm run lint", "pnpm test order", "pnpm build", "npm run test:int -- order",
-               "PORT=3100 npm run dev", "playwright-cli -s=<TASK>-fe *", "python3 .claude/scripts/uikit.py *"],
+               "PORT=3100 npm run dev", "playwright-cli -s=<TASK>-fe *", "python <SKILL_DIR>/scripts/uikit.py *"],
   "environments": ["local"],
   "expires_hours": 72
 }
