@@ -1,203 +1,52 @@
-<!-- Vendored for Cecilia v18.1. Source: https://github.com/vercel-labs/web-interface-guidelines
-     (command.md) at commit e3d624baaf29dc1fc645aff3e38f03e564d2d6b1 (2026-08-17), MIT licence below.
-     Changes: removed the slash-command frontmatter and the $ARGUMENTS line. Update only by re-vendoring. -->
+<!-- Condensed for Cecilia from https://github.com/vercel-labs/web-interface-guidelines (command.md) at commit
+     e3d624baaf29dc1fc645aff3e38f03e564d2d6b1 (2026-08-17), MIT licence below. Rules regrouped one line per
+     topic; the English-only copy and punctuation rules were dropped. -->
 
-> **How Cecilia uses this list** (read before the rules)
-> - It is a *checklist*, fixed at the commit above — never fetched at run time.
-> - **Priority:** Cecilia's decisions → the approved UI design (`<app>-ui.md`, `design-tokens.json`,
->   exports) → the repo's design system → this list. When they disagree, the higher one wins and the
->   finding is reported as "differs from guideline X — kept per <source>", not changed.
-> - **Content & Copy** and the typography punctuation rules (Title Case, curly quotes, `…`) describe English
->   UI. For Vietnamese or another language, follow the project's copy style; report only real problems.
-> - Library names (`virtua`, `nuqs`, …) are examples; a new dependency is still A3.
-> - Findings go into the report in the `file:line - issue` format below, grouped by file, with a count
->   (`guidelines: 3 findings in 2 files, 11 files pass`).
+# Web interface checklist
 
-# Web Interface Guidelines
-
-Review the changed UI files (or the files Cecilia names) for compliance.
-
-Read files, check against rules below. Output concise but comprehensive—sacrifice grammar for brevity. High signal-to-noise.
+A checklist for changed UI files, fixed at the commit above — never fetched at run time. Priority: Cecilia's
+decisions → the approved UI design (`<app>-ui.md`, `design-tokens.json`, exports) → the repo's design system →
+this list; a disagreement is reported as "differs from guideline X — kept per <source>", not changed. Library
+names are examples; a new dependency is still A3. Copy and punctuation follow the project's language.
 
 ## Rules
 
-### Accessibility
+- **Accessibility:** semantic HTML before ARIA (`<button>` for actions, `<a>`/`<Link>` for navigation, never
+  `<div onClick>`) · icon-only buttons and form controls have a label · `alt` on images (`""` if decorative),
+  `aria-hidden` on decorative icons · `aria-live="polite"` for toasts and async validation · headings in order,
+  skip link, `scroll-margin-top` on anchors · media has captions/transcripts and keyboard controls.
+- **Focus:** visible `:focus-visible` ring; never `outline: none` without a replacement; `:focus-within` for
+  compound controls; sticky bars and overlays never cover the focused element.
+- **Forms:** `autocomplete`, meaningful `name`, correct `type`/`inputmode` · never block paste · clickable labels,
+  one hit target for checkbox + label · no spellcheck on emails/codes/usernames · submit enabled until the request
+  starts, spinner during it · errors inline, focus the first one · warn before leaving with unsaved changes.
+- **Motion:** honour `prefers-reduced-motion` · animate `transform`/`opacity` only · never `transition: all` ·
+  correct `transform-origin` (SVG: on a `<g>` with `transform-box: fill-box`) · interruptible · autoplay > 5 s
+  needs pause/stop/hide.
+- **Content:** containers survive long, short and empty content (`truncate`, `line-clamp`, `break-words`,
+  `min-w-0` on flex children) · `tabular-nums` for number columns · empty states never render broken UI.
+- **Images & performance:** explicit `width`/`height` · `loading="lazy"` below the fold, `fetchpriority="high"`
+  above · virtualise lists > 50 items · no layout reads in render, batch DOM reads/writes · cheap controlled
+  inputs · `preconnect` asset domains, preload critical fonts with `font-display: swap` · video over GIF.
+- **Navigation & state:** URL holds filters, tabs, pagination, open panels; deep links work · destructive actions
+  confirm or offer undo.
+- **Touch & layout:** `touch-action: manipulation` · `overscroll-behavior: contain` in modals/drawers · gestures
+  have tap and keyboard alternatives · `autoFocus` only for a single desktop input · `env(safe-area-inset-*)` on
+  full-bleed layouts · CSS layout over JS measurement · no stray horizontal scrollbars.
+- **Theming:** `color-scheme` on `<html>` for dark themes · `theme-color` meta matches the background · native
+  `<select>` gets explicit colours · hover/active/focus raise contrast.
+- **Locale & hydration:** `Intl.DateTimeFormat` / `Intl.NumberFormat`, never hard-coded formats · language from
+  `Accept-Language`, not IP · `translate="no"` on brand names and code · inputs with `value` have `onChange` ·
+  dates rendered without server/client mismatch · `suppressHydrationWarning` only where truly needed.
 
-- Icon-only buttons need `aria-label`
-- Form controls need `<label>` or `aria-label`
-- Interactive elements need keyboard handlers (`onKeyDown`/`onKeyUp`)
-- `<button>` for actions, `<a>`/`<Link>` for navigation (not `<div onClick>`)
-- Images need `alt` (or `alt=""` if decorative)
-- Decorative icons need `aria-hidden="true"`
-- Async updates (toasts, validation) need `aria-live="polite"`
-- Use semantic HTML (`<button>`, `<a>`, `<label>`, `<table>`) before ARIA
-- Headings hierarchical `<h1>`–`<h6>`; include skip link for main content
-- `scroll-margin-top` on heading anchors
-- Meaningful media needs captions, transcripts, or descriptions as applicable
-- Media controls need keyboard support; decorative media needs assistive-tech hiding
+## Output
 
-### Focus States
-
-- Interactive elements need visible focus: `focus-visible:ring-*` or equivalent
-- Never `outline-none` / `outline: none` without focus replacement
-- Use `:focus-visible` over `:focus` (avoid focus ring on click)
-- Group focus with `:focus-within` for compound controls
-- Sticky headers/footers/overlays must not cover the focused element
-
-### Forms
-
-- Inputs need `autocomplete` and meaningful `name`
-- Use correct `type` (`email`, `tel`, `url`, `number`) and `inputmode`
-- Never block paste (`onPaste` + `preventDefault`)
-- Labels clickable (`htmlFor` or wrapping control)
-- Disable spellcheck on emails, codes, usernames (`spellCheck={false}`)
-- Checkboxes/radios: label + control share single hit target (no dead zones)
-- Submit button stays enabled until request starts; spinner during request
-- Errors inline next to fields; focus first error on submit
-- Placeholders end with `…` and show example pattern
-- `autocomplete="off"` on non-auth fields to avoid password manager triggers
-- Warn before navigation with unsaved changes (`beforeunload` or router guard)
-
-### Animation
-
-- Honor `prefers-reduced-motion` (provide reduced variant or disable)
-- Animate `transform`/`opacity` only (compositor-friendly)
-- Never `transition: all`—list properties explicitly
-- Set correct `transform-origin`
-- SVG: transforms on `<g>` wrapper with `transform-box: fill-box; transform-origin: center`
-- Animations interruptible—respond to user input mid-animation
-- Autoplay motion >5 seconds alongside other content needs pause, stop, or hide controls
-- Muted decorative loops must stop under `prefers-reduced-motion`
-
-### Typography
-
-- `…` not `...`
-- Curly quotes `“` `”` not straight `"`
-- Non-breaking spaces: `10&nbsp;MB`, `⌘&nbsp;K`, brand names
-- Loading states end with `…`: `"Loading…"`, `"Saving…"`
-- `font-variant-numeric: tabular-nums` for number columns/comparisons
-- Use `text-wrap: balance` or `text-pretty` on headings (prevents widows)
-
-### Content Handling
-
-- Text containers handle long content: `truncate`, `line-clamp-*`, or `break-words`
-- Flex children need `min-w-0` to allow text truncation
-- Handle empty states—don't render broken UI for empty strings/arrays
-- User-generated content: anticipate short, average, and very long inputs
-
-### Images
-
-- `<img>` needs explicit `width` and `height` (prevents CLS)
-- Below-fold images: `loading="lazy"`
-- Above-fold critical images: `priority` or `fetchpriority="high"`
-
-### Performance
-
-- Large lists (>50 items): virtualize (`virtua`, `content-visibility: auto`)
-- No layout reads in render (`getBoundingClientRect`, `offsetHeight`, `offsetWidth`, `scrollTop`)
-- Batch DOM reads/writes; avoid interleaving
-- Prefer uncontrolled inputs; controlled inputs must be cheap per keystroke
-- Add `<link rel="preconnect">` for CDN/asset domains
-- Critical fonts: `<link rel="preload" as="font">` with `font-display: swap`
-- Prefer `<video autoplay muted loop playsinline>` over animated GIF; provide a still alternative
-- Short non-essential loops: Safari H.264 MP4 `<picture>` source, `prefers-reduced-motion` media condition, and still fallback
-
-### Navigation & State
-
-- URL reflects state—filters, tabs, pagination, expanded panels in query params
-- Links use `<a>`/`<Link>` (Cmd/Ctrl+click, middle-click support)
-- Deep-link all stateful UI (if uses `useState`, consider URL sync via nuqs or similar)
-- Destructive actions need confirmation modal or undo window—never immediate
-
-### Touch & Interaction
-
-- `touch-action: manipulation` (prevents double-tap zoom delay)
-- `-webkit-tap-highlight-color` set intentionally
-- `overscroll-behavior: contain` in modals/drawers/sheets
-- During drag: disable text selection, `inert` on dragged elements
-- Drag/swipe/pinch/path gestures need tap/click and keyboard alternatives unless essential
-- `autoFocus` sparingly—desktop only, single primary input; avoid on mobile
-
-### Safe Areas & Layout
-
-- Full-bleed layouts need `env(safe-area-inset-*)` for notches
-- Avoid unwanted scrollbars: `overflow-x-hidden` on containers, fix content overflow
-- Flex/grid over JS measurement for layout
-
-### Dark Mode & Theming
-
-- `color-scheme: dark` on `<html>` for dark themes (fixes scrollbar, inputs)
-- `<meta name="theme-color">` matches page background
-- Native `<select>`: explicit `background-color` and `color` (Windows dark mode)
-
-### Locale & i18n
-
-- Dates/times: use `Intl.DateTimeFormat` not hardcoded formats
-- Numbers/currency: use `Intl.NumberFormat` not hardcoded formats
-- Detect language via `Accept-Language` / `navigator.languages`, not IP
-- Brand names, code tokens, identifiers: wrap with `translate="no"` to prevent garbled auto-translation
-
-### Hydration Safety
-
-- Inputs with `value` need `onChange` (or use `defaultValue` for uncontrolled)
-- Date/time rendering: guard against hydration mismatch (server vs client)
-- `suppressHydrationWarning` only where truly needed
-
-### Hover & Interactive States
-
-- Buttons/links need `hover:` state (visual feedback)
-- Interactive states increase contrast: hover/active/focus more prominent than rest
-
-### Content & Copy
-
-- Active voice: "Install the CLI" not "The CLI will be installed"
-- Title Case for headings/buttons (Chicago style)
-- Numerals for counts: "8 deployments" not "eight"
-- Specific button labels: "Save API Key" not "Continue"
-- Error messages include fix/next step, not just problem
-- Second person; avoid first person
-- `&` over "and" where space-constrained
-
-### Anti-patterns (flag these)
-
-- `user-scalable=no` or `maximum-scale=1` disabling zoom
-- `onPaste` with `preventDefault`
-- `transition: all`
-- `outline-none` without focus-visible replacement
-- Inline `onClick` navigation without `<a>`
-- `<div>` or `<span>` with click handlers (should be `<button>`)
-- Images without dimensions
-- Large arrays `.map()` without virtualization
-- Form inputs without labels
-- Icon buttons without `aria-label`
-- Hardcoded date/number formats (use `Intl.*`)
-- `autoFocus` without clear justification
-- Animated GIF when compressed video is suitable
-- Gesture-only action without tap/click and keyboard alternative
-
-## Output Format
-
-Group by file. Use `file:line` format (VS Code clickable). Terse findings.
+Group by file, `file:line - issue`, terse, plus a count (`guidelines: 3 findings in 2 files, 11 files pass`):
 
 ```text
-## src/Button.tsx
-
 src/Button.tsx:42 - icon button missing aria-label
-src/Button.tsx:18 - input lacks label
-src/Button.tsx:55 - animation missing prefers-reduced-motion
-src/Button.tsx:67 - transition: all → list properties
-
-## src/Modal.tsx
-
 src/Modal.tsx:12 - missing overscroll-behavior: contain
-src/Modal.tsx:34 - "..." → "…"
-
-## src/Card.tsx
-
-✓ pass
 ```
-
-State issue + location. Skip explanation unless fix non-obvious. No preamble.
 
 ---
 

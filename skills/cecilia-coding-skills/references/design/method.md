@@ -22,7 +22,7 @@ Used by `planner` when `STAGE=design`. Output: docs in `tensura/docs/`, never co
 |---|---|---|---|
 | HLD | `architecture.md` (+ `<svc>-overview.md`) | `stage-hld.md` | `assets/architecture.md` |
 | LLD | `<module>-design.md` | `stage-lld.md` | `assets/module-design.md` |
-| DB | `<unit>-database.md` | `stage-db.md` + `references/db/schema-design.md` | `assets/database.md` |
+| DB | `<unit>-database.md` | `references/db/schema-design.md` | `assets/database.md` |
 | API | `<unit>-api.md` + `.yaml` | `stage-api.md` | `assets/api.md` |
 | Frontend | `<app>-frontend.md` | `frontend-design.md` | `assets/frontend.md` |
 | Security | `security.md` | `threat-model.md`, `authz-matrix.md` | `assets/security.md` |

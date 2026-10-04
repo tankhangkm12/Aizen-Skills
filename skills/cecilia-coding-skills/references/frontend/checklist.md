@@ -59,7 +59,7 @@ Tick what applies; a group the change does not touch is "n/a" — do not tick bl
 - [ ] Naming per repo and design system; no banned names
 - [ ] Comments: why-comments and doc references; no noise, no commented-out code, no TODO without a task id
 - [ ] No abstraction without ≥ 2 real usages
-- [ ] Size signals checked (`principles.md` §10): file ~≤ 400 lines, component not past the signal — each crossing justified in the PR or split by reason
+- [ ] Size signals checked (`references/review/code-standards.md` §Size and shape) — each crossing justified in the PR or split by reason
 - [ ] Any component already over a signal that this change touches: named in the brief with keep-or-split stated
 - [ ] Styling follows the design system; no one-off magic values where a token exists
 

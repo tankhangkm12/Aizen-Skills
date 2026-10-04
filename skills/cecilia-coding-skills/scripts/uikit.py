@@ -10,7 +10,7 @@
                                                          image and a screenshot of the build
 
 Works on PNG files (what Playwright, Penpot and Figma export). Standard library only; Python 3.9+.
-Add --json for machine-readable output. `diff --max-percent N` exits 1 when the difference is above N.
+Add --json for machine-readable output. `diff --max-percent N` exits 1 when the difference is above N or the sizes differ.
 """
 from __future__ import annotations
 
@@ -377,15 +377,16 @@ def cmd_diff(a):
     if a.out:
         write_png(a.out, w, h, bytes(out))
         res["diff_image"] = str(a.out)
-    failed = a.max_percent is not None and pct > a.max_percent
+    # a cropped or wrong-size screenshot must never pass on the area it happens to share with the reference
+    failed = a.max_percent is not None and (pct > a.max_percent or res["size_mismatch"])
     res["verdict"] = None if a.max_percent is None else ("FAIL" if failed else "PASS")
     if a.json:
         print(json.dumps(res, indent=2))
     else:
         print(f"ref  {a.ref}: {wa}x{ha}\nshot {a.shot}: {wb}x{hb}")
         if res["size_mismatch"]:
-            print(f"WARNING: sizes differ — compared the top-left {w}x{h}. Screenshot at the reference size "
-                  f"(playwright-cli resize {wa} {ha}) for a fair number.")
+            print(f"WARNING: sizes differ — compared the top-left {w}x{h}; with --max-percent this is a FAIL. "
+                  f"Screenshot at the reference size (playwright-cli resize {wa} {ha}).")
         print(f"different pixels: {diff:,} of {area:,} = {pct:.3f}%  (a channel differs by > {thr})")
         if diff:
             print(f"difference box: x {minx}–{maxx}, y {miny}–{maxy}")

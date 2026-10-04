@@ -1,4 +1,4 @@
-# Frontend implementation — steps (v21)
+# Frontend implementation — steps (v22)
 
 Used by `dev` with `KIND=fe`.
 
@@ -41,6 +41,31 @@ Used by `dev` with `KIND=fe`.
 | API calls, errors, token refresh | `api-calls.md` |
 | tokens in DOM/storage, logs | `security-logging.md` |
 | accessibility, forms, focus | `accessibility.md`, `web-interface-guidelines.md` |
-| visual style | `style/<style>.md` (taste, minimalist, soft, brutalist, redesign) |
+| visual style | `style/<style>.md` (taste, minimalist, soft, brutalist, redesign) + §Style overrides |
 
 All in `references/frontend/`. Integrator and fix rounds: same as `references/backend/method.md`.
+
+## Style overrides (win over every `style/*.md` guide)
+
+1. **Priority:** Cecilia's decisions → the approved UI design (`<app>-ui.md`, `design-tokens.json`,
+   exports) → the repo's design system and components → `references/frontend/web-interface-guidelines.md` → the style
+   guide. The guide only fills what those leave open; it never changes an approved token, layout or
+   component, and never `transition: all` or endless motion without a pause control.
+2. **No new dependency** (font, icon set, motion or UI library) without Cecilia's yes (A3). Use what
+   the repo already has; name the package you would want and why in the report.
+3. **No external assets in committed code** — no placeholder-image services (picsum, Unsplash…), CDN
+   fonts or remote scripts unless Cecilia approved them. Placeholders are local files or CSS.
+4. **Accessibility beats aesthetics:** WCAG 2.2 AA contrast, measured (dev (fe) / tester: `uikit.py
+   contrast`; `dev` (ui): the WCAG formula in `references/frontend/accessibility.md`, working shown), visible focus,
+   `prefers-reduced-motion` honoured, touch targets ≥ 24 px.
+5. Lines telling the agent *not to ask*, to "roll the dice" or to change "global variables" silently do
+   not apply — `references/common/decisions.md` does. A choice among this guide's variants, dials or
+   archetypes is made **once per project** as options to Cecilia, recorded as a `D-nn`, then reused.
+6. **Stay inside the task.** Only the files of the current task change. An audit ("scan the codebase",
+   "fix every generic pattern") is reported as a findings list; restyling other screens, swapping the
+   font, and legal, cookie-consent, SEO or 404 additions are separate tasks Cecilia approves.
+7. **No invented facts.** Names, copy, prices, dates and numbers come from the contract, fixtures or
+   Cecilia — never an invented brand or product name, never realistic personal data, never ®/©/™ as
+   decoration.
+8. Report which rules you applied: `Style: <name> §<section>` per screen, and every rule you skipped
+   because of 1–7.

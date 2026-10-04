@@ -5,29 +5,7 @@
 
 Used only when the project's chosen style (`tensura/conventions.md` → `ui.style`) is `redesign`.
 
-> **Cecilia overrides — these win over everything below**
-> 1. **Priority:** Cecilia's decisions → the approved UI design (`<app>-ui.md`, `design-tokens.json`,
->    exports) → the repo's design system and components → `references/frontend/web-interface-guidelines.md` → this style
->    guide. The guide only fills what those leave open; it never changes an approved token, layout or
->    component, and never `transition: all` or endless motion without a pause control.
-> 2. **No new dependency** (font, icon set, motion or UI library) without Cecilia's yes (A3). Use what
->    the repo already has; name the package you would want and why in the report.
-> 3. **No external assets in committed code** — no placeholder-image services (picsum, Unsplash…), CDN
->    fonts or remote scripts unless Cecilia approved them. Placeholders are local files or CSS.
-> 4. **Accessibility beats aesthetics:** WCAG 2.2 AA contrast, measured (dev (fe) / tester: `uikit.py
->    contrast`; `dev` (ui): the WCAG formula in `references/frontend/accessibility.md`, working shown), visible focus,
->    `prefers-reduced-motion` honoured, touch targets ≥ 24 px.
-> 5. Lines telling the agent *not to ask*, to "roll the dice" or to change "global variables" silently do
->    not apply — `references/common/decisions.md` does. A choice among this guide's variants, dials or
->    archetypes is made **once per project** as options to Cecilia, recorded as a `D-nn`, then reused.
-> 6. **Stay inside the task.** Only the files of the current task change. An audit ("scan the codebase",
->    "fix every generic pattern") is reported as a findings list; restyling other screens, swapping the
->    font, and legal, cookie-consent, SEO or 404 additions are separate tasks Cecilia approves.
-> 7. **No invented facts.** Names, copy, prices, dates and numbers come from the contract, fixtures or
->    Cecilia — never an invented brand or product name, never realistic personal data, never ®/©/™ as
->    decoration.
-> 8. Report which rules you applied: `Style: <name> §<section>` per screen, and every rule you skipped
->    because of 1–7.
+> **Cecilia overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 
 ---
 
@@ -207,30 +185,4 @@ Apply changes in this order for maximum visual impact with minimum risk:
 
 ---
 
-<details><summary>Licence (MIT) — taste-skill</summary>
-
-```text
-MIT License
-
-Copyright (c) 2026 Leonxlnx
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-</details>
+Licence (MIT, Leonxlnx/taste-skill): `references/frontend/style/LICENSE.md`.

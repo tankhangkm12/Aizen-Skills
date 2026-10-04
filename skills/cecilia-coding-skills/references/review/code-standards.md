@@ -48,3 +48,26 @@ independent calls, timeouts everywhere.
 Commits with `[TASK]`; one logical change per commit; Draft PR with full description (context, flow, per-file
 changes, doc checklist, decisions, checks, rebase notes, impact, out-of-scope proposals); no unapproved
 dependency changes.
+
+## Size and shape — the one source for size signals
+
+Every number is a **stop-and-think line**, not a lint rule: crossing it forces one question, and "this file is
+fine" can be the answer. Crossing it without noticing is never fine.
+
+| Unit | Signal | The question it forces |
+|---|---|---|
+| Function / handler | ~30 lines · nesting > 2 · > 3 params · a boolean flag param | does it do one job? |
+| File / component file | ~300–400 lines | how many reasons does it have to change? |
+| Class / service | > 7 public methods · > 5 injected dependencies | is a second use case or another service's job hiding here? |
+| Module | owns > 5 tables · two endpoint groups sharing no data | one capability or two? |
+| Call depth | A → B → C → D inside one module | which layer adds a decision? |
+| Component props | > 7 props or ≥ 2 boolean flags | one component or several variants? |
+| Hook | > 3 pieces of state · fetches and orchestrates UI | a data hook hiding in a UI hook? |
+| Effects in one component | > 2 · props drilled > 2 levels | derived state pretending to be an effect? who owns this state? |
+
+- **Split by reason, never by size**: a different actor, lifecycle, rule or state owner. `part1`/`part2` makes the
+  metric green and the code worse; no nameable reason → leave it and say why in the PR.
+- **The test behind all the numbers**: to change one rule or screen behaviour, how many files must you open, and
+  can you explain each in one sentence? Two or three obvious ones is healthy.
+- **Adding to something already over a line** is where debt compounds: say so in the report — keep it and why,
+  or split it first as its own unit. Never silently make a known-heavy file heavier.

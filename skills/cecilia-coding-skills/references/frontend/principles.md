@@ -105,34 +105,6 @@ Banned: `data2`, `temp`, `tmp`, `obj`, `doStuff`, `handle` alone, `Wrapper`/`Con
 bare `manager`/`helper`, catch-all `utils`/`common` files (split by topic: `date.util.ts`,
 `money.util.ts`). If you must open the file to know what it does, rename it.
 
-## 10. Size and shape — thresholds that are signals, not laws
+## 10. Size and shape
 
-Every number here is a **stop-and-think line**, not a lint rule: crossing it means asking one question,
-and the answer may legitimately be "this file is fine". What is never fine is crossing it without
-noticing. A codebase does not become unmaintainable by one bad component; it becomes unmaintainable by
-fifty reasonable additions that nobody was asked to justify.
-
-| Unit | Signal | The question it forces | What it usually means |
-|---|---|---|---|
-| Function / handler | ~30 lines · nesting > 2 · > 3 params | already covered in §3 | — |
-| **Component file** | ~300–400 lines | "how many reasons does this file have to change?" | more than one → split by reason, never by line count |
-| **Component props** | > 7 props, or ≥ 2 boolean flags | "is this one component or three?" | flags usually mark hidden variants |
-| **Hook** | > 3 pieces of state · both fetching and orchestrating UI | "is there a data hook hiding inside this UI hook?" | one hook doing the data layer's job and the screen's |
-| **Effects in one component** | > 2 | "which of these is derived state pretending to be an effect?" | synchronising what render could compute |
-| **Prop drilling depth** | passed through > 2 components untouched | "who actually owns this state?" | state placed above the level the design named |
-| **JSX nesting** | deeply nested conditional blocks in one return | "is a branch here really a separate component?" | variants that deserve names |
-
-**Split by reason, never by size.** Cutting a 600-line screen into `OrderDetailPart1` and `Part2` makes
-the metric green and the code worse. The correct cut follows a reason to change: a different actor, a
-different state owner, a different part of the design. If you cannot name the reason, do not split —
-say so in the PR and leave it, with the reason you could not.
-
-**The test that replaces all the numbers.** To change one screen behaviour, how many files must you
-open — and is there a file you open whose relevance you cannot explain in one sentence? Two or three
-files, each obviously relevant, is healthy. Seven files, two of which you open "because something
-breaks otherwise", is the real defect, whatever the line counts say.
-
-**Adding to something already over the line** is where debt compounds. Touching a component already
-past a signal → say so in the implementation brief (F3) with one sentence: keep it and why, or split it
-first as its own task. Never silently make a known-heavy component heavier; that is the move that turns
-a 400-line screen into a 2000-line one, one innocent change at a time.
+Signals and how to act on them: `references/review/code-standards.md` §Size and shape (the one source).

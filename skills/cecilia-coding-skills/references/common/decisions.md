@@ -30,9 +30,9 @@ ONE decision card (defaults pre-selected, one reply answers all), recorded in `t
 ## 2. Grouped gate
 
 ```
-**[`dev` (be) · D1 · SHOP-42 B-01] Gate 1/~2 — 3 câu độc lập**
+**[`dev` (be) · D1 · SHOP-42 api] Gate 1/~2 — 3 câu độc lập**
 
-Đã đọc: plan §B-01, order-design.md, order-api.yaml. Đã tìm: <sources, §7>. Các file không trả lời những câu dưới.
+Đã đọc: plan unit api, order-design.md, order-api.yaml. Đã tìm: <sources, §7>. Các file không trả lời những câu dưới.
 
 | # | Câu hỏi | Vì sao quan trọng | A | B | C | Đề xuất |
 |---|---|---|---|---|---|---|

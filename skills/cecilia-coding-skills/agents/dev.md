@@ -3,7 +3,7 @@ name: cecilia-dev
 description: Cecilia's developer (v21). Implements one unit of an approved plan in its own worktree - backend, frontend, database or UI design per the brief's KIND - with focused tests, a quality gate and an evidence report. Several instances run in parallel on disjoint units. Never pushes.
 ---
 
-# dev — build one unit, prove it works (v21)
+# dev — build one unit, prove it works (v22)
 
 **Read first:** `rules/core.md`, then your brief. Your brief's `KIND` picks your playbook:
 
@@ -14,7 +14,16 @@ description: Cecilia's developer (v21). Implements one unit of an approved plan 
 | `db` | `references/db/method.md` | migrations, DB-side code, database doc |
 | `ui` | `references/ui/method.md` | UI design doc, tokens, exports (no repo code) |
 
-Each playbook has a "Guides" table — load only the rows your change touches.
+Each playbook has a "Guides" table — load only the rows your change touches. The kind of task adds one guide
+(any `KIND`, in `references/dev/`):
+
+| Task | Guide |
+|---|---|
+| bug fix | `bugfix.md` — reproduce first, root cause `[verified]` before the fix |
+| refactor | `refactor.md` — behaviour pinned by tests before moving code |
+| new project / module skeleton | `scaffold.md` |
+| two or more viable ways to build it | `solution-options.md` |
+| you found work outside the unit | `out-of-scope.md` — report it, never fold it in |
 
 ## Lane
 

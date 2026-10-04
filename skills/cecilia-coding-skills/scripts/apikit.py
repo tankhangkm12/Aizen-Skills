@@ -11,8 +11,9 @@ parallel; "xN" repeats a call N times (the N+1 pattern). The critical path is th
 slowest call. Latency per call: --latency-ms (one value or LOW,EXPECTED,HIGH).
 
 Reads OpenAPI 3 as JSON, or YAML (PyYAML when installed; otherwise a built-in reader for the plain block
-YAML specs are written in — anchors and flow collections spanning lines are not supported). Standard
-library only; Python 3.9+. Everything it prints is [projected] or [verified from the spec]; it never calls
+YAML specs are written in — anchors and flow collections spanning lines are not supported, and a spec it
+cannot read as an object with `paths` is refused, never half-read). Standard library only; Python 3.9+.
+Exit codes: 0 ok, 2 unreadable input or bad arguments. Everything it prints is [projected] or [verified from the spec]; it never calls
 the API.
 """
 from __future__ import annotations
@@ -148,15 +149,30 @@ def mini_yaml(text: str):
     return parse(0)
 
 
+def die(msg: str):
+    print(msg, file=sys.stderr)
+    raise SystemExit(2)
+
+
 def load(path: str) -> dict:
-    text = Path(path).read_text(encoding="utf-8-sig")
-    if path.endswith(".json") or text.lstrip().startswith("{"):
-        return json.loads(text)
     try:
-        import yaml  # type: ignore
-        return yaml.safe_load(text)
-    except ImportError:
-        return mini_yaml(text)
+        text = Path(path).read_text(encoding="utf-8-sig")
+        if path.endswith(".json") or text.lstrip().startswith("{"):
+            spec = json.loads(text)
+        else:
+            try:
+                import yaml  # type: ignore
+                spec = yaml.safe_load(text)
+            except ImportError:
+                spec = mini_yaml(text)
+    except (OSError, ValueError) as e:  # yaml.YAMLError subclasses Exception, caught below
+        die(f"apikit: cannot read {path}: {e}")
+    except Exception as e:  # noqa: BLE001 — PyYAML parse errors
+        die(f"apikit: cannot parse {path}: {e}")
+    if not isinstance(spec, dict) or not isinstance(spec.get("paths"), dict):
+        die(f"apikit: {path} has no `paths` object — not OpenAPI 3, or YAML the built-in reader cannot "
+                         "handle (convert to JSON or install PyYAML, A3)")
+    return spec
 
 
 def resolve(spec: dict, node):
@@ -303,10 +319,22 @@ def journey(calls: str, latency: tuple) -> dict:
 
 # --------------------------------------------------------------------------- diff
 
+def params(spec: dict, item: dict, op: dict) -> dict:
+    """Path-level parameters overridden by operation-level ones, keyed by (in, name) → by name."""
+    out = {}
+    for x in (item or {}).get("parameters") or [], op.get("parameters") or []:
+        for p in (resolve(spec, y) for y in x):
+            if isinstance(p, dict):
+                out[f"{p.get('in', '')}:{p.get('name')}"] = p
+    return {k.split(":", 1)[1]: v for k, v in out.items()}
+
+
 def diff(old: dict, new: dict) -> list[dict]:
     out = []
     o_ops = {(p, m): op for p, m, op, _ in operations(old)}
     n_ops = {(p, m): op for p, m, op, _ in operations(new)}
+    o_items = {(p, m): item for p, m, _, item in operations(old)}
+    n_items = {(p, m): item for p, m, _, item in operations(new)}
     for key in o_ops:
         if key not in n_ops:
             out.append({"breaking": True, "where": f"{key[1]} {key[0]}", "change": "endpoint removed"})
@@ -315,11 +343,20 @@ def diff(old: dict, new: dict) -> list[dict]:
         if oop is None:
             continue
         where = f"{key[1]} {key[0]}"
-        oreq = {p.get("name"): p for p in [resolve(old, x) for x in oop.get("parameters") or []] if isinstance(p, dict)}
-        nreq = {p.get("name"): p for p in [resolve(new, x) for x in nop.get("parameters") or []] if isinstance(p, dict)}
+        oreq, nreq = params(old, o_items[key], oop), params(new, n_items[key], nop)
         for n, p in nreq.items():
             if p.get("required") and (n not in oreq or not oreq[n].get("required")):
                 out.append({"breaking": True, "where": where, "change": f"parameter '{n}' is now required"})
+        for n, p in oreq.items():
+            if n not in nreq:
+                out.append({"breaking": True, "where": where, "change": f"parameter '{n}' removed"})
+                continue
+            os_, ns = resolve(old, p.get("schema") or {}), resolve(new, nreq[n].get("schema") or {})
+            if os_.get("type") != ns.get("type"):
+                out.append({"breaking": True, "where": where, "change": f"parameter '{n}' type {os_.get('type')} → {ns.get('type')}"})
+            gone = set(os_.get("enum") or []) - set(ns.get("enum") or os_.get("enum") or [])
+            if gone:
+                out.append({"breaking": True, "where": where, "change": f"parameter '{n}' enum lost {sorted(gone, key=str)}"})
         ob = ((oop.get("requestBody") or {}).get("content") or {})
         nb = ((nop.get("requestBody") or {}).get("content") or {})
         for mt in nb:
@@ -346,6 +383,9 @@ def diff(old: dict, new: dict) -> list[dict]:
                     elif of[f].get("type") != nf[f].get("type"):
                         out.append({"breaking": True, "where": f"{where} {code}",
                                     "change": f"'{f}' type {of[f].get('type')} → {nf[f].get('type')}"})
+                    elif of[f].get("enum") and nf[f].get("enum") and set(of[f]["enum"]) - set(nf[f]["enum"]):
+                        out.append({"breaking": True, "where": f"{where} {code}",
+                                    "change": f"'{f}' enum lost {sorted(set(of[f]['enum']) - set(nf[f]['enum']), key=str)}"})
                     elif of[f].get("enum") and nf[f].get("enum") and set(nf[f]["enum"]) > set(of[f]["enum"]):
                         out.append({"breaking": False, "where": f"{where} {code}",
                                     "change": f"'{f}' enum gained {sorted(set(nf[f]['enum']) - set(of[f]['enum']))} — "
@@ -385,7 +425,13 @@ def main() -> int:
                 print(f"  {f['severity']:10} {f['where']:40} {f['finding']}")
         return 0
     if a.cmd == "journey":
-        lat = tuple(float(x) for x in a.latency_ms.split(","))
+        try:
+            lat = tuple(float(x) for x in a.latency_ms.split(","))
+        except ValueError:
+            lat = ()
+        if len(lat) not in (1, 3) or min(lat, default=-1) < 0:
+            print("apikit: --latency-ms takes one value or LOW,EXPECTED,HIGH (ms, ≥ 0)", file=sys.stderr)
+            return 2
         lat = lat * 3 if len(lat) == 1 else lat
         r = journey(a.calls, lat)
         if a.json:

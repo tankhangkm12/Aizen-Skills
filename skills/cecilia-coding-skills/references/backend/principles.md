@@ -96,34 +96,6 @@ Banned: `data2`, `temp`, `tmp`, `res2`, `obj`, `doStuff`, `handle`, `process`, b
 catch-all `utils`/`common` files (split by topic: `date.util.ts`, `money.util.ts`). If you must open the
 file to know what it does, rename it.
 
-## 10. Size and shape — thresholds that are signals, not laws
+## 10. Size and shape
 
-Every number here is a **stop-and-think line**, not a lint rule: crossing it means asking one question,
-and the answer may legitimately be "this file is fine". What is never fine is crossing it without
-noticing. Code does not become unmaintainable by one bad function; it becomes unmaintainable by
-fifty reasonable additions that nobody was asked to justify.
-
-| Unit | Signal | The question it forces | What it usually means |
-|---|---|---|---|
-| Function | ~30 lines · nesting > 2 · > 3 params | already covered in §3 | — |
-| **File** | ~300–400 lines | "how many reasons does this file have to change?" | more than one → split by reason, never by line count |
-| **Class / service** | > 7 public methods | "is there a second use case hiding in here?" | a cohesive group of methods wants its own service |
-| **Constructor** | > 5 injected dependencies | "what is this orchestrating that it should not?" | the classic sign a service took over another's job |
-| **Module** | owns > 5 tables · two endpoint groups sharing no data | "is this one capability or two?" | boundary drawn around a noun, not around a behaviour |
-| **Call depth** | A → B → C → D inside one module | "which of these layers adds a decision?" | pass-through layers that only forward arguments |
-| **Branching** | a business rule spread across nested conditions in a service | "should this rule live in the domain?" | rules leaking out of the domain into orchestration |
-
-**Split by reason, never by size.** Cutting a 600-line file into `order.service.part1` and
-`.part2` makes the metric green and the code worse. The correct cut follows a reason to change:
-a different actor, a different lifecycle, a different rule owner. If you cannot name the reason, do
-not split — say so in the PR and leave it, with the reason you could not.
-
-**The test that replaces all the numbers.** To change one business rule, how many files must you
-open — and is there a file you open whose relevance you cannot explain in one sentence? Two or three
-files, each obviously relevant, is healthy. Seven files, two of which you open "because something
-breaks otherwise", is the real defect, whatever the line counts say.
-
-**Adding to something already over the line** is where debt compounds. Touching a file or class
-already past a signal → say so in the implementation brief (D3) with one sentence: keep it and why,
-or split it first as its own task. Never silently make a known-heavy file heavier; that is the move
-that turns a 400-line file into a 2000-line one, one innocent change at a time.
+Signals and how to act on them: `references/review/code-standards.md` §Size and shape (the one source).

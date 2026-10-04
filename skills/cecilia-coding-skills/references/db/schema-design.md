@@ -72,4 +72,4 @@ Research the function in official docs; unsure → Assumptions, never guess.
 | 11 | (`dev` (db)) Pool size × instances (+ migrations, jobs, admin) ≤ the server's connection limit, with headroom | |
 | 12 | (`dev` (db)) Every heavy query has a plan captured on representative data, or is marked `[unverified]` | |
 
-When `planner` (design) writes this document as the fallback, rows 9–12 read "not assessed — `dev` (db) off".
+When `planner` (design) writes this document as the fallback, rows 9–12 read "not assessed — no db unit".

@@ -39,8 +39,7 @@ Tick what applies; groups the change does not touch → write "n/a" in your head
 - [ ] Names: role-suffixed files, intent-named repository methods, no banned names
 - [ ] Comments: docstrings on public API, doc references, step comments in flows, why-comments; no noise, no commented-out code, no TODO without task id
 - [ ] No abstraction without an external dependency or ≥ 2 real implementations
-- [ ] Size signals checked (§10): file ~≤400 lines, class ≤7 public methods, ≤5 constructor deps,
-      no pass-through layer — each crossing either justified in the PR or split by reason
+- [ ] Size signals checked (`references/review/code-standards.md` §Size and shape) — each crossing justified in the PR or split by reason
 - [ ] Any file/class already over a signal that this change touches: named in the brief, with keep-or-split stated
 - [ ] Async style consistent; independent calls parallel; retries only idempotent with backoff
 - [ ] Structured logs with requestId at the right places, none in hot loops

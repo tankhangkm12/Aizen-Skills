@@ -17,7 +17,6 @@ Numeric inputs accept one value or three: "LOW,EXPECTED,HIGH".
   capacity.py forecast    --users 20000,50000,100000 --monthly-growth 0.03,0.08,0.15 --rows-per-user-month 2,4,8 \
                           --row-bytes 180 --index-bytes-per-row 90 --months 36 --peak-factor 5,10,30 \
                           --ram-gb 16 --storage-gb 500 --write-limit 3000 --restore-mbps 100,200,400 --rto-minutes 60
-  capacity.py threshold   (same inputs as forecast — prints only the "when does it break" table)
   capacity.py docsize     --fields "_id:objectId,userId:objectId,status:string=8,total:decimal128,items:array=400,createdAt:date"
   capacity.py restore     --data-gb 50,120,300 --restore-mbps 100,200,400 --index-factor 0.3,0.6,1.0 --rto-minutes 60
 
@@ -79,7 +78,9 @@ def pg_col(c, notes):
     t, a = c["type"], c["args"]
     fixed = {"smallint": 2, "int2": 2, "integer": 4, "int": 4, "int4": 4, "bigint": 8, "int8": 8,
              "real": 4, "float4": 4, "double precision": 8, "float8": 8, "boolean": 1, "bool": 1, "date": 4,
-             "timestamp": 8, "timestamptz": 8, "time": 8, "uuid": 16, "money": 8, "serial": 4, "bigserial": 8}
+             "timestamp": 8, "timestamptz": 8, "time": 8, "uuid": 16, "money": 8, "serial": 4, "bigserial": 8,
+             "timestamp with time zone": 8, "timestamp without time zone": 8, "time without time zone": 8,
+             "time with time zone": 12, "timetz": 12, "smallserial": 2, "serial4": 4, "serial8": 8}
     if t in fixed:
         return fixed[t]
     if t in {"numeric", "decimal"}:
@@ -211,6 +212,9 @@ def report(title, formula, inputs, rows, assumptions, verify, sens=None, as_json
     print("\nInputs:")
     for k, v in inputs.items():
         print(f"  - {k}: {v}")
+    if not rows:
+        print("\n(no rows in range — widen --months or --report-months)")
+        return
     headers = list(rows[0].keys())
     print("\n| " + " | ".join(headers) + " |")
     print("|" + "---|" * len(headers))
@@ -268,7 +272,8 @@ def cmd_growth(a):
     per_row, _ = row_bytes(a.engine, cols, notes)
     pk_cols = [cols[0]]
     pk_bytes = pg_col(cols[0], []) if a.engine == "postgres" else mysql_col(cols[0], [])
-    idx_specs = [pk_cols] + [parse_columns(i) for i in (a.index or [])]
+    # InnoDB: the PK *is* the clustered table, so only PostgreSQL pays for a separate PK index
+    idx_specs = ([pk_cols] if a.engine == "postgres" else []) + [parse_columns(i) for i in (a.index or [])]
     names = ("low", "expected", "high")
     rows_out = []
     for i, name in enumerate(names):
@@ -473,13 +478,14 @@ def thresholds(a, months):
     return out
 
 
-def cmd_forecast(a, only_thresholds=False):
+def cmd_forecast(a):
     names = ("low", "expected", "high")
+    wanted = set(a.report_months) | {a.months}  # the horizon itself is always reported
     table, breaks = [], {}
     for i, name in enumerate(names):
         months = forecast_rows(a, i)
         for r in months:
-            if r["month"] in a.report_months:
+            if r["month"] in wanted:
                 table.append({"scenario": name, "month": r["month"], "users": f"{r['users']:,.0f}",
                               "rows": f"{r['rows']:,.0f}", "data": human(r["data"]), "indexes": human(r["index"]),
                               "writes/s avg → peak": f"{r['writes_avg']:,.1f} → {r['writes_peak']:,.0f}",
@@ -506,10 +512,9 @@ def cmd_forecast(a, only_thresholds=False):
               "table + index size", "compare the growth rate with the production metric each month and re-run"]
     assumptions = ["compound growth continues for the whole horizon — the high case is the one to plan headroom for",
                    "bytes/row from `capacity.py rowsize`/`docsize` or a measured sample", "peak factor from real traffic (sales days)"]
-    if not only_thresholds:
-        report("Data growth forecast", formula, inputs, table, assumptions, verify, sens, a.json)
-        if not a.json:
-            print()
+    report("Data growth forecast", formula, inputs, table, assumptions, verify, sens, a.json)
+    if not a.json:
+        print()
     report("When does it break (first month a threshold is crossed)", formula[-2:], inputs, break_rows,
            ["thresholds are planning lines, not engine limits: 70% RAM hot set, 80% disk, RTO from the business"],
            ["watch the same metrics in monitoring and set alerts at these lines"], None, a.json)
@@ -554,6 +559,8 @@ def cmd_docsize(a):
 
 
 def cmd_restore(a):
+    if min(a.restore_mbps) <= 0:
+        raise SystemExit("--restore-mbps must be > 0 for every scenario (measure it: restore a sample, time it)")
     rows = []
     for i, name in enumerate(("low", "expected", "high")):
         load_min = a.data_gb[i] * 1024 / a.restore_mbps[i] / 60
@@ -673,9 +680,6 @@ def main(argv=None) -> int:
     p = sub.add_parser("forecast", help="data growth with compound growth, seasonality, retention + thresholds")
     forecast_args(p)
     p.set_defaults(fn=cmd_forecast)
-    p = sub.add_parser("threshold", help="only the 'when does it break' table of forecast")
-    forecast_args(p)
-    p.set_defaults(fn=lambda a: cmd_forecast(a, only_thresholds=True))
 
     p = sub.add_parser("docsize", help="MongoDB BSON document size")
     common(p, engine=False)
