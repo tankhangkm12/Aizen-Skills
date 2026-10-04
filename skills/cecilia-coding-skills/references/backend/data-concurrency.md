@@ -21,7 +21,7 @@ layer with explicit names (`fromUtc`, `toUtc`) · inject a Clock, never call `no
 ## 3. Race & duplicate patterns to recognise
 Lost update (read-compute-write without lock/version) · double submit · check-then-act · at-least-once
 reprocessing (consumers, webhooks, overlapping cron) · oversell (`SUM < limit` then insert) · deadlock
-(different lock order). The LLD should name the mechanism; if it does not → `workflows/solution-options.md`.
+(different lock order). The LLD should name the mechanism; if it does not → `references/dev/solution-options.md`.
 
 ## 4. Mechanisms (implement the one the docs chose)
 | Mechanism | Implementation notes |

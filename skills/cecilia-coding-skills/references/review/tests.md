@@ -1,7 +1,7 @@
 # Reviewing tests (test code, test-case catalogs, run reports)
 
 ## 1. Coverage against the docs (heaviest)
-- Every AC/FR/BR in the batch has ≥ 1 test case; every error code has a triggering case; every endpoint has
+- Every AC/FR/BR in scope has ≥ 1 test case; every error code has a triggering case; every endpoint has
   happy + invalid + forbidden; every allowed and blocked state transition; every CORE operation has a
   concurrency case proving the documented mechanism; idempotency replay/conflict cases; NFR targets tested
   where in scope. Produce the table `ID · TCs · automated? · gap`.
@@ -47,5 +47,5 @@ From STANDARD each tester runs one lens and writes `tensura/reports/<TASK>/test-
 
 Other review lenses use the test reports as evidence.
 
-Severity and finding format: same as `review-code.md` §2–§3 (a missing test for a CORE/money/security rule is
-a Blocker for batch completion; a weak assertion on a low-risk path is Should-fix).
+Severity and finding format: same as `code.md` §2–§3 (a missing test for a CORE/money/security rule is
+a BLOCKER; a weak assertion on a low-risk path is SHOULD-FIX).

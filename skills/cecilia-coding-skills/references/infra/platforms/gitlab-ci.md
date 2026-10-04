@@ -63,10 +63,10 @@ deploy_staging:
 - GitLab **environments** give deployment history and the "rollback" button — that history is only
   meaningful if every deploy goes through the environment rather than a raw script.
 - `when: manual` plus a protected environment is how a production deploy gets its human gate; that
-  gate is Cecilia's (`authority.md` §1).
+  gate is Cecilia's (`references/infra/authority.md` §1).
 - Review apps: `environment.on_stop` with an expiry, or they accumulate silently
-  (`environments.md` §4).
-- Rollback still has to be rehearsed (`deploy-and-rollback.md` §4) — the button is not proof.
+  (`references/infra/environments.md` §4).
+- Rollback still has to be rehearsed (`references/infra/deploy-and-rollback.md` §4) — the button is not proof.
 
 ## 5. Caching and artifacts
 
@@ -80,7 +80,7 @@ for correctness.
 `glab ci status` / `glab ci trace` (or the gitlab MCP server) · `CI_DEBUG_TRACE` only on a branch
 with no protected variables in scope — it prints the environment, secrets included · validate the
 config with the CI Lint endpoint before pushing · reproduce in the same image locally
-(`mcp-and-tools.md` §4).
+(`references/infra/mcp-and-tools.md` §4).
 
 ## 7. Checklist
 

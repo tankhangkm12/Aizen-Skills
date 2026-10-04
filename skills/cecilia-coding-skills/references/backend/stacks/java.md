@@ -1,6 +1,6 @@
 # Java
 
-Read after `code/principles.md`. Repo build and style config (Maven/Gradle, Checkstyle, Spotless) wins.
+Read after `references/backend/principles.md`. Repo build and style config (Maven/Gradle, Checkstyle, Spotless) wins.
 
 ## 1. Stack is never assumed
 Existing repo → detect from `pom.xml`/`build.gradle*`, confirm in one line. New project and docs silent →

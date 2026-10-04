@@ -58,12 +58,12 @@ parts that would have been much worse with different timing, load or day of week
 
 | # | Action | Role | Why | Tracked as |
 |---|---|---|---|---|
-| 1 | | dev-be / dev-fe / devops / test / design / plan | | batch or PR |
+| 1 | | dev (be/fe/db) / devops / tester / planner | | plan unit or PR |
 
 Two questions every incident asks of this skill's own work, answered explicitly:
 
-- **Would an alert have caught this sooner?** (`observability.md` §4) →
-- **Had the rollback been rehearsed, and did it behave as expected?** (`deploy-and-rollback.md` §4) →
+- **Would an alert have caught this sooner?** (`references/infra/observability.md` §4) →
+- **Had the rollback been rehearsed, and did it behave as expected?** (`references/infra/deploy-and-rollback.md` §4) →
 
 ## 9. Needs your decision
 

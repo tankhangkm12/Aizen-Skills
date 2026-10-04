@@ -39,8 +39,8 @@ Cite sources in findings; no access → `[unverified]` + what to check.
 
 Every consequential choice in the design shows ≥ 3 options when three genuinely exist (or says why
 fewer), compared on the same criteria, with the recommendation separate and a note of what would change
-it (`decisions.md` §6). NFRs and sizing carry projections with formula, inputs and low/expected/high
-(`numbers.md`). A design that states "scales well" or picks a technology without a comparison is a
+it (`references/common/decisions.md` §6). NFRs and sizing carry projections with formula, inputs and low/expected/high
+(`references/common/numbers.md`). A design that states "scales well" or picks a technology without a comparison is a
 SHOULD-FIX; a choice that fails its own projection is a BLOCKER.
 
 ## 5. Feasibility vs context

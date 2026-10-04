@@ -44,7 +44,7 @@ Sample deliberately rather than reading everything: every row where the ownershi
 join · every bulk endpoint · every endpoint added since the last review · every admin endpoint. For
 each, cite the file and line that enforces it, or report it as unenforced.
 
-Report the result as counts (`common/evidence.md`): endpoints with a stated ownership rule / total, and
+Report the result as counts (`references/common/evidence.md`): endpoints with a stated ownership rule / total, and
 endpoints verified in code / sampled. Never "authorization looks fine".
 
 ## 4. When there is no contract

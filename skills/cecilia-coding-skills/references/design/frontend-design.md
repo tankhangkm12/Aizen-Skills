@@ -1,6 +1,6 @@
 # Frontend design → `<app>-frontend.md` (path per `references/common/workspace.md` §2.1)
 
-Architecture, not visual design: structure, data, states and behaviour. Layout, colour and typography belong to `dev` (ui) when it is on in `.cecilia/config.json` — it designs every SCR × state listed here. When it is off, they are out of scope unless Cecilia asks; if she has a design system, record its name and where components come from.
+Architecture, not visual design: structure, data, states and behaviour. Layout, colour and typography belong to `dev` (ui) when the plan has a ui unit — it designs every SCR × state listed here. When it is off, they are out of scope unless Cecilia asks; if she has a design system, record its name and where components come from.
 
 No API contract yet → design screens, states and components anyway, and produce the **data requirements list** the contract must satisfy — that list is how the backend learns what the frontend needs before either exists.
 
@@ -50,7 +50,7 @@ validation and never contradicts it — where they differ, that is a finding.
 | 8 | Budgets stated as numbers, with how they will be measured |
 | 9 | Every technology choice cites a source and a version |
 
-**FE-7 — Report · 🛑** (`common/evidence.md` §3) + the two metrics + the contract-gap list, which goes to
+**FE-7 — Report · 🛑** (`references/common/evidence.md` §3) + the two metrics + the contract-gap list, which goes to
 `planner` (design) (backend mode)` as change requests. Then one question: what next.
 
 ## Contract gaps — the section that earns this skill its place
@@ -62,5 +62,5 @@ validation and never contradicts it — where they differ, that is a finding.
 ```
 
 Every row is a question for `planner` (design) (backend mode)` and a decision for Cecilia. Found during design, a gap
-costs one contract edit; found during implementation, it costs a stalled frontend batch and a backend
+costs one contract edit; found during implementation, it costs a stalled frontend unit and a backend
 change mid-flight. This table is the cheapest thing in the whole workflow.

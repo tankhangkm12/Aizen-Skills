@@ -9,7 +9,7 @@ lost updates, double spend, oversell, deadlocks, lock waits, pool exhaustion, la
 ## Oracle
 LLD concurrency mechanism per CORE operation (`D-nn`: version column, conditional update, row lock,
 unique key, idempotency key) · NFR numbers (p95/p99, rps, error rate, pool size) · `[projected]` figures
-from `numbers.md` that the design was built on.
+from `references/common/numbers.md` that the design was built on.
 
 ## Techniques
 - **Races:** N parallel actors on one key started by a barrier (latch, `asyncio.gather`, `Promise.all`), not

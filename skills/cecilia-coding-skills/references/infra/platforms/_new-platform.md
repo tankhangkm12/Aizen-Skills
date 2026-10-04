@@ -22,16 +22,16 @@ applies, a Dockerfile nothing builds. Half-migrations are common and they are ex
 mentions in the interview. Then confirm with Cecilia before building on any of it (Y1).
 
 Nothing found → this is a choice, not a detection. Present options with trade-offs and let her pick
-(`common/decisions.md` §1). Never install a platform because it is the popular one.
+(`references/common/decisions.md` §1). Never install a platform because it is the popular one.
 
 ## 2. Working with a platform that has no guide here
 
-The principles in `pipeline-design.md`, `deploy-and-rollback.md`, `environments.md`,
-`observability.md`, `secrets.md` and `authority.md` are platform-independent — they all still apply.
+The principles in `references/infra/pipeline-design.md`, `references/infra/deploy-and-rollback.md`, `references/infra/environments.md`,
+`references/infra/observability.md`, `references/infra/secrets.md` and `references/infra/authority.md` are platform-independent — they all still apply.
 Only the syntax is unknown. So:
 
 1. **Read the repo's existing config first.** The established pattern in this repo outranks anything
-   general (`common/workspace.md` §3). Copy its conventions: naming, structure, how environments are
+   general (`references/common/workspace.md` §3). Copy its conventions: naming, structure, how environments are
    expressed.
 2. **Research the actual version in use** (`references/common/decisions.md` §7): official docs first, then release
    notes. Infrastructure syntax and defaults move quickly, and a confidently-remembered flag that no

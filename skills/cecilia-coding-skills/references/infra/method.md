@@ -47,7 +47,7 @@ CI/CD, manifests and IaC are CONTROLLED by default.
 
 | Task | Read |
 |---|---|
-| CI, pipeline stages, slow pipeline | `pipeline-design.md`, `platforms/github-actions.md` / `gitlab-ci.md` |
+| CI, pipeline stages, slow pipeline | `pipeline-design.md`, `platforms/github-actions.md` / `references/infra/platforms/gitlab-ci.md` |
 | containerize, image | `platforms/docker.md` |
 | deploy, environments, staging | `deploy-and-rollback.md`, `environments.md` |
 | Kubernetes / Helm | `platforms/kubernetes-helm.md` |

@@ -7,7 +7,7 @@ request — fails under load with "too many connections" long before CPU runs ou
 ## 1. The budget — write it in the database doc §9
 
 Compute it, do not estimate it: `scripts/capacity.py connections …` for server RAM and
-`scripts/capacity.py throughput …` for busy connections per instance (`numbers.md`).
+`scripts/capacity.py throughput …` for busy connections per instance (`references/common/numbers.md`).
 
 ```
 Σ over consumers (instances at peak × pool max per instance)

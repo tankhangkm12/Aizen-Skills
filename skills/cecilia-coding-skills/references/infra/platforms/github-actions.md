@@ -55,17 +55,17 @@ jobs:
 - Reusable workflows (`workflow_call`) for shared logic; composite actions for shared steps. Copy the
   same 40 lines into six workflows and they will diverge.
 - **Environments** (`environment: production`) give required reviewers and environment-scoped
-  secrets — this is how a production deploy gets a human gate, and it matches `authority.md`: the
+  secrets — this is how a production deploy gets a human gate, and it matches `references/infra/authority.md`: the
   approval lives in the platform, not in a convention.
 - Artifacts between jobs via `upload-artifact`/`download-artifact`; never rebuild
-  (`deploy-and-rollback.md` §1).
+  (`references/infra/deploy-and-rollback.md` §1).
 
 ## 5. Secrets
 
 Repository, environment or organization secrets only — never in the workflow file, never in
 `env:` at workflow level where every job inherits them. They are masked in logs, but masking is
 pattern-matching: a transformed secret (base64'd, split, JSON-encoded) prints in the clear. Never
-echo one, and never pass one in argv (`secrets.md` §2).
+echo one, and never pass one in argv (`references/infra/secrets.md` §2).
 
 `GITHUB_TOKEN` expires with the run and is preferable to a PAT. If a PAT is unavoidable, it is
 fine-grained, minimally scoped, expiring, and its rotation owner is written in
@@ -76,7 +76,7 @@ the infrastructure doc.
 `gh run list` / `gh run view <id> --log-failed` (or the github MCP server) · re-run a single failed
 job rather than the whole workflow · `ACTIONS_STEP_DEBUG` as a repository secret for verbose logs,
 removed afterwards · reproduce inside the same container image locally before editing the workflow
-(`mcp-and-tools.md` §4).
+(`references/infra/mcp-and-tools.md` §4).
 
 ## 7. Checklist
 

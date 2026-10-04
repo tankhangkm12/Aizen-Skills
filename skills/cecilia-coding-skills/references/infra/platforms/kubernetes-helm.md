@@ -4,14 +4,14 @@
 
 `kubectl` and `helm` act on whatever context is current, and the difference between staging and
 production is one forgotten flag. State the context and namespace in every approval quote
-(`authority.md` §3) and prefer explicit `--context` and `-n` on every command rather than relying on
-the current one. Production contexts are Cecilia's only (`authority.md` §1) — never selected by the agent.
+(`references/infra/authority.md` §3) and prefer explicit `--context` and `-n` on every command rather than relying on
+the current one. Production contexts are Cecilia's only (`references/infra/authority.md` §1) — never selected by the agent.
 
 ## 2. Workload essentials
 
 Each of these has a specific failure it prevents; none is boilerplate.
 
-- **Probes**: readiness and liveness separate, per `observability.md` §1. Add a startup probe for
+- **Probes**: readiness and liveness separate, per `references/infra/observability.md` §1. Add a startup probe for
   slow boots, or liveness kills the pod mid-startup, forever.
 - **Resources**: requests always (the scheduler is blind without them); memory limit always (no
   limit means the node dies instead of the pod). CPU limits throttle — set them deliberately, not
@@ -31,7 +31,7 @@ Each of these has a specific failure it prevents; none is boilerplate.
 ConfigMap for non-secret config, Secret for the rest — remembering that a Kubernetes Secret is
 base64, **not encryption**: anyone who can read it in the namespace can read the value. Prefer an
 external secrets operator or a CSI driver so the value never exists in a manifest or in etcd
-unencrypted (`secrets.md` §3). Never `kubectl get secret -o yaml` to "check" a value.
+unencrypted (`references/infra/secrets.md` §3). Never `kubectl get secret -o yaml` to "check" a value.
 
 Config change must actually restart the pods — a ConfigMap edit alone does nothing to a running
 Deployment. Use a checksum annotation on the pod template so a config change rolls the pods.
@@ -46,7 +46,7 @@ Deployment. Use a checksum annotation on the pod template so a config change rol
 - `--atomic --timeout` so a failed upgrade rolls itself back instead of leaving half a release.
 - Pin chart and subchart versions; `helm dependency update` is a change that belongs in the PR.
 - Rollback is `helm rollback <release> <revision>` — check the revision exists (`helm history`)
-  **before** offering it as the rollback path, and rehearse it (`deploy-and-rollback.md` §4).
+  **before** offering it as the rollback path, and rehearse it (`references/infra/deploy-and-rollback.md` §4).
 - Never `helm upgrade --force`; it replaces resources and drops things you did not intend.
 
 Kustomize instead of Helm: same discipline — `kustomize build` and read the output, overlays per

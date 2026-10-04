@@ -23,7 +23,7 @@ filter, list column and state is a schema requirement; filter/sort fields need i
 7. Files/media: where stored, and whether file metadata is created **before** its parent record
    (presigned upload → nullable FK or staging table). Decide here, not in stage 5.
 8. Money representation and rounding, time storage (UTC `timestamptz`, `date` for pure dates) —
-   offer Cecilia's standards (`design-standards.md`) as the recommended option.
+   offer Cecilia's standards (`references/design/design-standards.md`) as the recommended option.
 
 ## Step 2 — Doubts before writing
 

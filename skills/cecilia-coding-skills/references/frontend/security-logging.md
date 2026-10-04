@@ -39,7 +39,7 @@ checks — see the authZ matrix in `tensura/docs/system/security.md` for who may
 ## C. Client validation mirrors, never replaces
 
 - Client rules exist for **speed of feedback**. The server stays the authority and its `errorCode`
-  drives the final message (`api-contract.md` §3).
+  drives the final message (`references/backend/api-contract.md` §3).
 - Never contradict the server: if the client accepts what the server rejects, the user hits a dead end;
   if the client rejects what the server accepts, a legitimate action becomes impossible. A mismatch
   found while building is a finding, not something to "fix" on the client.
@@ -65,7 +65,7 @@ checks — see the authZ matrix in `tensura/docs/system/security.md` for who may
   Masked forms where something is needed (`u***@x.com`, `****1234`).
 - Error reporting (Sentry-style) is configured with scrubbing **before** it is enabled, and enabling it
   at all is a tooling proposal (`references/common/decisions.md` §7), never an autonomous adoption.
-- What is worth reporting: the `errorCode`, the `requestId` (`api-contract.md` §4), the route, the
+- What is worth reporting: the `errorCode`, the `requestId` (`references/backend/api-contract.md` §4), the route, the
   `SCR` id, and whether it was the mock or the real API. That set makes a bug reproducible; a raw
   payload dump does not, and it leaks.
 - `console.log` left in shipped code is noise and sometimes a leak — remove it; use the framework's

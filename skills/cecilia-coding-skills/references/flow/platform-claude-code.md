@@ -15,7 +15,7 @@
 
 | Role | Default | Why |
 |---|---|---|
-| planner | strongest (opus) | one plan replaces three voters; quality matters most here |
+| planner | strongest (opus) | one plan drives every other dispatch; quality matters most here |
 | dev | sonnet | volume work; switch to opus for CONTROLLED units |
 | tester | sonnet | |
 | reviewer | a different model than the devs (opus when devs ran sonnet) | independence comes from a different context **and** model |

@@ -18,7 +18,7 @@ behaviour changes past everyone who signs off. Good ideas still matter — they 
 
 **① Proposal** — in the report ("Needs your decision") and the PR section "Out-of-scope proposals"; do
 not interrupt the main flow unless it is severe (data loss, security hole) → report immediately. Numbers
-for the problem (`numbers.md`), options per `decisions.md` §6:
+for the problem (`references/common/numbers.md`), options per `references/common/decisions.md` §6:
 
 ```markdown
 **P2 — N+1 query when listing orders** (`order.repository.ts:88`, not in docs)
@@ -26,8 +26,8 @@ for the problem (`numbers.md`), options per `decisions.md` §6:
 Problem: one extra query per order → 50 orders = 51 queries; measured 420 ms at 50 orders [verified M-07].
 - A. Do nothing
 - B. New task after this epic (`planner` adds it)
-- C. Separate batch inside this epic
-- D. Fold into current batch (not recommended: mixes perf with feature)
+- C. Separate unit inside this task
+- D. Fold into the current unit (not recommended: mixes perf with feature)
 I lean to B.
 ```
 Always include "do nothing". Never a single option.
@@ -43,4 +43,4 @@ batch on its own branch; commit type matches its nature (`perf`, `refactor`, `fi
 
 **No separate proposal needed only for:** registering the new module in the app wiring, or fixing
 type/lint errors your own change caused — and in CONTROLLED only when that file is inside the approved
-`scope block`. Unsure → it is out of scope; ask.
+approved write set. Unsure → it is out of scope; ask.

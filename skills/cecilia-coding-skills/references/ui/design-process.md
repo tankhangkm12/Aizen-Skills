@@ -5,7 +5,7 @@
 | Input | From | Missing → |
 |---|---|---|
 | journeys, FR/UC, AC | requirements | ask; or design from Cecilia's brief and mark every screen `[inferred]` |
-| SCR list, states per screen, CMP tree, routes | frontend architecture (`planner` (design)) | write the SCR inventory yourself (`workspace.md` §4: first writer creates ids) and send gaps to design |
+| SCR list, states per screen, CMP tree, routes | frontend architecture (`planner` (design)) | write the SCR inventory yourself (`references/common/workspace.md` §4: first writer creates ids) and send gaps to design |
 | data per screen, error codes | API contract | design with placeholders, list each as a contract gap |
 | brand, existing kit | Cecilia / repo | propose a neutral token set as an option, not a decision |
 

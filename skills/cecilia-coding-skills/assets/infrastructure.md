@@ -2,7 +2,7 @@
 
 > Task: <TASK> · Owner: `devops` · Updated: <YYYY-MM-DD> · Status: DRAFT | APPROVED
 > Sources: `tensura/docs/system/architecture.md` §7 (infrastructure components), §10 (environments + delivery expectations),
-> §11 (NFR mechanisms) · `tensura/plans/<TASK>-<slug>.md` `OPS-Bnn`
+> §11 (NFR mechanisms) · `tensura/plans/<TASK>.md` (infra unit)
 > Every resource, environment and alert below traces to one of: a flow in the HLD, an `NFR-nn`, an
 > `ENV-nn` Cecilia approved, or an `INC-nn` follow-up. Anything tracing to nothing is a question, not a row.
 > Confidence: `[verified]` = read from the live system this session · `[inferred]` · `[unverified]`

@@ -7,7 +7,7 @@ its life **before** it is big.
 ## 1. First question: does it need partitioning at all?
 
 Start from the projection: `scripts/capacity.py growth --columns … --users L,E,H --rows-per-user-month …
---months 24 --index …` gives table + index size per scenario (`numbers.md`). Decide on those numbers.
+--months 24 --index …` gives table + index size per scenario (`references/common/numbers.md`). Decide on those numbers.
 
 | Situation | Usually enough | Partition when |
 |---|---|---|

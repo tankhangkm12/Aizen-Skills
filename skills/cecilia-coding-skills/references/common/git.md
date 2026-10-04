@@ -17,14 +17,14 @@ Task branch names — `<type>/<TASK>-<nn>-<desc>`:
 
 | Type | For |
 |---|---|
-| `feature/` | a batch of new behaviour (any role: backend, frontend, db, infra) |
+| `feature/` | new behaviour (any unit: backend, frontend, db, infra) |
 | `bugfix/` · `hotfix/` | a fix · an urgent fix to released code (gitflow: from `main`) |
 | `refactor/` · `test/` · `docs/` · `ci/` · `infra/` · `chore/` | as named |
 | `int/<TASK>` | local only: merge of a parallel wave's branches for combined tests (`parallel.md` §4) |
 | `backup/<TASK>-<n>` | local only: a named checkpoint before a risky rewrite (§3) |
 
-Parallel writers on one task use one branch each, per role and unit: `feature/SHOP-42-01-dev-be-order`,
-`feature/SHOP-42-01-dev-be-payment`, `feature/SHOP-42-01-dev-fe-web`.
+Parallel writers on one task use one branch each, per unit: `feature/SHOP-42-order-api`,
+`feature/SHOP-42-payment-api`, `feature/SHOP-42-web` (`state.py brief` derives `feature/<TASK>-<unit>`).
 
 A team convention (branch pattern such as `feature/{ticket}-{slug}`, commit subject format) in `CONTRIBUTING.md` or
 `tensura/conventions.md` replaces the defaults here where they differ.
@@ -42,7 +42,7 @@ git rev-parse HEAD                # record: start SHA  → report "Rollback" sec
 ```
 
 Never edit on a protected branch, on a detached HEAD or outside a git repository. Worktrees for parallel roles are created the same way:
-`git worktree add .worktrees/<role>-<scope> -b <task-branch> <base>`.
+`git worktree add .worktrees/<unit> -b feature/<TASK>-<unit> <base>`.
 
 ## 3. Checkpoints during the work
 

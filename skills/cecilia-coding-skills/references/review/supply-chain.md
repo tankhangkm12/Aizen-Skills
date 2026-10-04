@@ -2,7 +2,7 @@
 
 ## 1. Counted, never estimated
 
-Run a real scanner and report counts with the tool, its version and the date (`common/evidence.md`):
+Run a real scanner and report counts with the tool, its version and the date (`references/common/evidence.md`):
 
 | Ecosystem | Usual tools |
 |---|---|

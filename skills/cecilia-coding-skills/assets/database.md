@@ -72,23 +72,23 @@ Seed data: · Brownfield backfill under traffic (batch size, throttle):
 ## 12. Doubts
 ## 13. Assumptions & risks
 
-## 14. Growth model & scaling (`growth-forecast.md`, `scaling-ladder.md`)
+## 14. Growth model & scaling (`references/db/growth-forecast.md`, `references/db/scaling-ladder.md`)
 Assumptions (low / expected / high): users · monthly growth · rows per user per month · peak factor · retention
 | Threshold | Crossed at (expected) | Crossed at (high) | Chosen rung | Trigger for next rung | Alert |
 |---|---|---|---|---|---|
 Last re-forecast (date, real vs projected):
 
-## 15. Engine decision (`engine-selection.md`)
+## 15. Engine decision (`references/db/engine-selection.md`)
 Engine + version: · ADR link: · Revisit when:
 | Store | Workload it owns | Source of truth? | Fed by (outbox / CDC / none) | Owner |
 |---|---|---|---|---|
 
-## 16. Backup & DR (`backup-dr.md`)
+## 16. Backup & DR (`references/db/backup-dr.md`)
 RPO: · RTO: · Retention: · Method: · Off-site copy: · Encrypted:
 | Drill date | Restored to | Measured RTO | Data lost | Problems |
 |---|---|---|---|---|
 
-## 17. Personal data inventory (`security-compliance.md`)
+## 17. Personal data inventory (`references/db/security-compliance.md`)
 Applicable law packs:
 | Table.column | Category | Sensitive? | Purpose / basis | Retention | Readers | Leaves country? | Masked outside prod? |
 |---|---|---|---|---|---|---|---|

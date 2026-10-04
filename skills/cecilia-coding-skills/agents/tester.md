@@ -20,10 +20,10 @@ A failing check outside your lane = a `BUG` + `HANDOFF: needs <role> — <what>`
 
 | Need | Read |
 |---|---|
-| designing cases | `test-design.md` |
-| choosing unit/integration/E2E | `test-levels.md` |
-| writing a bug | `bug-report.md` |
-| test strategy for a new area | `test-strategy.md` → `assets/test-plan.md` |
+| designing cases | `references/test/test-design.md` |
+| choosing unit/integration/E2E | `references/test/test-levels.md` |
+| writing a bug | `references/test/bug-report.md` |
+| test strategy for a new area | `references/test/test-strategy.md` → `assets/test-plan.md` |
 | browser evidence | `references/frontend/visual-check.md`, `scripts/uikit.py` |
 | perf/contention numbers | `scripts/capacity.py`, `references/api-ux/contention.md` |
 

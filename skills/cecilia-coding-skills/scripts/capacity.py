@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capacity calculator for Cecilia roles — numbers computed, not guessed (common v19).
+"""Capacity calculator for Cecilia roles — numbers computed, not guessed (v22).
 
 Every command prints the formula, the inputs (with which ones are assumptions), a low / expected / high
 table and a sensitivity ranking (which input moves the result most). Results are PROJECTIONS: label them
@@ -398,7 +398,7 @@ def cmd_bandwidth(a):
            ["read the load balancer / CDN metrics for bytes out per request"], as_json=a.json)
 
 
-# ------------------------------------------------------------------------------------------ v19 commands
+# ------------------------------------------------------------------------------------------ more commands
 
 def contention_model(p):
     """Poisson arrivals on one key: P(conflict per attempt) = 1 − e^(−λ·w)."""

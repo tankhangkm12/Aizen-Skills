@@ -1,6 +1,6 @@
 # Environments
 
-Every environment gets an id (`ENV-nn`, `common/workspace.md` §4) so a report, a PR or an approval quote
+Every environment gets an id (`ENV-nn`, `references/common/workspace.md` §4) so a report, a PR or an approval quote
 can never be ambiguous about which one is meant. "Staging" in one team's mouth is another's
 production.
 

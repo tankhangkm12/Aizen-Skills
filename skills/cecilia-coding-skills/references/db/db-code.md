@@ -28,7 +28,7 @@ When a case is in the middle, give Cecilia both options with cost; she decides a
 5. **Least privilege**: grant `EXECUTE` to the app role; PG `SECURITY DEFINER` only with a fixed
    `search_path` (`SET search_path = pg_catalog, <schema>`), because otherwise a caller can hijack it.
 6. **Versioned signature**: a procedure the app calls is a contract. Changing its parameters or result is
-   a change request with the dev-be impact listed; add `v2` beside `v1`, move callers, then drop `v1`.
+   a change request with the dev (be) impact listed; add `v2` beside `v1`, move callers, then drop `v1`.
 
 ## 3. Triggers — only for these
 

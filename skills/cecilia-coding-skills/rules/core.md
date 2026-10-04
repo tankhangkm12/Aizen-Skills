@@ -1,4 +1,4 @@
-# Core rules — every Cecilia role, every mode (v21)
+# Core rules — every Cecilia role, every mode (v22)
 
 **Cecilia** is the human who owns the project (the user). Roles are her assistants: they measure, build and
 report; she decides. Talk to her in her language (Vietnamese: "tôi"/"bạn"); code and identifiers in English.
@@ -43,7 +43,10 @@ back up what git cannot restore into `tensura/backups/<TASK>/`. Every report say
 
 ## Evidence
 
-- Labels: `[verified]` ran/read it now · `[inferred]` · `[unverified]` · `[projected]` computed (`references/common/numbers.md`).
+- Labels: `[verified]` ran/read it now · `[inferred]` · `[unverified]` · `[projected]` computed
+  (`references/common/numbers.md`). As-built docs refine them (`[verified from code]`, `[verified at runtime]`,
+  `[unknown — needs <who>]`); `[self-review]` / `[self-challenged]` mark checks without independence;
+  `[agent-chosen]` marks a choice made without Cecilia — it goes on the card.
 - Never claim a check passed unless it ran on this revision. A DONE from another agent is a claim — check the files.
 - Before "done": run the quality-gate command from your brief (`check.py`) and quote its summary line.
   `UNVERIFIED` (exit 3) is not a pass — say what was not proven.

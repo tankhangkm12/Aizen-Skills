@@ -1,5 +1,5 @@
 {
-  "$description": "Design tokens for <app> — Design Tokens Community Group format. Screens and components use the semantic group only; themes swap the primitives behind them. Owner: cecilia-ui. Values below are placeholders to replace.",
+  "$description": "Design tokens for <app> — Design Tokens Community Group format. Screens and components use the semantic group only; themes swap the primitives behind them. Owner: dev (KIND=ui). Values below are placeholders to replace.",
   "primitive": {
     "color": {
       "neutral": {

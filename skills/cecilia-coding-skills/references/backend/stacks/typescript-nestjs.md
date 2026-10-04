@@ -1,6 +1,6 @@
 # TypeScript / NestJS (Node backend)
 
-Read after `code/principles.md`. Repo `tsconfig`, ESLint, Prettier win. ORM (TypeORM/Prisma/MikroORM),
+Read after `references/backend/principles.md`. Repo `tsconfig`, ESLint, Prettier win. ORM (TypeORM/Prisma/MikroORM),
 validation library and broker come from tensura/docs/repo; silent → ask (one question, researched bundles).
 
 ## 1. TypeScript

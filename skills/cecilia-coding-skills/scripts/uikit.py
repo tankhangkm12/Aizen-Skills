@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""UI measurement helpers for Cecilia frontend roles — numbers, not eyeballing (v18.1).
+"""UI measurement helpers for Cecilia frontend roles — numbers, not eyeballing (v22).
 
   uikit.py contrast "#1d4ed8" "#ffffff"                  WCAG 2.x contrast ratio and AA/AAA verdicts
   uikit.py palette shot.png [--top 8] [--tokens tensura/docs/.../design-tokens.json]

@@ -1,6 +1,6 @@
 # Python
 
-Read after `code/principles.md`. Repo config (`pyproject.toml`, ruff/mypy/pyright config) wins.
+Read after `references/backend/principles.md`. Repo config (`pyproject.toml`, ruff/mypy/pyright config) wins.
 
 ## 1. Stack is never assumed
 Existing repo → detect from `pyproject.toml`/`requirements*.txt`/lock files and confirm in one line.

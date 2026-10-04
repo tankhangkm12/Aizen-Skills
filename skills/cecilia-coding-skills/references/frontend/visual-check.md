@@ -35,11 +35,11 @@ The MCP server is host configuration — Cecilia adds it herself; you only say w
   `attach` to Cecilia's real browser, a `--profile`, another `--config` or `run-code` needs her yes (A3).
   A page that must call a remote API during the check → mock it with `route` (§4) or ask.
 - **Your session and server only.** Always `-s=<member>` — the browser session in your brief's RUNTIME
-  block, or your role name (`dev-fe`, `test`) when there is no brief. Never `close-all` / `kill-all` —
+  block, or your role name (`dev`, `tester`) when there is no brief. Never `close-all` / `kill-all` —
   they stop other members' browsers (A3). Start the dev server on your own port, check the port is free
   first, note its process id, and stop it when you finish — never leave it running when you report.
 - **CONTROLLED:** the dev server command, `playwright-cli -s=<member> *` and the `uikit.py` calls must be
-  in the batch scope's `commands`; if they are not, the visual rows are `[unverified]` and the missing
+  in the plan unit's `Commands`; if they are not, the visual rows are `[unverified]` and the missing
   commands are a scope question for Cecilia.
 - **No real accounts.** Test users and seed data only. `state-save` files hold tokens: only when
   `.playwright-cli/` is in `.gitignore`; never commit or report their content.
@@ -54,7 +54,7 @@ The MCP server is host configuration — Cecilia adds it herself; you only say w
 (`python3` / `py` where `python` is not on PATH).
 
 ```bash
-S=dev-fe-B02                                   # your session name
+S=<TASK>-<unit>                               # your session name (from the brief)
 PORT=3100 npm run dev                          # your own port block (parallel.md §2), in the background;
                                                # note its process id — stop it at the end
 playwright-cli -s=$S open http://localhost:3100/orders --config=/repo/.playwright/cli.config.json
@@ -81,8 +81,8 @@ playwright-cli -s=$S close                     # then stop the dev server you st
 5. **Measure contrast** of every text/background pair you introduced:
    `python3 $UIKIT contrast "#6b7280" "#ffffff"` (AA: 4.5 text, 3 large text and UI parts).
 6. **Guidelines.** Check the changed files against `references/frontend/web-interface-guidelines.md`.
-7. **dev-fe:** fix, re-capture, re-measure — at most 3 polish rounds per screen, then report what remains
-   (a failing build or command still follows `parallel.md` §7). **`tester`:** never fix — each defect
+7. **dev (fe):** fix, re-capture, re-measure — at most 3 polish rounds per screen, then report what remains
+   (a failing build or command still follows `references/common/parallel.md` §6). **`tester`:** never fix — each defect
    is a `BUG-nn` with the screenshot as evidence.
 
 ## 4. States from the contract

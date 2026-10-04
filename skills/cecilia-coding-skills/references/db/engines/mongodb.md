@@ -44,7 +44,7 @@ Aggregations: put `$match` and `$sort` first so they use indexes; `$lookup` on i
 
 ## 6. Scale
 
-Replica set (≥ 3 voting members) for HA; sharding only after rungs 0–5 (`scaling-ladder.md`): shard key with high
+Replica set (≥ 3 voting members) for HA; sharding only after rungs 0–5 (`references/db/scaling-ladder.md`): shard key with high
 cardinality, even write distribution and present in most queries; monotonically increasing keys create a hot
 shard (hash or compound key). Time-series collections for measurements.
 

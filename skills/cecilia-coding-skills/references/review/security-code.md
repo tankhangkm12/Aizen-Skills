@@ -1,7 +1,7 @@
 # Security review of code — against the model, not against a feeling
 
 The threat model says what should be true. This pass checks whether it is, in the code, with
-citations. Where no model exists, build the minimal one first (`threat-model.md` §2–§3) — reviewing
+citations. Where no model exists, build the minimal one first (`references/design/threat-model.md` §2–§3) — reviewing
 code for "security issues" with no model produces a list of habits, not a list of risks.
 
 ## 1. Order of reading
@@ -33,7 +33,7 @@ code for "security issues" with no model produces a list of habits, not a list o
 
 ## 3. Reporting
 
-Severity from `SKILL.md`. Every finding carries the attack scenario, not just the pattern:
+Severity from `references/review/method.md`. Every finding carries the attack scenario, not just the pattern:
 
 ```markdown
 ### F-3 · High · `order.repository.ts:88` · Missing ownership in query (THR-07, EP-14)
@@ -47,5 +47,5 @@ Severity from `SKILL.md`. Every finding carries the attack scenario, not just th
 - **Test to keep it fixed:** TC — customer A requests B's order → 404 and nothing in the log
 ```
 
-Findings that need a fix become plan tasks (`SEC-Bnn` for the analysis, `BE-`/`FE-Bnn` for the change).
+Findings that need a fix go to the fix round as finding ids for the owning `dev` unit.
 This skill writes none of them itself.

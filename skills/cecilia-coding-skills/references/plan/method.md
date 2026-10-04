@@ -45,4 +45,4 @@ Questions for Cecilia: <preference/risk only, choices + default>
 ## Track and adjust
 
 Status = measured: done / failing / next, branch + SHA, open findings. When facts change, show before → after for
-the affected steps and why; CONTROLLED scope changes need Cecilia's approval again (`tracking.md`).
+the affected steps and why; CONTROLLED scope changes need Cecilia's approval again (`planning-method.md` §4).

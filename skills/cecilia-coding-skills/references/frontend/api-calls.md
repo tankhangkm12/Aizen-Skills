@@ -12,8 +12,8 @@ not something to work around locally. `<unit>-api.md` and the repo win over the 
 
 - Generated from the contract with a tool (Prism, MSW + an OpenAPI generator, orval, whatever the repo
   already has). **A hand-written mock is a second contract**, and it drifts silently until integration.
-- Regenerate whenever the contract version changes; record in the report **which version this batch
-  was built against** (`common/parallel.md` — the plan tracks it).
+- Regenerate whenever the contract version changes; record in the report **which version this unit
+  was built against** (`references/common/parallel.md` — the plan tracks it).
 - The mock must serve every documented response, including **each error code**, not just 200. A mock
   that only returns success cannot exercise the states the design requires.
 - At the planned integration point, re-verify the same screen list against the real API. Any
@@ -97,4 +97,4 @@ A field, endpoint, error code or shape the screen needs and the contract does no
    patch the generated client by hand.
 
 A local workaround is invisible at integration and expensive exactly then — that is the cost
-`common/parallel.md` exists to avoid.
+`references/common/parallel.md` exists to avoid.

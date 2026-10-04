@@ -15,7 +15,7 @@ One endpoint for both causes restart loops: a dependency blip restarts a healthy
 fails readiness again on boot. Readiness checks dependencies; liveness never does — otherwise a slow
 database restarts every instance at once.
 
-The handlers are `dev` (be) / `dev` (fe)'s to write (path ownership in SKILL.md). This skill specifies what
+The handlers are `dev` (be) / `dev` (fe)'s to write (path ownership in `references/infra/method.md`). This skill specifies what
 they must answer and wires the probes, with timeouts and thresholds that tolerate a normal hiccup.
 
 ## 2. What to collect, in priority order

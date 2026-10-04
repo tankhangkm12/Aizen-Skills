@@ -27,7 +27,7 @@ The question that settles it: after a mutation, what must refresh, and how does 
 
 ## 3. Client state
 
-Keep it small and say where each thing lives (`SKILL.md` rule 6):
+Keep it small and say where each thing lives:
 
 | Kind | Belongs in | Sign it is in the wrong place |
 |---|---|---|
@@ -72,4 +72,4 @@ Define these as shared patterns in `<app>-frontend.md`, so every screen referenc
 State the level (e.g. WCAG 2.2 AA) and what is actually checked: keyboard path through every flow ·
 focus visible and managed on route change and dialog open · labels and error association on forms ·
 contrast · motion preference. Budgets as numbers with the tool that measures them, so
-`dev` (fe) can be held to them (`common/evidence.md`) rather than asked to "keep it fast".
+`dev` (fe) can be held to them (`references/common/evidence.md`) rather than asked to "keep it fast".

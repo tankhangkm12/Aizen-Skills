@@ -14,10 +14,10 @@ motion (duration, easing), breakpoints, z-index layers.
 
 `design-tokens.json` (template `assets/design-tokens.json`) follows the Design Tokens Community Group shape
 (`$value`, `$type`) so tools and code generators can read it. `dev` (fe) maps it to CSS variables or
-the repo's theme (Tailwind config, a theme object) — the mapping is dev-fe's code.
+the repo's theme (Tailwind config, a theme object) — the mapping is dev (fe)'s code.
 
 Every colour pair that can appear together (text on surface, icon on button) is listed with its measured
-contrast ratio in the UI doc (`accessibility.md`).
+contrast ratio in the UI doc (`references/frontend/accessibility.md`).
 
 ## 2. Component spec — one per `CMP`
 
@@ -39,7 +39,7 @@ loading, error, selected/checked where relevant — each with its tokens.
 
 ## 3. Naming shared with code
 
-- Component names are the ones dev-fe will use in code (`OrderStatusBadge`), with the `CMP` id.
+- Component names are the ones dev (fe) will use in code (`OrderStatusBadge`), with the `CMP` id.
 - Variants are named like props (`size="sm"`, `status="paid"`).
 - An existing component library in the repo wins: design with its components and variants, and list any
   new variant as a proposal.

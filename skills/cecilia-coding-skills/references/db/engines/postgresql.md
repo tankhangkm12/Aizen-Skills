@@ -40,7 +40,7 @@ Version matters: state it (`SELECT version();`) and cite the official docs page 
 
 ## Connections
 - Process per connection; `max_connections` needs a restart to change. Poolers: PgBouncer, pgcat,
-  RDS Proxy. Transaction-pooling limits: see `connections.md` §4.
+  RDS Proxy. Transaction-pooling limits: see `references/db/connections.md` §4.
 - Timeouts: `statement_timeout`, `lock_timeout`, `idle_in_transaction_session_timeout`
   (`idle_session_timeout` 14+).
 

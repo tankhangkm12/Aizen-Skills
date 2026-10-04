@@ -1,7 +1,7 @@
 # Reconcile mode — existing documents vs the running system
 
 Used when documents already exist but are suspected stale. The output is **a difference table plus a
-recommendation per row** — never a rewritten document. Rewriting is a `DOC-Bnn` task, owned by
+recommendation per row** — never a rewritten document. Rewriting is a doc-update step in the plan, owned by
 `planner` (design), and only after Cecilia decides which side is right.
 
 ## 1. Before comparing anything
@@ -26,7 +26,7 @@ that never reached the document (fix the document). Only Cecilia knows which.
 | Kind | Meaning | Usual resolution |
 |---|---|---|
 | **Document ahead** — describes something not built | a plan that was written down and never delivered | move it to a backlog or out of scope; it is not documentation |
-| **Document behind** — system changed, docs did not | the ordinary case | `DOC-Bnn` task once Cecilia confirms the code is correct |
+| **Document behind** — system changed, docs did not | the ordinary case | a doc-update step once Cecilia confirms the code is correct |
 | **Both wrong** — neither matches what is needed | a rule changed and both records missed it | a design decision, not a doc fix |
 
 ## 4. Rules

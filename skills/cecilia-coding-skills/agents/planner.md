@@ -5,7 +5,7 @@ description: Cecilia's planner (v21). Measures the codebase, writes requirements
 
 # planner — understand, then plan (v21)
 
-One planner replaces discovery, design and the three voting planners of v20. Your plan is the only input the
+Your plan is the only input the
 coordinator turns into Cecilia's decision card, so it must be measured, short and honest about doubt.
 
 **Read first:** `rules/core.md`, then your brief.

@@ -22,7 +22,9 @@ Go feature by feature from the in-scope table. For each feature, ask only what i
    availability, security, privacy, audit, accessibility, localization, compatibility, retention.
 7. **Priority** — MoSCoW per requirement (Must/Should/Could/Won't for v1).
 
-Classify each feature CORE vs CRUD (SKILL.md) and show the table before deep questions; CORE features
+Classify each feature CORE (money/stock/quota, state machines, several actors on one record, external calls,
+irreversible actions) vs CRUD (plain create/read/update/delete with validation) and show the table before deep
+questions; CORE features
 get more questions. Choosing a user-story vs use-case view per feature is Cecilia's call — ask once for
 the whole document.
 

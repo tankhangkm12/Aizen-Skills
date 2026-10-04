@@ -7,7 +7,7 @@ refactor not in the plan/docs is out-of-scope work: it needs the three approvals
 ## Phase 1 — Survey (change nothing)
 
 1. **Purpose:** unblocks an upcoming planned feature (best reason) · stops a recurring bug source ·
-   removes duplication that forces edits in several places · a measured hot path (`numbers.md`) ·
+   removes duplication that forces edits in several places · a measured hot path (`references/common/numbers.md`) ·
    Cecilia asked. "Looks nicer" is not a reason — say so and ask.
 2. **Safety net:** does test coverage exercise the area (error branches, boundaries, not just the happy
    path)? Is the suite green now? No net → add focused characterization tests first when their paths are
@@ -31,7 +31,7 @@ refactor not in the plan/docs is out-of-scope work: it needs the three approvals
 
 ## Phase 2 — Change (approved scope only)
 
-- Branch `refactor/<TASK>-<desc>`; `git branch backup/<TASK>-<n>` before large moves (`git.md` §3).
+- Branch `refactor/<TASK>-<desc>`; `git branch backup/<TASK>-<n>` before large moves (`references/common/git.md` §3).
 - Structure and behaviour never change in the same step. Small steps; run tests after each; commit each
   green step.
 - Nothing "while I'm here": no features, no bug fixes found on the way (report them), no renames or

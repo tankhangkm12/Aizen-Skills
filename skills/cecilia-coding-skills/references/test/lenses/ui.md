@@ -8,13 +8,13 @@ and screen reader, with the console clean.
 
 ## Oracle
 Frontend design `<app>-frontend.md` (screens, states, breakpoints) · UI doc and tokens · SRS AC for the
-journeys · WCAG level Cecilia chose · `../web-interface-guidelines.md`.
+journeys · WCAG level Cecilia chose · `references/frontend/web-interface-guidelines.md`.
 
 ## Techniques
-- **Real browser** per `../visual-check.md` with `ui.browser` (`playwright-cli` default), own session
+- **Real browser** per `references/frontend/visual-check.md` with `ui.browser` (`playwright-cli` default), own session
   `-s=test-ui-<unit>`, `--config` = the main checkout's `.playwright/cli.config.json`, local origins only.
 - **States:** loading, empty, error, partial, offline, forbidden-hidden actions, long text; each driven
-  from the contract (route mocks per `visual-check.md` §4), one screenshot per case `<SCR>-<state>-<width>.png`.
+  from the contract (route mocks per `references/frontend/visual-check.md` §4), one screenshot per case `<SCR>-<state>-<width>.png`.
 - **Breakpoints** from the design doc (else 360, 768, 1280); no horizontal scroll, no clipped controls.
 - **a11y:** keyboard-only path through each journey, focus visible and in order, labels and roles,
   contrast numbers from `scripts/uikit.py`; an automated checker (axe) when the repo has one.

@@ -23,8 +23,9 @@ numbers, several real options, a recommendation kept separate — and asked as f
 
 FAST often asks nothing; STANDARD asks only real unknowns; CONTROLLED uses the full gate discipline.
 **In an orchestrated task (from STANDARD) a role never asks Cecilia directly:** its questions go into its
-report (`PENDING QUESTIONS`, or the merged plan's open points), and the coordinator puts them on the task's
-ONE decision card (`tensura/decisions/<TASK>.md`, defaults pre-selected, one reply answers all).
+report (`PENDING QUESTIONS`, or the plan's questions), and the coordinator puts them on the task's
+ONE decision card (defaults pre-selected, one reply answers all), recorded in `tensura/tasks/<TASK>/state.md`
+`## Decision` with `state.py answer`.
 
 ## 2. Grouped gate
 

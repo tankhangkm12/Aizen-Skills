@@ -1,4 +1,4 @@
-# Workspace — where things live (v21)
+# Workspace — where things live (v22)
 
 Everything Cecilia's roles write lives under `tensura/` at the workspace root (the project root unless
 `CLAUDE.md`/`AGENTS.md` names another). `tensura/`, `.worktrees/` are local-only: add them to `.git/info/exclude`,
@@ -18,7 +18,8 @@ tensura/
 ├── lessons.md                            L-nn lessons from past tasks
 ├── tasks/<TASK>/state.md · run.json      written by scripts/state.py — read first when resuming
 ├── reports/<TASK>/
-│   ├── plan.md · dev-<unit>.md · test.md · review.md · devops.md
+│   ├── plan.md · dev-<unit>.md · test[-<unit>].md · review[-redteam].md · devops[-<unit>].md
+│   │                                     (exact name in each brief)
 │   ├── pr-body[-<unit>].md               Draft PR text for `gh pr create --body-file` (one per unit; the
 │   │                                     coordinator merges them into pr-body.md for the final PR)
 │   └── evidence[-<unit>].json            written by scripts/check.py (always in the main checkout)

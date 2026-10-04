@@ -78,7 +78,7 @@ plan before and after attached; the metric row:
 
 A change that helps one query and hurts writes (a new index on a hot insert table) states both numbers.
 
-## 6. Hand-off to dev-be
+## 6. Hand-off to dev (be)
 
 The fix often lives in application code: the query the ORM builds, a missing eager load, a loop. Write it
 as a "For other roles" line naming file, query and the shape to use; `dev` (be) changes the code.

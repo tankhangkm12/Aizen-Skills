@@ -53,7 +53,7 @@ provider's parameter group docs for the version before proposing a change.
 
 Good for read-heavy load that tolerates lag (lists, reports, search). Not for read-your-own-write flows
 (the user saves and immediately reloads) — route those to the primary. The design must say which queries
-may go to a replica and what lag is acceptable; the app routing is `dev-be` code; the replica is
+may go to a replica and what lag is acceptable; the app routing is `dev (be)` code; the replica is
 `devops` infrastructure. Monitor lag and fall back to the primary when it passes the stated limit.
 
 ## 5. What goes in the report

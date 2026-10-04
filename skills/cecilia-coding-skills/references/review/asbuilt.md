@@ -67,7 +67,7 @@ invisible and inherited.
 - **Problem:** the document states cancel is refused for SHIPPED orders [verified from code], but the
   guard checks `status !== DELIVERED` only — SHIPPED orders can be cancelled.
 - **Failure scenario:** a test suite written from this document asserts a 409 for SHIPPED and fails;
-  worse, a dev batch "preserving existing behaviour" preserves behaviour that was never there.
+  worse, a dev unit "preserving existing behaviour" preserves behaviour that was never there.
 - **Evidence:** `order.service.ts:142` reads `if (order.status === OrderStatus.DELIVERED) throw …`
   [verified — read this session]
 - **Suggested direction:** correct §4.2 and re-check the other status guards in the same file; the

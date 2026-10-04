@@ -24,7 +24,7 @@
 Never a secret in a `Dockerfile`, a build arg, an `ENV`, or any intermediate layer — **`docker
 history` reveals all of them**, and deleting a file in a later layer does not remove it from the
 earlier one. Use BuildKit build secrets (`--mount=type=secret`) for build-time credentials, and
-runtime injection (env var or mounted file) for everything else (`secrets.md`).
+runtime injection (env var or mounted file) for everything else (`references/infra/secrets.md`).
 
 Registry credentials: `docker login --password-stdin`, never `--password` in argv.
 
@@ -34,7 +34,7 @@ Build it, then: run it and hit the health endpoint · check the user is not root
 (`docker run --rm img id`) · check the size and the layer list for anything unexpected ·
 `docker history` for leaked values · scan for vulnerabilities · confirm it stops within a few seconds
 on `docker stop`. Record the digest — that is what gets deployed
-(`deploy-and-rollback.md` §1).
+(`references/infra/deploy-and-rollback.md` §1).
 
 ## 4. Compose
 

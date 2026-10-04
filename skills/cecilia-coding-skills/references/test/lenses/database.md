@@ -8,7 +8,7 @@ queries that are fine on 10 rows and collapse on the documented volume, locks a 
 
 ## Oracle
 DB design doc (tables, constraints, indexes, retention) · migration files and their declared down path ·
-NFR data volumes and growth (`numbers.md`, `capacity.py growth`/`forecast` figures) · LLD invariants.
+NFR data volumes and growth (`references/common/numbers.md`, `capacity.py growth`/`forecast` figures) · LLD invariants.
 
 ## Techniques
 - **Migrations up → down → up** on an empty DB and on a seeded one; schema after the second up equals the

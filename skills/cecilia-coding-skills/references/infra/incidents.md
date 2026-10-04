@@ -86,7 +86,7 @@ made a wrong call, the question is what made the wrong call look right.
 | Where luck helped | the parts that would have been much worse with different timing |
 | Actions | each one concrete, owned, and assigned a role: `dev` (be) / `dev` (fe) (code), `devops` (infra, alerting), `tester` (regression), `planner` (design) (the design assumption that did not hold) |
 
-Actions go through the normal route — a plan batch or an `infra/` PR. A postmortem whose actions are
+Actions go through the normal route — a plan unit or an `infra/` PR. A postmortem whose actions are
 never scheduled is a document that records the same outage twice.
 
 **Every incident asks two questions of this skill's own work:** would the alert have caught it sooner

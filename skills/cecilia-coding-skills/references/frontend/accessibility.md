@@ -30,4 +30,4 @@ dark separately). A pair that fails is fixed in the tokens, not per screen.
 
 Semantic HTML, accessible names, keyboard handling, focus management on route change and dialogs, live
 regions for async feedback — `dev` (fe)'s work, checked by `reviewer`. The UI doc lists
-the expected focus order and the accessible name for icon-only buttons so dev-fe does not guess.
+the expected focus order and the accessible name for icon-only buttons so dev (fe) does not guess.

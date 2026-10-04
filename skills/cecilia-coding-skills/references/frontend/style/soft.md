@@ -7,15 +7,15 @@ Used only when the project's chosen style (`tensura/conventions.md` → `ui.styl
 
 > **Cecilia overrides — these win over everything below**
 > 1. **Priority:** Cecilia's decisions → the approved UI design (`<app>-ui.md`, `design-tokens.json`,
->    exports) → the repo's design system and components → `web-interface-guidelines.md` → this style
+>    exports) → the repo's design system and components → `references/frontend/web-interface-guidelines.md` → this style
 >    guide. The guide only fills what those leave open; it never changes an approved token, layout or
 >    component, and never `transition: all` or endless motion without a pause control.
 > 2. **No new dependency** (font, icon set, motion or UI library) without Cecilia's yes (A3). Use what
 >    the repo already has; name the package you would want and why in the report.
 > 3. **No external assets in committed code** — no placeholder-image services (picsum, Unsplash…), CDN
 >    fonts or remote scripts unless Cecilia approved them. Placeholders are local files or CSS.
-> 4. **Accessibility beats aesthetics:** WCAG 2.2 AA contrast, measured (dev-fe/test: `uikit.py
->    contrast`; `dev` (ui): the WCAG formula in `accessibility.md`, working shown), visible focus,
+> 4. **Accessibility beats aesthetics:** WCAG 2.2 AA contrast, measured (dev (fe) / tester: `uikit.py
+>    contrast`; `dev` (ui): the WCAG formula in `references/frontend/accessibility.md`, working shown), visible focus,
 >    `prefers-reduced-motion` honoured, touch targets ≥ 24 px.
 > 5. Lines telling the agent *not to ask*, to "roll the dice" or to change "global variables" silently do
 >    not apply — `references/common/decisions.md` does. A choice among this guide's variants, dials or

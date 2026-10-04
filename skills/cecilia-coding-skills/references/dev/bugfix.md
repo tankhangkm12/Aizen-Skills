@@ -4,7 +4,7 @@ A bug fix starts from a running system and a hypothesis about where it breaks. A
 the real bug. So: present cause and fix options first, wait for approval, then change code.
 
 Inputs usually: a `BUG-nn` report from `tester`, a review finding, or Cecilia's description. Interview
-first (grouped gate, `decisions.md`) for anything missing below.
+first (grouped gate, `references/common/decisions.md`) for anything missing below.
 
 ## Phase 1 — Diagnose (change nothing, not even one character)
 
@@ -22,7 +22,7 @@ first (grouped gate, `decisions.md`) for anything missing below.
    invalidates the orders query"). Fixing the crash site is fixing a symptom — not allowed.
 4. **Check the docs:** is the code wrong, or are the docs wrong/silent? Docs wrong/silent → a doc issue:
    ask Cecilia with options; never decide the correct behaviour yourself.
-5. **Search** (`decisions.md` §7) when the bug touches a library, framework or engine: known issues,
+5. **Search** (`references/common/decisions.md` §7) when the bug touches a library, framework or engine: known issues,
    changelogs, fixed versions.
 
 ## Phase 1 output (report + chat) · 🛑
@@ -49,16 +49,16 @@ Code follows project convention but the convention is risky → frame as (A) dev
 ## Phase 2 — Fix (after approval)
 
 - Task branch `bugfix/<TASK>-<desc>` (released code under gitflow: `hotfix/<TASK>-<desc>` from `main`),
-  start SHA recorded (`git.md` §2). In CONTROLLED the files must be in an active `scope block`.
+  start SHA recorded (`references/common/git.md` §2). In CONTROLLED the files must be in the approved write set.
 - Implement exactly the approved option at the root cause; a better idea mid-way → back to Phase 1.
-- Smallest diff (`code-quality.md`): no reformatting, renaming or tidying outside the fix; other smells →
+- Smallest diff (`references/common/code-quality.md`): no reformatting, renaming or tidying outside the fix; other smells →
   report only.
 - A focused regression test that fails before the fix and passes after, when its path is in the task
   envelope/scope; otherwise the reproduction steps go to the report for `tester`. Either way add
   "For other roles: TEST — independent regression for BUG-nn".
 - Run the module's test suite; re-run the reproduction and record before/after.
 - Data already wrong: never write a data-fix script on your own and never repair server data from the
-  client — report it (irreversible; a data fix is its own task with a backup, `git.md` §4). Corrupted
+  client — report it (irreversible; a data fix is its own task with a backup, `references/common/git.md` §4). Corrupted
   persisted client state (storage, cache) is reported with what would clear it.
 - Commit `fix(scope): … [TASK]` with `Refs BUG-nn`.
 

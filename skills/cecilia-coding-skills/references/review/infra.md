@@ -18,7 +18,7 @@ is judged as evidence; if it was not supplied, say so and label the finding `[un
    judgement depends on it. Check the claim against the diff: a manifest touching a shared namespace,
    ingress, node pool, IAM role, security group, DNS or database is wider than one service.
 2. **Rollback exists, is exact, and was rehearsed.** A named command, not "redeploy the previous
-   version". Evidence that it ran and the service came back (`devops`/references/deploy-and-rollback.md`
+   version". Evidence that it ran and the service came back (`references/infra/deploy-and-rollback.md``
    §4 if that skill is in use). An unrehearsed rollback on a change that can take a service down is a
    Blocker. Also: is the rollback still valid after this change (a migration that the old code cannot
    read makes the rollback a lie).
@@ -53,7 +53,7 @@ is judged as evidence; if it was not supplied, say so and label the finding `[un
    an alert route with an owner. An alert nobody receives is not monitoring.
 10. **Cost.** Recurring cost delta stated; anything that scales without a ceiling (autoscaling max,
     retention, log volume, egress, always-on managed service) named with its ceiling.
-11. **Traceability & docs.** The change cites its plan task (`OPS-Bnn`) and the requirement it serves
+11. **Traceability & docs.** The change cites its plan unit (the infra unit id) and the requirement it serves
     (`NFR-nn`, an `ENV-nn` target, or an `INC-nn` follow-up). the infrastructure docs updated to match what
     now exists. Nothing in the diff that traces to nothing.
 12. **Boundary.** No application source in an infra PR (and no infra file in a dev PR) — see the path
@@ -74,7 +74,7 @@ reach production data, credentials or DNS is judged as production. State that re
 ## 3. Finding format
 
 ```markdown
-### I-1 · Blocker · `.github/workflows/deploy.yml:34` · Environment isolation (ENV-02, OPS-B01)
+### F-1 · BLOCKER · `.github/workflows/deploy.yml:34` · Environment isolation (ENV-02, unit deploy)
 - **Problem:** the deploy job takes `AWS_ROLE` from a repository-level variable with no environment
   scoping, and the default points at the production account.
 - **Failure scenario:** a staging deploy triggered from any branch assumes the production role and
@@ -104,7 +104,7 @@ Inputs: the incident report (`INC-nn`), the timeline, and the actions it propose
 | 1 | Timeline is evidence-based (log lines, deploy times, alert timestamps), not reconstructed from memory |
 | 2 | Cause chain reaches a mechanism, not a person; "human error" is a finding about the system that allowed it |
 | 3 | Detection is examined separately from the cause: what noticed it, how long that took, what should have |
-| 4 | Each action is concrete, owned, and traced into the plan as a task (`OPS-Bnn`) — an action with no task row will not happen |
+| 4 | Each action is concrete, owned, and traced into the plan as a unit — an action with no unit will not happen |
 | 5 | The action actually prevents recurrence, rather than adding a step someone must remember |
 | 6 | Anything that got worse during recovery (a rollback that failed, a runbook that was wrong) is recorded |
 | 7 | Risks knowingly accepted are listed for Cecilia to accept explicitly |

@@ -1,4 +1,4 @@
-# Independent review — steps (v21)
+# Independent review — steps (v22)
 
 Used by `reviewer`. Find what is wrong, missing or risky, precisely enough to act on. Read-only.
 
@@ -13,7 +13,8 @@ Used by `reviewer`. Find what is wrong, missing or risky, precisely enough to ac
 7. **Same bar for every author**; a security hole is never a suggestion, style is never a blocker.
 8. **Always ask simplicity** — less code, fewer layers, no new dependency? Over-engineering = SHOULD-FIX.
 
-Severity: **BLOCKER** (must not merge) · **SHOULD-FIX** · **SUGGESTION** · **QUESTION**.
+Severity: **BLOCKER** (must not merge) · **SHOULD-FIX** · **SUGGESTION** · **QUESTION** (always upper case).
+Finding ids: `F-1`, `F-2` … kept stable across fix rounds so devs and delta reviews can cite them.
 Verdict: **PASS** · **CHANGES_REQUIRED** · **INCOMPLETE**.
 
 ## Every review also checks
@@ -59,5 +60,5 @@ Scope = diff since the last reviewed SHA. Each earlier finding → resolved / pa
 
 ## Verify mode (reports, packets) — `assets/verify-report-template.md`
 
-A claim is PASS only when a named source, read now, says exactly it. Then build from the sources the list of every
-open finding, failing check and regressed metric, and confirm each appears in the packet. Dropped bad news = BLOCKER.
+Follow `verification-method.md`: commission (each claim against a named source) then omission (every open
+finding, failing or UNVERIFIED check, deviation and pending A3 must appear). Dropped bad news = BLOCKER.

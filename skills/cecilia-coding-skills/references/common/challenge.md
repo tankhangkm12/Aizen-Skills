@@ -1,70 +1,45 @@
-# Challenge — use challenge where it pays (v21)
+# Challenge — where a second viewpoint pays (v22)
 
-Challenge is a tool, not mandatory ceremony. Use it for CONTROLLED work, CORE/high-risk artifacts, or when a second viewpoint materially reduces risk. FAST work normally self-checks; STANDARD work challenges only the uncertain or consequential parts. Agreement nobody tested on high-risk work is momentum, not agreement.
+A tool, not ceremony. FAST: self-check. STANDARD: challenge only the uncertain or consequential parts.
+CONTROLLED and high-risk artifacts (money/stock/quota, state machines, several actors on one record, races,
+external calls failing midway, irreversible actions, public contracts, schema, production, secrets): the
+independent `reviewer` pass plus the `redteam` reviewer (`references/flow/controlled.md`).
 
 ## 1. Who challenges what
 
 | Artifact | Owner | Challenged by |
 |---|---|---|
-| Idea, scope, SRS, as-built docs | discovery | design · test · review |
-| HLD, LLD, threat model | design | dev-be · devops · review(security) |
-| Database doc, migrations, DB-side code, performance claims | db (design while db is off) | dev-be · devops · review(database) |
-| **API contract** | design | **dev-fe** · dev-be · test |
-| Frontend architecture | design | dev-fe · test |
-| UI design, tokens, exports | ui | dev-fe · test · review(ui) |
-| **Execution plan** | plan | CONTROLLED: **dev-be · dev-fe · test · review** before plan approval; STANDARD: only relevant roles |
-| Code / PR | dev-be · dev-fe | review · test |
-| Tests, test plan | test | review · dev |
-| Infra diff | devops | review(infra) · dev-be |
-| Review findings | review | the artifact's owner |
-| Merge or release packet | coordinator · devops | review(verify) |
+| Requirements, design docs, plan | planner | reviewer (plan / design lens); the devs who consume it, in their report |
+| API contract, schema | planner or `dev` (db) | the `dev` units on both sides of the seam · tester |
+| Code, migrations, UI | `dev` | tester · reviewer |
+| Tests | tester | reviewer |
+| Infra diff | devops | reviewer (infra lens) |
+| Review findings | reviewer | the code's owner, in the fix round |
 
 ## 2. The duty — before consuming an upstream artifact
 
-Write **2–4 challenges**. Each one is:
-
-- **Concrete** — names the section, file, line or ID.
-- **Falsifiable** — predicts a failure: situation → wrong outcome, or a cost that lands later.
-- **Actionable** — names an alternative and its cost.
-
-No failure scenario → it is a question, ask it as one. Found nothing → say what you attacked:
-*"Không phản đối HLD §4–§7; đã kiểm tra luồng hủy với BR-02, quyền sở hữu bảng `orders`, 3 call đồng bộ
-về timeout."* "Looks good" with no list is the failure this file exists to prevent.
-
-For FAST work, a self-check is enough. For STANDARD, one or two targeted challenges are enough when needed. Full exchange is for CONTROLLED/CORE: money, points, stock, quota ·
-state machines · several actors on one record · races and duplicates · external calls that can fail
-midway · irreversible actions · public contracts · schema · production · secrets.
+Write **2–4 challenges**, each **concrete** (section, file, line or id), **falsifiable** (situation → wrong
+outcome, or a cost that lands later) and **actionable** (an alternative and its cost). No failure scenario → it
+is a question; ask it as one. Found nothing → say what you attacked: *"Không phản đối HLD §4–§7; đã kiểm tra
+luồng hủy với BR-02, quyền sở hữu bảng `orders`, 3 call đồng bộ về timeout."*
 
 ## 3. The exchange — two rounds, then Cecilia
 
-**Round 1.** Owner answers each: **ACCEPT** (what changes, file + section) · **REJECT** (evidence: doc
-quote, code line, measurement, cited source) · **ESCALATE** (a business or priority call).
-**Round 2.** Only open items. Each side writes one final position: the failure it predicts and what
-evidence would make it drop the objection. **Then stop** — open items go to Cecilia:
+Round 1: the owner answers each — **ACCEPT** (what changes, file + section) · **REJECT** (evidence) ·
+**ESCALATE** (a business call). Round 2: open items only, one final position each — the predicted failure and
+what evidence would drop the objection. Then stop; open items go to Cecilia on the card:
 
 ```
-| # | Item | Position A (role) | Position B (role) | Cost if A wrong | Cost if B wrong | Each side's pick |
+| # | Item | Position A (role) | Position B (role) | Cost if A wrong | Cost if B wrong |
 ```
 
-Rules: silence is not agreement · no resolution by seniority, model, or who ran last · never split the
-difference on a fact — find out which side is right · neither side checked → `[unverified]`, escalate ·
-the challenger never edits the artifact · attack the artifact, not the agent — no praise, no apology.
+Silence is not agreement · no resolution by seniority or model · never split the difference on a fact — find
+out · neither side checked → `[unverified]`, escalate · the challenger never edits the artifact.
 
 ## 4. Record
 
-`tensura/reports/<TASK>/challenges.md` — append whole rows, never rewrite others' rows. Under the
-coordinator, agents return rows and the coordinator appends them.
+Rows go in the role's report under `## Challenges`; the coordinator copies open ones to the card. An ACCEPTED
+challenge that changes a document is closed by the file changing, not by the conversation.
 
-```
-| # | Date | Artifact / ID | Challenger → Owner | Claim (failure scenario) | Response | Status | Decided by |
-```
-
-Status: `OPEN` (blocks the gate) · `ACCEPTED` · `REJECTED (evidence)` · `ESCALATED → Cecilia` ·
-`DEFERRED (where tracked)`. An ACCEPTED row that changes a document becomes a `DOC-Bnn` task — a
-challenge is closed by the file changing, not by the conversation.
-
-## 5. Only one agent running
-
-Challenge what you consume (§2), then challenge your own output once in writing — the two or three
-ways it could be wrong and what would show it. Label it `[self-challenged]`: weaker than independent.
-For CONTROLLED/CORE work, use an independent `reviewer` pass. For STANDARD, offer it when it adds confidence; FAST normally stops at self-check.
+Only one agent running: challenge your own output once in writing — the two or three ways it could be wrong and
+what would show it — and label it `[self-challenged]` (weaker than independent).

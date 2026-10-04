@@ -1,4 +1,4 @@
-# Evidence, numbers and reports (v21)
+# Evidence, numbers and reports (v22)
 
 Cecilia steers from what agents report. A confident wrong number, or a claim of DONE that the files
 do not support, steers her wrong. So claims carry evidence proportionate to the work, and reports are short enough to actually be read.
@@ -11,7 +11,7 @@ Every metric: `<value> — <formula> — <source: command/file/tool> — <when>`
 Example: `coverage 72.4% (412/569 lines) — covered/total — vitest --coverage @3f2a9c1 — 2026-09-23`.
 
 Missing any part → do not state the number; ask the question instead ("không đo được coverage — chưa
-có công cụ; thêm công cụ hay chấp nhận batch này không có số coverage?").
+có công cụ; thêm công cụ hay chấp nhận unit này không có số coverage?").
 
 Never estimated: coverage · latency/throughput/bundle size · requirement coverage · defect counts ·
 progress · cost — each is measured, or projected with a formula and inputs (`numbers.md`), never
@@ -21,14 +21,12 @@ warm-up").
 
 | Role | Reports |
 |---|---|
-| discovery | requirements with ≥1 AC / total · requirements failing the quality test / total · as-built confidence share |
-| design | FR+BR with an LLD section / in scope · endpoints fully specified / total · screens fully specified / total · threats with a control / total |
-| db | queries meeting target / in scope · p95 before → after with data size · tables with a growth answer / growing tables · pool total vs connection limit |
-| ui | SCR × states designed / required · contrast pairs passing / checked · components specified / used |
-| plan | requirements placed in exactly one batch / total · tasks merged / total |
-| dev | IDs verified / IDs in batch · build, lint, tests: pass/fail counts with the command |
-| test | ACs with ≥1 TC / ACs in scope · passed/failed/skipped/flaky · coverage with tool · perf vs NFR |
-| review | findings by severity · claims confirmed / checked (verify mode) |
+| planner | requirements with ≥1 AC / total · ids placed in exactly one unit / total · endpoints, screens, threats fully specified / total |
+| dev (be, fe) | ids verified / ids in unit · build, lint, tests: pass/fail counts with the command |
+| dev (db) | queries meeting target / in scope · p95 before → after with data size · pool total vs connection limit |
+| dev (ui) | screens × states designed / required · contrast pairs passing / checked |
+| tester | ACs with ≥1 TC / ACs in scope · passed/failed/skipped/flaky · coverage with tool · perf vs NFR |
+| reviewer | findings by severity · claims confirmed / checked (verify lens) |
 | devops | apply result · rollback rehearsed yes/no · cost delta with source |
 
 ## 2. Evidence records
@@ -38,7 +36,7 @@ warm-up").
 **CONTROLLED / merge-release readiness:** every check, run or review names: task · role/instance · time · source SHA (and contract hash or
 artifact digest when relevant) · environment · command or method · exit status · raw output path ·
 limitations. Redact credentials and personal data when collecting, not later. Template:
-`assets/evidence-record.json` where the skill ships one.
+`assets/evidence-record.json`; `check.py` writes `evidence[-<unit>].json` in this shape.
 
 - **Claims are not facts.** An agent's "DONE" is checked against the files, branch, SHA and output.
   Trust the file; report the gap.
@@ -49,10 +47,10 @@ limitations. Redact credentials and personal data when collecting, not later. Te
 
 ## 3. Report shape
 
-File: `tensura/reports/<TASK>/<YYYY-MM-DD>-<role>-<topic>.md`, plus one row in the report `README.md`.
+File: `tensura/reports/<TASK>/<role>[-<unit>].md` — the exact name is in your brief.
 
 ```markdown
-> **<ROLE> · <TASK> <BATCH> · <gate> · <STATUS>**
+> **<ROLE> · <TASK> <UNIT> · <STATUS>**
 > Done: <finished, with the measured number>
 > Now: <in hand, where it stopped>
 > Blocked: <what, by what — or "nothing">
@@ -80,7 +78,7 @@ does the work itself.
 In a fix round (`ROUND≥1` in the brief) the report lists, per finding id, `fixed @<sha>` / `not fixed — why`
 and the checks re-run on the new SHA.
 
-Caps: chat summary ≤ 9 lines, Deviations line included (it says where the report is) · report body ≈ 120 lines before the
+Caps: chat return ≤ 15 lines, Deviations line included (it says where the report is) · report body ≈ 120 lines before the
 appendix · one finding ≤ 6 lines (problem · scenario · evidence · direction) · quoted output ≤ 10
 lines in the body.
 

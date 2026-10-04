@@ -1,8 +1,8 @@
 ## 1. Context
 - **Task / issue:** <TASK> · #<issue>
-- **Plan:** `tensura/plans/<file>.md` — **Batch <n>/<total>:** <one-sentence goal> · role: <dev-be|dev-fe|test|db>
+- **Plan:** `tensura/plans/<file>.md` — **Unit:** <unit> — <one-sentence goal> · kind: <be|fe|db|ui|infra>
 - **Docs followed:** <doc> §<section> (<IDs>)
-- **Branch:** `<branch>` → `<target>` · **Head SHA:** `<sha>` · **Approved scope:** `<TASK>-Bnn` (all changed files inside it: yes/no)
+- **Branch:** `<branch>` → `<target>` · **Head SHA:** `<sha>` · **Write set respected:** yes/no
 - **Why:** <1–2 sentences, business language>
 
 ## 2. Summary of changes
@@ -18,7 +18,7 @@
 ## 5. Doc checklist
 | ID | Requirement (doc §) | Where implemented / tested | Status |
 |---|---|---|---|
-| FR-03 | ... | `path:line` | ✅ / ⏭ batch n / ❌ blocked |
+| FR-03 | ... | `path:line` | ✅ / ⏭ unit <id> / ❌ blocked |
 
 ## 6. Decisions & assumptions
 | # | Content | Options compared (decisions.md §6) | Source (D-nn / Cecilia date / [agent-chosen — needs review]) |
@@ -44,7 +44,7 @@
 DB-side objects added/changed (procedure, function, trigger, job, view): <name — why in the DB — test> / none
 Connection budget changed: <pool × instances vs limit> / no
 
-## 8c. Rollback (`git.md` §5)
+## 8c. Rollback (`references/common/git.md` §5)
 ```
 branch <task-branch> from <base>@<start-sha>; commits <sha1..shaN>
 undo all, keep history:   git revert --no-edit <start-sha>..HEAD

@@ -32,7 +32,7 @@
 <the first 3–5 rows of the risk map, with evidence>
 
 ## Challenges
-<raised against my own output (`challenge.md` §7), labelled [self-challenged]>
+<raised against my own output (`references/common/challenge.md` §7), labelled [self-challenged]>
 
 ## For other roles
 <what plan/design/test/review should know before touching this system>

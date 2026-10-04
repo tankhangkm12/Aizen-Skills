@@ -18,7 +18,7 @@ and it changes what is worth reading deeply. Do not start reading business logic
 | 9 | Tests | test folders, CI test steps, coverage output if produced | which areas have tests, which have none |
 | 10 | Git signal | `git log --since=1.year --name-only`, churn per path, last touch per module | what is alive, what is frozen |
 
-Every row is mechanical. Anything against a running system is A3 — quote it and ask (SKILL.md "Authority for this role").
+Every row is mechanical. Anything against a running system is A3 — quote it and ask (`rules/core.md` §Authority).
 
 ## 2. The system map — the deliverable of this step
 
@@ -43,7 +43,7 @@ last touched.
 | entry point for `admin/` | the folder exists with controllers | not registered anywhere | `[unknown]` — dead, or wired dynamically |
 | migrations for `audit_log` | the table is queried in `audit.repository` | no migration creates it | `[unknown]` — created by hand, or by another system |
 
-A "not found" is never silently dropped and never called "unused" (`evidence.md` §6).
+A "not found" is never silently dropped and never called "unused" (`references/common/evidence.md` §6).
 
 ## 3. Sizing the deep pass
 

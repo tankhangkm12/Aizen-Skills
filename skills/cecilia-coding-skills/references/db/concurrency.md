@@ -15,7 +15,7 @@ or single writer.
 ## 2. Hot rows / keys
 
 Quantify with `capacity.py contention` (writes/s on the same key × window). Options and their ceilings:
-`reviewer` (api-ux lens) `contention.md` §2 (optimistic lock, conditional atomic update, pessimistic lock, reservation,
+`reviewer` (api-ux lens) `references/api-ux/contention.md` §2 (optimistic lock, conditional atomic update, pessimistic lock, reservation,
 queue, sharded counter). Prefer the database's atomic conditional update for counters and stock.
 
 ## 3. Deadlocks

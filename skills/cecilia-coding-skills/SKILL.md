@@ -14,7 +14,7 @@ Rules for everyone: `rules/core.md` (read it first) and `rules/mcp.md`.
 |---|---|---|---|
 | **FAST** | tiny, local, obvious; no CONTROLLED trigger | **You do it yourself**: task branch → minimal change → focused test → self-review the diff → `scripts/check.py` → 3-line summary + `Deviations:` | 0 |
 | **STANDARD** (default) | features, non-trivial bugs, refactors | `references/flow/standard.md` | ~4–6 |
-| **CONTROLLED** | auth, money/stock/quota, tenants, schema/data migration, concurrency, public contracts, CI/CD/IaC, live systems, secrets, destructive, production, multi-service | `standard.md` + `references/flow/controlled.md` | ~6–8 |
+| **CONTROLLED** | auth, money/stock/quota, tenants, schema/data migration, concurrency, public contracts, CI/CD/IaC, live systems, secrets, destructive, production, multi-service | `references/flow/standard.md` + `references/flow/controlled.md` | ~6–8 |
 
 FAST that grows (cause unclear, > ~3 files, a trigger appears) → stop and move to STANDARD.
 

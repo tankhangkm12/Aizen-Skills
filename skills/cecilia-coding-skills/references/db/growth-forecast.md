@@ -1,7 +1,7 @@
 # Growth forecast — from business assumptions to "when does it break"
 
 Answer, per table/collection, **how big, how fast, and when a limit is crossed** — before choosing a schema,
-partition scheme, engine or instance size. Numbers are `[projected]` until measured (`numbers.md`).
+partition scheme, engine or instance size. Numbers are `[projected]` until measured (`references/common/numbers.md`).
 
 ## 1. Assumptions Cecilia approves (one table, before any calculation)
 

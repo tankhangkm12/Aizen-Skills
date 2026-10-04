@@ -58,7 +58,7 @@ code harder to read. Splitting a long component into local sub-components needs 
 
 ## 6. Errors
 - Never swallow. No empty `catch`, no `catch → return null` without surfacing something.
-- **`errorCode` is the branch, `message` is for humans** (`api-contract.md` §3). Every code an endpoint
+- **`errorCode` is the branch, `message` is for humans** (`references/backend/api-contract.md` §3). Every code an endpoint
   can return has a designed state; an unmapped code still renders something honest, never a blank.
 - The API client translates transport errors (`AxiosError`, `fetch` rejection, timeout, abort) into the
   app's error shape **once** — raw SDK errors never reach a component.
@@ -81,7 +81,7 @@ components · clock, random and id generators are injected or wrapped, so a scre
 - **Out-of-order responses**: a slower earlier request must never overwrite a newer result. Key the
   result by its input, or abort the previous one.
 - Independent work runs in parallel (`Promise.all`), dependent work is sequential and says why.
-- Retries only where `api-contract.md` §6 allows them, with backoff and a max.
+- Retries only where `references/backend/api-contract.md` §6 allows them, with backoff and a max.
 - Effects have correct, complete dependencies; an effect that exists to synchronise state that could be
   derived during render should not exist.
 

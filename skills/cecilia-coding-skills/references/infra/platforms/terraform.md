@@ -6,7 +6,7 @@ not read first.
 ## 1. Plan is not optional, and it must be read
 
 `terraform plan` against real state is a live read (A3, or covered by an approved read-only session)
-— always run first, always included in the apply quote (`authority.md` §3). Read the whole plan, not the summary line.
+— always run first, always included in the apply quote (`references/infra/authority.md` §3). Read the whole plan, not the summary line.
 
 **Stop and ask** whenever the plan shows: any `destroy`, any `replace` (`-/+`), a change to a
 stateful resource (database, volume, bucket, queue), a count going down, or anything you did not
@@ -27,7 +27,7 @@ plan look clean.
   directories or workspaces, and a backend key that names the environment.
 - State holds secret values in plain text: treat the backend as a secret store — encrypted,
   access-controlled, never in the repo, never printed. `terraform show` and `terraform output` can
-  reveal them, so never paste their raw output (`secrets.md`).
+  reveal them, so never paste their raw output (`references/infra/secrets.md`).
 - Never edit state by hand. `import`, `mv` and `rm` are surgery: state the exact command, take a state
   backup first, and get approval per command.
 - A lock left behind by a crashed run is a stop: find out what ran, do not `force-unlock` reflexively.

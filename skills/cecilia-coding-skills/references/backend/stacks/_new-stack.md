@@ -9,7 +9,7 @@
 ## Template for a new stack file
 ```markdown
 # <Language / framework>
-Read after `code/principles.md`. Repo config (<files>) wins.
+Read after `references/backend/principles.md`. Repo config (<files>) wins.
 ## 1. Stack is never assumed   (detection files; bundle question examples)
 ## 2. Tooling                  (lint/format/type-check)
 ## 3. Types                    (strictness, null/optional, money, time, enums)

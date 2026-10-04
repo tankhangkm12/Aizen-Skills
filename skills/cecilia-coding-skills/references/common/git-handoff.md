@@ -40,5 +40,5 @@ unless she names them.
 
 Review feedback (Cecilia pastes or points to it; in the `team` flow the agent may read it with read-only
 `gh pr view --comments` / `gh api` GET): one new commit per group of comments; never reply on the host;
-feedback that contradicts the docs is asked about, not applied. Do not start a batch that depends on
+feedback that contradicts the docs is asked about, not applied. Do not start a unit that depends on
 this PR until Cecilia says it is merged or the host shows it merged.

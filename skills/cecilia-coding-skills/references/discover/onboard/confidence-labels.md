@@ -3,7 +3,7 @@
 An as-built document is trusted by every later role. A wrong sentence here does not cause one mistake;
 it causes a class of mistakes, all pointing the same way, with nobody suspecting the document.
 
-## 1. The three labels
+## 1. The labels
 
 | Label | Means | You may use it when |
 |---|---|---|

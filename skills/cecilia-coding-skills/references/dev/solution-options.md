@@ -26,8 +26,8 @@ I lean to A because … (would change if …)
 **Needs Cecilia:** business assumptions I cannot decide
 ```
 
-Rules: options per `decisions.md` §6 (≥ 3 when three genuinely exist, same criteria, researched —
-§7 — with numbers from `numbers.md` for load, latency, memory or bundle) · · named mechanisms (`code/data-concurrency.md`) · no external calls inside DB
+Rules: options per `references/common/decisions.md` §6 (≥ 3 when three genuinely exist, same criteria, researched —
+§7 — with numbers from `references/common/numbers.md` for load, latency, memory or bundle) · · named mechanisms (`references/backend/data-concurrency.md`) · no external calls inside DB
 transactions · new infrastructure always offered with an existing-stack alternative. After the choice,
 code exactly that; deviation needed → back here. The decision is recorded in the report and proposed to
 `planner` (design)/plan as a doc update ("For other roles"). TEST must receive "same input twice" and

@@ -24,7 +24,7 @@ Tick what applies; a group the change does not touch is "n/a" — do not tick bl
 
 ## 🔴 State, data and ownership
 - [ ] State lives where the design says; no server data duplicated into local state that can go stale
-- [ ] What each mutation invalidates or refetches is implemented as briefed (`api-contract.md` §7)
+- [ ] What each mutation invalidates or refetches is implemented as briefed (`references/backend/api-contract.md` §7)
 - [ ] Optimistic updates only where designed, each with its rollback path
 - [ ] Double submit guarded in the handler, not only by a disabled control
 - [ ] No auto-retry on non-idempotent calls; one shared in-flight token refresh

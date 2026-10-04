@@ -15,17 +15,17 @@ contract (fields, error codes) · WCAG 2.2 at the level recorded in the doc · `
 | # | Check | Failure it catches |
 |---|---|---|
 | 1 | Every user-facing FR/UC has a flow and screens; every flow branch (failure, cancel, back, timeout) ends somewhere sensible | dead ends, journeys nobody designed |
-| 2 | Every SCR × state from the frontend architecture is designed — count them from `ui-exports/` file names and the doc's state tables | the state dev-fe will invent under pressure |
+| 2 | Every SCR × state from the frontend architecture is designed — count them from `ui-exports/` file names and the doc's state tables | the state dev (fe) will invent under pressure |
 | 3 | Every error code a screen can receive has a message and a recovery; messages match the contract's codes | generic "something went wrong" everywhere |
 | 4 | Contrast: **recompute** the ratio from the hex values with the WCAG luminance formula for the pairs in the doc's table (show the working; if you cannot calculate reliably, mark `[unverified]` and ask for a contrast run by another role); non-text contrast for inputs, focus rings, meaningful icons | text that fails WCAG in one theme only |
 | 5 | Focus states designed for every interactive component; targets ≥ 24×24 CSS px; nothing conveyed by colour alone; labels on every input | inaccessible by construction |
 | 6 | Only semantic tokens on screens; tokens file consistent with the doc; no raw values | themes that cannot be switched, drift between screens |
-| 7 | Components: every one used has a spec with all interactive states; names match `CMP` ids and the code's names | dev-fe building three versions of one button |
+| 7 | Components: every one used has a spec with all interactive states; names match `CMP` ids and the code's names | dev (fe) building three versions of one button |
 | 8 | Responsive: each agreed breakpoint designed; reflow at 320 px | broken mobile layout |
 | 9 | Real content: long Vietnamese text, 0/1/many, big numbers and money | truncation and overflow in production |
 | 10 | Data shown maps to contract fields; missing data is a listed gap, not an invented field | UI that needs an API that does not exist |
 | 11 | Unapproved copy and choices are marked `[agent-chosen — needs review]` | agent decisions passing as Cecilia's |
-| 12 | Component specs against `web-interface-guidelines.md` (focus, forms, motion/reduced motion, touch, long and empty content); the priority note at its top applies | patterns dev-fe will have to rework |
+| 12 | Component specs against `references/frontend/web-interface-guidelines.md` (focus, forms, motion/reduced motion, touch, long and empty content); the priority note at its top applies | patterns dev (fe) will have to rework |
 | 13 | `ui.style` / inspiration used only where brand and design system were silent; no other brand's logo, name, signature colours or copy; sources named | a design that copies someone else or overrides decisions |
 
 ## 3. Severity
@@ -41,5 +41,5 @@ contract (fields, error codes) · WCAG 2.2 at the level recorded in the doc · `
 
 - **State coverage table**: `SCR · states required · states designed · exports present · gap`.
 - **Contrast table**: `pair · theme · ratio claimed · ratio recomputed · pass`.
-- After dev-fe builds: `review-frontend.md` §2 checks the code against this design; differences between
+- After dev (fe) builds: `frontend.md` §2 checks the code against this design; differences between
   exports and the running UI are findings for whichever side is wrong.

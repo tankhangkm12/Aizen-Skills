@@ -4,8 +4,8 @@ Triggers: auth/authZ, money/stock/quota, multi-tenant data, schema or data migra
 contract changes, CI/CD/IaC, live clusters/VMs, secrets, destructive operations, production, multi-service.
 Everything in `references/flow/standard.md` applies, plus:
 
-1. **Plan is exact.** The planner uses `references/plan/planning-method.md`: batches with exact paths, commands,
-   checks, a rollback per batch, and a measurement batch first when the root cause is not `[verified]`.
+1. **Plan is exact.** The planner uses `references/plan/planning-method.md`: units with exact paths, commands,
+   checks, a rollback per unit, and a measurement unit first when the root cause is not `[verified]`.
 2. **Explicit approval.** The card asks Cecilia to approve the plan itself ("approve plan <TASK>"), recorded with
    `state.py answer`. Devs write only the approved paths; anything outside → stop and ask for a scope change.
 3. **Wave check-in.** Stop after each build wave and show Cecilia the result before the next one.

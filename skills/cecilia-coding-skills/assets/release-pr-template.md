@@ -33,7 +33,7 @@ Say what is *not* affected too — that is half the reassurance, and writing it 
 <exact check and what a healthy result looks like>
 ```
 
-## Evidence from the run (`deploy-and-rollback.md` §4)
+## Evidence from the run (`references/infra/deploy-and-rollback.md` §4)
 
 | Proof | Result | Evidence |
 |---|---|---|
@@ -87,7 +87,7 @@ The infrastructure doc updated: sections <n>. Decisions added to `tensura/docs/D
 ---
 
 Pushing, opening this PR, marking it Ready and every later push are Cecilia's (A4 for agents, local-only,
-`common/git-handoff.md` §1): this body goes to `tensura/reports/<TASK>/pr-body.md` and the report carries the push and
+`references/common/git-handoff.md` §1): this body goes to `tensura/reports/<TASK>/pr-body.md` and the report carries the push and
 `gh pr create --draft … --body-file …` commands for her to run. **Production
 promotion is hers to run** — the commands above are written for her, not executed
-(`authority.md` §1).
+(`references/infra/authority.md` §1).

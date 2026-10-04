@@ -4,7 +4,7 @@ Two targets, one file: the **frontend design** (`<app>-frontend.md`) before code
 code** afterwards. What makes frontend review different is that the defects are rarely in the happy
 path — they are in the states nobody implemented and in the authorization nobody enforced server-side.
 
-The visual design by `dev` (ui) (`<app>-ui.md`, tokens, exports) is reviewed with `review-ui.md`; this
+The visual design by `dev` (ui) (`<app>-ui.md`, tokens, exports) is reviewed with `ui.md`; this
 file covers the frontend architecture and the code.
 
 ## 1. Reviewing the design (`<app>-frontend.md`)
@@ -14,7 +14,7 @@ file covers the frontend architecture and the code.
 | 1 | Every `SCR` traces to an `FR`/`UC`, and every user-facing `FR` has a screen | a requirement with no interface |
 | 2 | Every screen lists **all** states — loading, empty (no data vs no results), partial, **one row per error code the endpoints can return**, permission-denied, offline/stale, submitting | the classic source of rework; a happy-path-only design is not a design |
 | 3 | Every data element names endpoint + field | "computed somehow" becomes a guess at implementation time |
-| 4 | Every endpoint the screens need exists in the contract, or is in "Contract gaps" | the frontend stalls mid-batch waiting for a field |
+| 4 | Every endpoint the screens need exists in the contract, or is in "Contract gaps" | the frontend stalls mid-unit waiting for a field |
 | 5 | Every piece of state names exactly one owner | bugs that only appear on refresh or back-navigation |
 | 6 | Every route states its guard and deep-link-without-permission behaviour | an unguarded route reachable by URL |
 | 7 | Client rules name the server rule they mirror, and contradict none | two truths about what is valid |
@@ -47,14 +47,14 @@ Ordered heaviest first.
    and visible on route change and dialog open · form fields labelled and errors associated · images
    with meaningful alt · nothing conveyed by colour alone. Report what was actually checked and how;
    an unmeasured a11y claim is `[unverified]`.
-8. **Budgets** measured, not asserted (`common/evidence.md`): bundle per entry vs budget, interaction
+8. **Budgets** measured, not asserted (`references/common/evidence.md`): bundle per entry vs budget, interaction
    latency vs budget. A PR that changed the bundle without saying so is a finding.
 9. **Security of what ships**: no secrets or internal URLs in the bundle · no unsanitised HTML
    injection · tokens stored where the threat model says · no admin-only code shipped to everyone.
-10. **Structure and maintainability**: component boundaries follow data ownership (`principles.md`
+10. **Structure and maintainability**: component boundaries follow data ownership (`references/frontend/principles.md`
     §10 size signals apply to components too) · no prop drilling through four layers where the design
     named an owner · shared components changed without checking their other users.
-11. **Visual evidence (v18.1)**: the PR/report carries the `visual-check` table — a screenshot per
+11. **Visual evidence**: the PR/report carries the `visual-check` table — a screenshot per
     `SCR` × state × breakpoint, console result, diff vs the design export, contrast pairs. Missing rows
     are `[unverified]` (not PASS); look at the screenshots themselves — a clipped label, overflow, wrong
     token colour or a state that shows the happy path is a finding with the image path as evidence.
