@@ -105,16 +105,28 @@ Secret đã có (chỉ tên): <DOCKERHUB_TOKEN, SSH_KEY>
 
 ```text
 /skill-creator
-Skill mới: <tên> — giúp agent <làm gì>
-Kích hoạt khi: <các câu người dùng hay nói>  · Không kích hoạt khi: <…>
-Đầu ra: <file / báo cáo / định dạng>
-Ví dụ prompt thật: 1) <…> 2) <…>
+Skill mới: <tên-gạch-ngang> — giúp agent <làm gì, cho ai>
+Phải kích hoạt khi: 1) "<prompt thật>" 2) "<…>" 3) "<…>"
+Không kích hoạt khi: "<…>" (để cho skill <tên skill có sẵn>)
+Đầu ra: <file nào, định dạng gì / câu trả lời gồm những phần nào>
+Các bước: <nếu đã có quy trình: 1 … 2 … 3 …>
+Phần nên viết thành script: <việc lặp lại, cần kết quả giống nhau>
+Phải hỏi tôi trước khi: <ghi file / gọi API / cài đặt / push>
+Tài liệu tham khảo: <link, file>
+```
+
+```text
+/skill-creator
+Cải thiện skill <tên>: <vấn đề gặp phải, kèm prompt đã dùng và kết quả sai>
+Mong muốn: <hành vi đúng>  · Giữ nguyên: <…>
 ```
 
 ```text
 /skill-cloner
-Nguồn: <https://github.com/<owner>/<repo>/tree/main/skills/<x>>  · Tên đích: <tên>
-Muốn đổi: <quy trình / quy tắc / ngôn ngữ>
+Nguồn: https://github.com/<owner>/<repo>/tree/<branch>/<đường-dẫn-tới-thư-mục-skill>   (hoặc đường dẫn thư mục skill trên máy)
+Tên đích: <tên-gạch-ngang>
+Muốn đổi: <quy trình / luật / công cụ / định dạng đầu ra / ngôn ngữ trigger>
+Task mẫu cho A/B test: <một yêu cầu thật, vd "đọc file X.pdf và tóm tắt theo mẫu Y">
 ```
 
 ```text

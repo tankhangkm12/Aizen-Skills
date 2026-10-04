@@ -1,106 +1,73 @@
 ---
 name: skill-creator
-description: Create new skills, modify and improve existing skills, and measure skill performance. Aizen optimized version. Use when users want to create a skill from scratch following the Aizen Universal Structure, edit an existing skill, or run evals to test a skill using Antigravity Artifacts.
+description: Create a new skill for the Aizen-Skills repo, or improve an existing one, following the Aizen Universal Structure - interview, scaffold all 8 parts, write SKILL.md/rules/references/scripts, register it in README and docs (usage guide + prompt template), evaluate it against a baseline, then npm test, sync and commit. Use when the user wants to create, write, edit, improve, benchmark or evaluate a skill for Aizen-Skills (tạo skill, viết skill, sửa skill, cải thiện skill, đánh giá skill). Not for: copying a skill from GitHub or another folder (skill-cloner), testing a skill without changing it (agent-skill-tester), or using an existing skill.
 ---
 
-# Skill Creator (Aizen Edition)
+# skill-creator — build Aizen skills that pass the standard (v2)
 
-A skill for creating new skills and iteratively improving them.
+You create and improve skills **inside the Aizen-Skills repo** so that every skill has the same shape, is
+documented for the user, and passes `npm test`.
 
-At a high level, the process of creating a skill goes like this:
+**Read first:** `rules/aizen.md`, `rules/mcp.md`, then the standard `<REPO>/docs/aizen-skill-standard.md`
+(`<REPO>` = the Aizen-Skills checkout; `scripts/new_skill.py` finds it, or ask the user for the path).
 
-- **Phân tích yêu cầu và hệ thống**: Sử dụng MCP tools `context7` & `sequentialthinking`.
-- **Write a draft of the skill**: Tuân thủ **Aizen Universal Structure**.
-- **Create a few test prompts**: Run subagents on them via `invoke_subagent`.
-- **Evaluate results**: Help the user evaluate the results both qualitatively and quantitatively via **Antigravity Artifacts**.
-- **Iterate**: Rewrite the skill based on feedback from the user's evaluation of the results.
-- **Repeat** until satisfied.
+## Workflow — new skill
 
-## Communicating with the user
+1. **Interview (one round, then stop and wait).** Ask only what you cannot read yourself, each with a proposed
+   answer: what the skill lets an agent do · 3 real prompts that must trigger it · prompts that must not (and
+   which existing skill owns them — read every `skills/*/SKILL.md` description first) · the exact output ·
+   what is deterministic enough for a script · what needs the user's confirmation. Propose the name.
+2. **Design note (confirm before writing).** ≤ 15 lines: name, description, workflow steps, files per part
+   (rules / agents / references / scripts / assets), eval prompts. Wait for "ok".
+3. **Scaffold.** `python "<SKILL_DIR>/scripts/new_skill.py" <name> --description "<…>" --title "<…>"` — never
+   overwrites an existing skill.
+4. **Write the skill** to the standard: `SKILL.md` lean (≤ ~150 lines) with a workflow of imperative steps,
+   long knowledge in `references/` with "when to read", repeatable logic in `scripts/` (stdlib, `--help`,
+   `--selfcheck`), hard limits in `rules/`. Delete `.gitkeep` from parts that now hold files.
+5. **Register the docs** — the rows `new_skill.py` printed: `README.md` skill table, `docs/huong-dan-su-dung.md`
+   §2 and §4, a `/<name>` prompt template in `docs/prompt-mau.md`. A script with `--selfcheck` → one line in
+   `tests/check-scripts.js`.
+6. **Evaluate** (below) when the skill drives judgment or multi-step work; a pure reference skill may skip it —
+   say so.
+7. **Finish:** `npm test` green → `node bin/cli.js sync` → `git add <the files you changed>` →
+   `git commit -m "feat(<name>): …"`. Push only when the user says so for this push; else print the command.
+   Report: files created, test result, eval numbers, `Deviations:` from the design note.
 
-The skill creator is liable to be used by people across a wide range of familiarity with coding jargon. Please pay attention to context cues to understand how to phrase your communication! 
+## Workflow — improve an existing skill
 
-## Creating a skill
+1. Read the whole skill and the user's complaint or goal; reproduce the weakness with one prompt if you can.
+2. Copy the current version to `<REPO>/.aizen-work/<name>/baseline/` (never inside `skills/`).
+3. Propose the change as a short diff summary (files, what changes, why) → wait for "ok".
+4. Edit; bump `manifest.json` version (patch / minor / major) and any `(vN)` in headings to match; update the
+   docs rows if triggers or usage changed.
+5. Evaluate against the baseline, then step 7 above (`fix(<name>): …` or `feat(<name>): …`).
 
-### Capture Intent & Analyze
+## Evaluate — with skill vs baseline
 
-Start by understanding the user's intent. 
+1. Write 2–3 realistic prompts with checkable expectations to `skills/<name>/evals/evals.json`
+   (`references/schemas.md`).
+2. Workspace `<REPO>/.aizen-work/<name>/iteration-<N>/eval-<id>/{with_skill,without_skill}/run-1/`.
+3. Dispatch all runs in one message (Claude Code: Agent tool, `general-purpose`; Antigravity:
+   `invoke_subagent`): with-skill runs get the skill path, baseline runs get none (or the baseline copy). Each
+   writes its outputs and `transcript.md` into its run folder. No sub-agent tool → run them yourself and label
+   the baseline `[not independent]`.
+4. Grade each run with `agents/grader.md` → `grading.json`; then
+   `python "<SKILL_DIR>/scripts/aggregate_benchmark.py" <iteration dir> --skill-name <name>`.
+5. Show the user `iteration-<N>/review.md`: pass rate with vs without, time/tokens, the failing expectations,
+   and your proposed fixes. Iterate until the user is satisfied.
 
-**QUAN TRỌNG:** Trước khi viết code, bạn BẮT BUỘC phải dùng MCP server `context7` (để tra cứu mã nguồn, tài liệu liên quan trong workspace) và `sequentialthinking` (để phân tích giải pháp từng bước). Điều này đảm bảo skill được tạo ra hiểu đúng context của project.
+## Writing well
 
-1. What should this skill enable the agent to do?
-2. When should this skill trigger?
-3. What's the expected output format?
-4. Should we set up test cases to verify the skill works?
+- `description` decides triggering: what · "Use when …" (English + Vietnamese keywords) · "Not for: …".
+- Explain why a step exists instead of shouting MUST; give one input → output example per non-obvious step.
+- Every backtick path and markdown link must exist — `npm test` fails otherwise.
+- Bundle what every run would rewrite (parsers, validators, API calls) into `scripts/`.
 
-### Write the SKILL.md
+## Knowledge
 
-Based on the user interview, fill in these components:
-
-- **name**: Skill identifier
-- **description**: When to trigger, what it does. Include both what the skill does AND specific contexts for when to use it. Make it slightly "pushy".
-
-#### Anatomy of an Aizen Skill
-
-Bạn PHẢI tuân thủ kiến trúc Aizen. Hãy đọc file `references/aizen-structure.md` để nắm rõ.
-- Luôn chia các quy định/rules vào thư mục `rules/` (ví dụ: `rules/mcp.md` để bắt buộc dùng MCP).
-- Phân tách agents vào `agents/` nếu cần.
-- Lưu trữ file thực thi trong `scripts/`.
-- Tuyệt đối giữ nguyên tắc Self-Contained.
-
-#### Writing Patterns
-- Prefer using the imperative form in instructions.
-- Explain the **why** behind everything you're asking the model to do instead of heavy-handed musty MUSTs. 
-- Use examples (Input/Output format).
-
-### Test Cases
-
-After writing the skill draft, come up with 2-3 realistic test prompts. Share them with the user.
-Save test cases to `evals/evals.json`.
-
-## Running and evaluating test cases
-
-Put results in `<skill-name>-workspace/` as a sibling to the skill directory. Organize by iteration (`iteration-1/`, `iteration-2/`, etc.) and within that, each test case gets a directory (`eval-0/`, `eval-1/`, etc.).
-
-### Step 1: Spawn all runs (with-skill AND baseline)
-
-For each test case, spawn subagents (Antigravity: `invoke_subagent`; Claude Code: the Agent tool; no sub-agent tool: run them yourself one by one and say the baseline is not independent).
-- **With-skill run**: Delegate to a subagent, explicitly telling it to use the new skill path.
-- **Baseline run**: Delegate to another subagent without the skill (or using the old version of the skill).
-
-### Step 2: Draft assertions
-
-Draft quantitative assertions for each test case. Update `eval_metadata.json` and `evals/evals.json`.
-
-### Step 3: Grade and Present via Artifacts
-
-Once all runs are done:
-
-1. **Grade each run**: Evaluate each assertion against the outputs.
-2. **Present via Artifact**: Bạn **KHÔNG ĐƯỢC** sử dụng web server (`generate_review.py`) vì không tương thích. Thay vào đó, hãy tạo một báo cáo Markdown. Antigravity: dùng tool `write_to_file` (với ArtifactMetadata). Agent khác: ghi vào `<skill-name>-workspace/iteration-<N>/review.md` và đưa đường dẫn cho user.
-   - Tên Artifact: `<skill-name>-review-iteration-<N>.md`
-   - Nội dung: 
-     - So sánh Output của bản cũ vs bản mới.
-     - Các đánh giá định lượng (Assertions passed/failed).
-     - Bảng tổng hợp thời gian/token.
-   - Đặt `UserFacing=true` và hiển thị cho người dùng xem.
-
-### Step 4: Read the feedback
-
-User sẽ chat trực tiếp phản hồi của họ sau khi đọc Artifact. Bạn đọc phản hồi và tiến hành cải thiện skill.
-
-## Improving the skill
-
-1. **Generalize from the feedback.** Try branching out and using different metaphors, or recommending different patterns of working.
-2. **Keep the prompt lean.** Remove things that aren't pulling their weight. 
-3. **Explain the why.** Try hard to explain the why behind everything.
-4. **Look for repeated work.** If multiple subagents write the same script, bundle it into `scripts/`.
-
-Rerun test cases after making improvements.
-
-## Antigravity (AGY) Specific Notes
-- Khác với Claude Code, bạn có thể tự do sử dụng `invoke_subagent` và giao tiếp với chúng.
-- Bỏ qua các bước Description Optimization bằng `claude -p` vì tool này không tồn tại trong AGY.
-- Để đóng gói, chỉ cần nhắc user đẩy code lên repo `Aizen-Skills` thông qua CLI tool `node bin/cli.js sync` có sẵn.
-
-Good luck!
+| Need | Read |
+|---|---|
+| structure, manifest, docs rows, git rules | `<REPO>/docs/aizen-skill-standard.md` |
+| eval JSON formats | `references/schemas.md` |
+| grading a run | `agents/grader.md` |
+| skeleton files | `assets/skill-template.md`, `assets/mcp-rule.md` |

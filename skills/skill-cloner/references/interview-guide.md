@@ -1,27 +1,39 @@
-# Skill Customization Interview Guide
+# Interview guide — from "a copy" to "the user's skill"
 
-Khi tạo một bản sao (clone) của một skill gốc, mục tiêu của bạn không chỉ là copy, mà là **Tinh chỉnh sâu (Deep Customization)** để skill đó hoàn toàn phù hợp với quy trình (workflow) của User.
+The goal is not a copy but a skill that fits how the user works. Do the homework first, then ask few, sharp
+questions, each with your proposal so the user can answer "ok".
 
-Hãy sử dụng cẩm nang phỏng vấn này sau khi đã tải skill gốc về:
+## 1. Homework (silent)
 
-## 1. Phân tích Skill gốc (Tự làm ngầm)
-- Đọc file `SKILL.md` và các file trong `scripts/`, `references/` của skill vừa tải về.
-- Nắm bắt được: Nhiệm vụ chính của skill này là gì? Nó đang tuân theo chuẩn mực gì? Đầu ra của nó là gì?
+- Read `SKILL.md`, every file in `rules/`, `references/`, `scripts/`, `agents/` of the copy.
+- Write down for yourself: its job, its steps, its output, the tools/libraries it assumes, what it asks the user,
+  what it does without asking, and overlaps with skills already in the repo (read their descriptions).
 
-## 2. Phỏng vấn User (Grill the User)
-Hãy đặt ra tối đa 3-4 câu hỏi sắc bén nhất để tìm ra khoảng cách giữa "Skill Gốc" và "Nhu cầu của User". Xoáy sâu vào các điểm sau:
-- **Quy trình (Process):** "Skill gốc đang chia làm 3 bước. Bạn có muốn thêm/bớt bước nào không?"
-- **Luật lệ (Rules & Knowledge):** "Có quy định riêng nào về naming convention hay thư viện cấm dùng không?"
-- **Chức năng (Features):** "Bạn có muốn skill này tích hợp thêm công cụ nào không?"
-- **ĐẶC BIỆT (Sample Test Case):** "Hãy cung cấp cho tôi một Yêu cầu bài toán mẫu (Ví dụ: 'Hãy dùng skill này để đọc file PDF X và tóm tắt theo format Y'). Tôi sẽ dùng bài toán này để cho 2 con AI thi đấu với nhau (1 con xài skill gốc, 1 con xài skill mới) để chứng minh skill mới xịn hơn."
+## 2. Questions (3–4, one round)
 
-## 3. Thực thi Tinh chỉnh (Customization)
-Sau khi User trả lời, hãy sửa đổi nội dung của skill mới:
-- Nếu User muốn đổi quy trình ➔ Sửa file `SKILL.md`.
-- Nếu User muốn thêm luật (Rules) ➔ Sửa hoặc thêm file `.md` vào thư mục `references/`.
-- Nếu User muốn đổi logic công cụ ➔ Sửa code trong thư mục `scripts/`.
-**Tuyệt đối tuân thủ kiến trúc Self-Contained.**
+Pick the ones with the biggest gap between the original and the user's needs:
 
-## 4. Báo cáo & Đồng bộ
-- Báo cáo tóm tắt các điểm đã sửa.
-- Tự động chạy lệnh đồng bộ và push code lên Github.
+| Area | Ask like this (always with a proposal) |
+|---|---|
+| Process | "It runs A → B → C. I propose dropping B (you do it in CI) and adding D (review before writing). OK?" |
+| Rules | "It writes files without asking. I propose: confirm before overwrite, never push. Any naming or library rule to add?" |
+| Tools | "It needs `pdfplumber`. I propose a stdlib fallback and asking before installing. OK?" |
+| Output | "It returns a long chat answer. I propose a file `<x>.md` with sections …. OK?" |
+| Language / scope | "Trigger words in Vietnamese too, and 'Not for' pointing to `<existing skill>`?" |
+| **Sample task (always)** | "Give me one real task, e.g. 'đọc file X.pdf và tóm tắt theo mẫu Y'. Both versions will run it, and a judge compares them." |
+
+## 3. Answers → files
+
+| The user wants | Change |
+|---|---|
+| a different process | the workflow in `SKILL.md` |
+| a hard limit (must / never / ask first) | `rules/<topic>.md` |
+| domain knowledge, conventions, examples | `references/<topic>.md` + a "when to read" row in `SKILL.md` |
+| repeatable or exact logic | `scripts/<x>.py` (stdlib, `--help`, `--selfcheck`) |
+| templates | `assets/` |
+| other trigger words / boundaries | `description` in the frontmatter |
+
+## 4. Report back
+
+What changed per file, what was removed and why, the A/B verdict, and anything the user asked for that you did
+not do (`Deviations:`).

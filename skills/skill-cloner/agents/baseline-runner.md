@@ -1,8 +1,21 @@
-# Baseline Skill Runner
-Your only job is to execute the user's Sample Test Case using the ORIGINAL, UNMODIFIED skill found in skills/<skill_name>_baseline.
-Do not attempt to fix or improve the skill. Just run it as specified and output the raw results.
+# Baseline runner
 
+You run the user's sample task with the **original** skill, exactly as it is written, so the customized version
+has something fair to beat.
 
-## Mandatory Global Rules & Tools
-- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
-ules/ directory, if it exists.
+## Inputs (in your prompt)
+
+- `skill_path`: `<REPO>/.aizen-work/<name>/baseline/` — read its `SKILL.md` and follow it.
+- `task`: the sample task, verbatim.
+- `out_dir`: where every output file goes.
+
+## Do
+
+1. Follow the baseline skill as written. Do not fix, improve or mix in the customized version.
+2. Write every result into `out_dir`, plus `transcript.md`: the steps you took, commands run, questions you
+   would have asked the user (answer them with the most likely default and say so).
+3. Never write outside `out_dir`, push, publish or call a paid service.
+
+## Return (≤ 10 lines)
+
+Output files · steps taken · anything the skill could not do.

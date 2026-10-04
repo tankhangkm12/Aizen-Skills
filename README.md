@@ -83,8 +83,8 @@ quyền cho trước) giúp agent không phải đoán và không hỏi lại.
 | [`database-table-design`](skills/database-table-design) | Thiết kế schema quan hệ / bảng MySQL theo 9 nguyên tắc, viết DDL, review kiến trúc DB. |
 | [`devsecops-pipeline-flow`](skills/devsecops-pipeline-flow) | Dựng CI/CD bảo mật (GitHub Actions, GitLab CI, Jenkins, ArgoCD), quét Gitleaks/Trivy/Semgrep, có các bước xác nhận. |
 | [`agent-skill-tester`](skills/agent-skill-tester) | Đánh giá một skill so với baseline (Outcome, Process, Style, Efficiency), LLM-as-a-judge. |
-| [`skill-creator`](skills/skill-creator) | Tạo/cải thiện skill theo cấu trúc Aizen, chạy eval. |
-| [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/đường dẫn local, phỏng vấn để tùy biến rồi đồng bộ. |
+| [`skill-creator`](skills/skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn cho Aizen-Skills: phỏng vấn, dựng đủ 8 phần, viết docs + prompt mẫu, đánh giá so với baseline, `npm test` rồi commit. |
+| [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/thư mục local về Aizen-Skills, chuẩn hoá cấu trúc + ghi nguồn/giấy phép, phỏng vấn để tuỳ biến, chứng minh bằng A/B test, viết docs rồi commit. |
 | [`tech-learning-tree`](skills/tech-learning-tree) | Nghiên cứu công nghệ mới và ghi lại thành cây kiến thức trên Notion. |
 | [`video-to-skill`](skills/video-to-skill) | Biến video YouTube/file local thành skill (phụ đề → hoặc ffmpeg + speech-to-text). |
 
@@ -157,7 +157,7 @@ Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`
 
 ```text
 .
-├── docs/                      # hướng dẫn sử dụng + prompt mẫu
+├── docs/                      # hướng dẫn sử dụng, prompt mẫu, chuẩn viết skill
 ├── skills/<skill>/            # mỗi skill tự chứa, đủ 8 phần:
 │   ├── SKILL.md               #   điểm vào: front-matter name/description + hướng dẫn
 │   ├── manifest.json          #   metadata, version
@@ -194,10 +194,16 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 
 ## Phát triển skill
 
-1. Tạo skill mới bằng `skill-creator` hoặc chép một skill có sẵn, giữ đủ 8 phần.
-2. `description` trong `SKILL.md` quyết định khi nào agent chọn skill — viết rõ "dùng khi…".
-3. Giữ `SKILL.md` ngắn; kiến thức dài đưa vào `references/` và chỉ dẫn khi nào đọc.
-4. Kiểm tra rồi đồng bộ:
+Chuẩn đầy đủ: [docs/aizen-skill-standard.md](docs/aizen-skill-standard.md) (cấu trúc 8 phần, `description`,
+`manifest.json`, scripts, tài liệu bắt buộc, git).
+
+1. Tạo skill mới: `/skill-creator` · chép và tuỳ biến skill có sẵn: `/skill-cloner` (prompt mẫu trong
+   [docs/prompt-mau.md](docs/prompt-mau.md)). Cả hai dựng đủ 8 phần, viết docs, đánh giá rồi commit.
+2. Mỗi skill dùng trực tiếp phải có: một dòng trong bảng [Danh sách skill](#danh-sách-skill), dòng trong
+   `docs/huong-dan-su-dung.md` (§2, §4) và một prompt `/<tên>` trong `docs/prompt-mau.md` — `npm test` kiểm.
+3. `description` quyết định khi nào agent chọn skill: làm gì · "Use when …" · "Not for: …".
+4. Thư mục tạm (baseline, kết quả eval) ở `.aizen-work/` — không bao giờ trong `skills/`.
+5. Kiểm tra rồi đồng bộ:
 
 ```bash
 npm test               # check-skills.js + check-scripts.js + test-installer.js

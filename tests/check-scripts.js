@@ -1,5 +1,5 @@
 'use strict';
-// Smoke test cho script Python của các skill: self-check + --help + một lần chạy thật cho mỗi công cụ Cecilia.
+// Smoke test cho script Python của các skill: self-check + --help + một lần chạy thật cho mỗi công cụ.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
@@ -21,6 +21,8 @@ const run = (args, expect = 0) => {
 const S = name => path.join(scripts, name);
 const cases = [
   ['state.py self-check', [S('state.py'), '--selfcheck']],
+  ['skill-creator new_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-creator', 'scripts', 'new_skill.py'), '--selfcheck']],
+  ['skill-cloner fetch_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-cloner', 'scripts', 'fetch_skill.py'), '--selfcheck']],
   ...['state.py', 'check.py', 'graph.py', 'capacity.py', 'uikit.py', 'apikit.py'].map(n => [`${n} --help`, [S(n), '--help']]),
   ['check.py --plan', [S('check.py'), '--task', 'T-1', '--plan']],
   ['graph.py outside git → exit 2', [S('graph.py'), '--project', '.', '--check'], 2],

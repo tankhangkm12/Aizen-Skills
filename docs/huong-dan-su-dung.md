@@ -28,8 +28,8 @@ nghị cài khi cần — bạn duyệt một lần.
 | review PR / diff / code AI viết | `adversarial-code-reviewer` | "review PR", "audit diff" |
 | thiết kế bảng / schema MySQL | `database-table-design` | "thiết kế bảng", "DDL" |
 | CI/CD bảo mật, Docker, deploy | `devsecops-pipeline-flow` | "pipeline CI/CD", "DevSecOps" |
-| tạo / sửa skill | `skill-creator` | "tạo skill" |
-| chép skill có sẵn rồi tuỳ biến | `skill-cloner` | "clone skill" + link |
+| tạo skill mới / cải thiện skill trong repo | `skill-creator` | "tạo skill", "cải thiện skill <tên>" |
+| chép skill từ GitHub/thư mục khác rồi tuỳ biến | `skill-cloner` | "clone skill" + link |
 | đánh giá một skill | `agent-skill-tester` | "test skill", "benchmark skill" |
 | học công nghệ mới → Notion | `tech-learning-tree` | "nghiên cứu", "học <công nghệ>" |
 | biến video thành skill | `video-to-skill` | link YouTube / file video |
@@ -99,8 +99,26 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 | `adversarial-code-reviewer` | diff/PR (số PR, branch, hoặc `git diff base...head`), mục tiêu của thay đổi, phần nào là lõi |
 | `database-table-design` | engine + version, các thực thể và quan hệ, quy mô dữ liệu, truy vấn chính |
 | `devsecops-pipeline-flow` | repo, nền tảng CI, nơi deploy, registry, branch nào deploy đi đâu, secret đã có (chỉ tên) |
-| `skill-creator` | skill làm gì, khi nào kích hoạt, đầu ra mong muốn, 2–3 ví dụ prompt thật |
-| `skill-cloner` | link nguồn (GitHub tree URL hoặc đường dẫn), tên skill đích, muốn đổi gì |
+| `skill-creator` | skill làm gì, 3 prompt phải kích hoạt + vài prompt không được kích hoạt, đầu ra mong muốn, việc nào cần hỏi bạn |
+| `skill-cloner` | link thư mục skill (`…/tree/<branch>/<path>`) hoặc đường dẫn local, tên skill đích, muốn đổi gì, một task mẫu để A/B test |
 | `agent-skill-tester` | tên skill, tiêu chí đạt, vài prompt nên/không nên kích hoạt |
 | `tech-learning-tree` | tên công nghệ, mục đích học, trang Notion đích |
 | `video-to-skill` | link/file video, skill mới giúp agent làm gì, tên + ngôn ngữ skill |
+
+## 5. Tạo và chép skill
+
+Cả hai skill làm việc ngay trong repo Aizen-Skills và theo [chuẩn skill Aizen](aizen-skill-standard.md).
+
+| | `skill-creator` | `skill-cloner` |
+|---|---|---|
+| Đầu vào | ý tưởng skill | link GitHub hoặc thư mục skill có sẵn |
+| Bạn được hỏi | 1 lượt phỏng vấn → duyệt bản thiết kế ngắn | 1 lượt phỏng vấn → duyệt bản tóm tắt thay đổi |
+| Agent tự làm | dựng đủ 8 phần (`new_skill.py`), viết skill, thêm dòng README + docs + prompt mẫu, eval có/không skill | tải về, chuẩn hoá 8 phần + ghi nguồn/giấy phép (`fetch_skill.py`), tuỳ biến, A/B test bản gốc vs bản mới, thêm docs |
+| Kết thúc | `npm test` xanh → `sync` → commit đúng file | như bên trái |
+| Push | chỉ khi bạn đồng ý | chỉ khi bạn đồng ý |
+
+- Cải thiện skill đã có trong repo: dùng `skill-creator` ("cải thiện skill <tên>: <vấn đề>"); nó lưu bản cũ vào
+  `.aizen-work/<tên>/baseline/`, đề xuất thay đổi, rồi so sánh bản mới với bản cũ.
+- Không bao giờ ghi đè skill trùng tên; thư mục tạm nằm ở `.aizen-work/` (đã git-ignore).
+- Skill chép về không có giấy phép → agent báo trước khi tuỳ biến; bạn quyết định giữ riêng hay không.
+
