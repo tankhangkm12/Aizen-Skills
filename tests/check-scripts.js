@@ -23,6 +23,7 @@ const cases = [
   ['state.py self-check', [S('state.py'), '--selfcheck']],
   ['skill-creator new_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-creator', 'scripts', 'new_skill.py'), '--selfcheck']],
   ['tech-learning-tree check_tree.py self-check', [path.join(__dirname, '..', 'skills', 'tech-learning-tree', 'scripts', 'check_tree.py'), '--selfcheck']],
+  ['tech-learning-tree to_notion.py self-check', [path.join(__dirname, '..', 'skills', 'tech-learning-tree', 'scripts', 'to_notion.py'), '--selfcheck']],
   ['skill-cloner fetch_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-cloner', 'scripts', 'fetch_skill.py'), '--selfcheck']],
   ...['state.py', 'check.py', 'graph.py', 'capacity.py', 'uikit.py', 'apikit.py'].map(n => [`${n} --help`, [S(n), '--help']]),
   ['check.py --plan', [S('check.py'), '--task', 'T-1', '--plan']],

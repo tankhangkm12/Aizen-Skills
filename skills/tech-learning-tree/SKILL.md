@@ -41,10 +41,12 @@ component map (IDs `C1…Cn`) → one branch per layer → core algorithm → co
 8. **Write and check.** Fill `references/tree-template.md` in the user's language into the markdown file, then
    `python "<SKILL_DIR>/scripts/check_tree.py" <file>` (add `--min-alternatives 1` when the user named only one
    alternative). Fix until PASS.
-9. **Publish to Notion.** `notion-search` for a page with the same title under the parent: found → update it
-   (`notion-update-page`), else `notion-create-pages` under the parent. Headings stay as headings (`#` root,
-   `##` branches); mermaid stays a `mermaid` code block (Notion renders it); tables stay tables. Notion missing
-   or failing → keep the markdown file and tell the user once.
+9. **Publish to Notion.** `python "<SKILL_DIR>/scripts/to_notion.py" <file>` → `<file>.notion.md` + the title
+   (the `#` heading becomes the page title; tables become Notion `<table>`; URLs become links; markup
+   characters are escaped; mermaid stays a `mermaid` code block, which Notion renders). Then `notion-search`
+   for that title under the parent: found → `notion-update-page`, else `notion-create-pages` with the
+   converted file as `content`, parent = the page the user named. Fetch the page once to confirm tables and
+   diagrams rendered. Notion missing or failing → keep the markdown file and tell the user once.
 10. **Report:** the file path and Notion link, the thesis in 3 lines, layers marked not relevant, and every
     claim left as `not found` or `estimate`.
 
