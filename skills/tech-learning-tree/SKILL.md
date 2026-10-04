@@ -1,88 +1,66 @@
 ---
 name: tech-learning-tree
-description: Research and master new technologies, libraries, and frameworks following a structured deep-dive workflow and document them into Notion as an architecture-first tree structure. Use when the user asks to learn, research, analyze, evaluate, or structure a new technology, tool, or framework into Notion.
+description: Research a technology in depth for one concrete workload - trace one operation from the application layer down through runtime, OS/kernel, network and hardware to explain the algorithm and mechanism that make it efficient there, draw Mermaid architecture diagrams linked by component IDs, compare alternatives architecture-to-architecture, then write a checked markdown note and publish it as a tree page in Notion. Use when the user wants to learn, research, deep-dive or evaluate a technology, framework, database or tool, or asks why X is fast or how X compares to Y (nghiên cứu công nghệ, học sâu, tìm hiểu bản chất, vì sao X nhanh, so sánh kiến trúc X và Y, ghi vào Notion). Not for: designing a database schema (database-table-design), writing or reviewing code (cecilia-coding-skills, adversarial-code-reviewer), or building CI/CD (devsecops-pipeline-flow).
 ---
 
-# tech-learning-tree
+# tech-learning-tree — understand why a technology wins, layer by layer (v2)
 
-A structured methodology to systematically deconstruct, understand, and document new technologies using an architecture-first tree hierarchy in Notion.
+You explain **the mechanism**, not the brochure: follow one real operation of the user's workload down the stack,
+show where the time and copies go, and compare alternatives on the same path. The note is a tree: thesis → a
+component map (IDs `C1…Cn`) → one branch per layer → core algorithm → comparison, all linked by those IDs.
 
-## When to Use
+**Read first:** `rules/research.md`, `rules/mcp.md`. Use context7 for library docs when available.
 
-- When tasked with learning or evaluating a new technology, framework, database, engine, or tool from scratch.
-- When researching a technology across official documentation and technical YouTube tutorials.
-- When creating an architecture-centric knowledge base or structured study guide in Notion.
-- When analyzing real-world deployment patterns and AI agent or MCP integration feasibility for a tech stack.
+## Workflow
 
-## Workflow Steps
+0. **Intake (one round, then stop and wait).** Ask only what is missing, each with your proposal:
+   - technology and version (propose the latest stable);
+   - **the reference workload** — one sentence the whole note hangs on, e.g. "cache, 100k GET/s, 1 KB values,
+     1 node" (propose the most common one for this technology);
+   - alternatives to compare (propose 2–3 that solve the same workload differently);
+   - Notion parent page, and the markdown path (default `./tech-tree/<technology>.md`).
+1. **Sources.** Collect the official docs, the source repo at the version's tag, the design paper or talk.
+   Locate in the source the files that implement the hot path of the operation — you will link them.
+2. **Thesis** (3 lines): the problem before it, the one or two design choices that win this workload (C-IDs),
+   the price paid.
+3. **Component map.** Table of `C1…Cn` (component · data structure/state · thread/process) and a mermaid
+   `flowchart` whose edges say what flows. Every later section refers to these IDs — that is what links the
+   architecture together. `references/diagram-guide.md`.
+4. **Descend the layers** L1 application/API → L2 runtime/engine → L3 OS/kernel → L4 network → L5 hardware, for
+   the one operation. Per layer: a `sequenceDiagram`, **Why it is efficient here** (the mechanism and its
+   counted cost: copies, syscalls, round-trips, O(…), locks), **Observe** (a command that shows it, e.g.
+   `strace -c`, `perf`, `ss -ti`) and a source link. A layer that does not matter gets one line
+   `Not relevant: <reason>` — never skip silently. What to look for: `references/layer-guide.md`.
+5. **Core algorithm.** The key structure or protocol (event loop, LSM-tree, B+tree, Raft, …): steps,
+   invariants, complexity, and the **breaking point** — the workload that makes it slow and why.
+6. **Compare by architecture.** Each alternative runs the same operation through the same layers, with its own
+   diagram; a table per layer with mechanism + cost per cell; the verdict as "choose X when <condition>".
+   `references/compare-method.md`.
+7. **In practice (short).** Quick start, the production settings that tune the mechanisms above (say which
+   C-ID/layer each one affects), SDKs; AI agent / MCP integration only when it exists.
+8. **Write and check.** Fill `references/tree-template.md` in the user's language into the markdown file, then
+   `python "<SKILL_DIR>/scripts/check_tree.py" <file>` (add `--min-alternatives 1` when the user named only one
+   alternative). Fix until PASS.
+9. **Publish to Notion.** `notion-search` for a page with the same title under the parent: found → update it
+   (`notion-update-page`), else `notion-create-pages` under the parent. Headings stay as headings (`#` root,
+   `##` branches); mermaid stays a `mermaid` code block (Notion renders it); tables stay tables. Notion missing
+   or failing → keep the markdown file and tell the user once.
+10. **Report:** the file path and Notion link, the thesis in 3 lines, layers marked not relevant, and every
+    claim left as `not found` or `estimate`.
 
-### Step 1: Identify the Core Problem
+## Quality bar
 
-- Pinpoint the exact problem, architectural bottleneck, or limitation that prompted the creation of this technology.
-- Determine the design philosophy: Why existing solutions were insufficient and what core assumptions this technology challenges.
-- Formulate a clear 1-2 sentence problem-solution thesis before examining implementation details.
+- Depth means a mechanism with a cost, linked to source code — not more adjectives or more sections.
+- One operation, followed all the way down, beats a survey of every feature.
+- If the reader cannot say after reading why it is fast **in this workload** and when it stops being fast, the
+  note is not done.
 
-### Step 2: Multi-Source Information Gathering
+## Knowledge
 
-Gather verified information by consulting official project documentation, GitHub repositories, and technical YouTube deep-dives in the following strict order:
-
-1. **Tool Fundamentals and Usage**
-   - Identify core primitives, basic CLI or API usage, hello-world workflow, and standard setup requirements.
-2. **Deep Internal Architecture and Visual Diagrams**
-   - Dissect the internal subsystems, memory model, execution engine, or distributed topology.
-   - Search for and inspect detailed architectural diagrams to visualize component boundaries and interactions.
-3. **Pros, Cons, and Strategic Trade-Offs**
-   - Identify the strengths, limitations, and operational costs.
-   - Explicitly detail what must be sacrificed (e.g. latency vs. consistency, simplicity vs. flexibility) when choosing this technology over alternatives.
-4. **Core Operational Lifecycle and Data Flow**
-   - Trace the end-to-end data lifecycle: inputs, serialization, internal queueing, processing pipelines, state transitions, and outputs.
-   - Break down how each internal component transforms data.
-5. **Alternative Solutions**
-   - Map direct competitors, legacy equivalents, and modern alternatives.
-   - Build a comparison matrix covering throughput, developer ergonomics, ecosystem maturity, and maintenance overhead.
-6. **Production Deployment Across Environments and Languages**
-   - Examine real-world production configurations (e.g. Docker, Kubernetes, cloud managed services, bare metal).
-   - Detail SDK support and client implementations across major programming languages (e.g. Python, TypeScript, Go, Rust, Java).
-7. **AI Agent, Skill, and MCP Integration Potential**
-   - Evaluate whether and how this technology connects to AI agents, tool calling, Model Context Protocol (MCP) servers, or custom agent skills.
-   - Identify failure modes, security boundaries, rate limits, latency overhead, and authentication risks.
-
-### Step 3: Synthesize and Publish Tree Structure in Notion
-
-Structure the resulting knowledge base in Notion using a strict hierarchical tree model:
-
-- **Root (Core Architecture & Thesis)**
-  - Problem statement, core thesis, and primary architectural diagram.
-  - High-level system overview acting as the trunk of the document.
-- **Primary Branches (Structural Components)**
-  - Subsystem 1: Fundamentals & Quick Start.
-  - Subsystem 2: Deep Architecture & Component Breakdown.
-  - Subsystem 3: Core Lifecycle & I/O Pipeline.
-  - Subsystem 4: Trade-Offs & Alternative Matrix.
-- **Leaf Nodes (Extensions, Implementations & Integrations)**
-  - Production deployment guides across environments.
-  - Multi-language SDK examples.
-  - AI Agent / MCP integration patterns and risk mitigations.
-- **Notion Formatting Standards**
-  - Use clear Heading levels (H1 for Root, H2 for Branches, H3 for Sub-branches, Toggles for Leaf nodes).
-  - Use Callout blocks for critical trade-offs, warnings, and architectural principles.
-  - Use Code blocks for syntax and configuration snippets.
-  - Use Tables for alternative comparisons.
-
-## Gotchas
-
-- Skipping the trade-offs: Every technology is optimized for specific workloads at the expense of others. Never present a technology as universally superior.
-- Surface-level learning: Do not stop at basic CLI commands. Always uncover internal state management and execution flows.
-- Flat documentation: Avoid long unbroken walls of text. Preserve the tree hierarchy so dependencies and extensions branch logically from the core architecture.
-- Ignoring AI/MCP security boundaries: Always assess security implications such as credential leaks or unbounded tool execution when integrating with AI agents.
-
-## Mandatory Global Rules & Tools
-- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the `rules/` directory, if it exists.
-
-## Mandatory Aizen Architecture
-This skill follows the Aizen Universal Structure. Check and use these components when present:
-- `rules/`: Strict rules you must obey (e.g., read `rules/mcp.md` for mandatory tools).
-- `agents/`: Sub-agent prompts. Load them as sub-agents if delegation is needed.
-- `references/`: Domain knowledge and guidelines.
-- `tools/` & `scripts/`: Executable scripts and utilities.
-- `assets/`: Static files and templates.
+| Need | Read |
+|---|---|
+| what to look for per layer, common mechanisms, observe commands | `references/layer-guide.md` |
+| comparison method and table | `references/compare-method.md` |
+| mermaid conventions that render in Notion | `references/diagram-guide.md` |
+| note skeleton (the checker keys on its headings) | `references/tree-template.md` |
+| source and publishing rules | `rules/research.md` |

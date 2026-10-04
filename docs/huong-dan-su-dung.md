@@ -31,7 +31,7 @@ nghị cài khi cần — bạn duyệt một lần.
 | tạo skill mới / cải thiện skill trong repo | `skill-creator` | "tạo skill", "cải thiện skill <tên>" |
 | chép skill từ GitHub/thư mục khác rồi tuỳ biến | `skill-cloner` | "clone skill" + link |
 | đánh giá một skill | `agent-skill-tester` | "test skill", "benchmark skill" |
-| học công nghệ mới → Notion | `tech-learning-tree` | "nghiên cứu", "học <công nghệ>" |
+| hiểu sâu một công nghệ, so sánh kiến trúc → Notion | `tech-learning-tree` | "nghiên cứu", "vì sao X nhanh", "so sánh kiến trúc X và Y" |
 | biến video thành skill | `video-to-skill` | link YouTube / file video |
 
 Các `cecilia-*` còn lại là knowledge pack — **không gọi trực tiếp**, Cecilia tự nạp cho từng role.
@@ -102,7 +102,7 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 | `skill-creator` | skill làm gì, 3 prompt phải kích hoạt + vài prompt không được kích hoạt, đầu ra mong muốn, việc nào cần hỏi bạn |
 | `skill-cloner` | link thư mục skill (`…/tree/<branch>/<path>`) hoặc đường dẫn local, tên skill đích, muốn đổi gì, một task mẫu để A/B test |
 | `agent-skill-tester` | tên skill, tiêu chí đạt, vài prompt nên/không nên kích hoạt |
-| `tech-learning-tree` | tên công nghệ, mục đích học, trang Notion đích |
+| `tech-learning-tree` | tên công nghệ + version, **workload tham chiếu** (vd. cache 100k GET/s, value 1KB), 2–3 công nghệ để so sánh, trang Notion cha |
 | `video-to-skill` | link/file video, skill mới giúp agent làm gì, tên + ngôn ngữ skill |
 
 ## 5. Tạo và chép skill

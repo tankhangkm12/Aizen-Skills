@@ -1,6 +1,6 @@
 {
   "name": "tech-learning-tree",
-  "version": "1.0.0",
-  "description": "Aizen standardized skill for tech-learning-tree",
+  "version": "2.0.0",
+  "description": "Deep, layer-by-layer technology research with architecture diagrams and architecture-based comparison, published to Notion",
   "framework": "Aizen Universal Structure"
 }

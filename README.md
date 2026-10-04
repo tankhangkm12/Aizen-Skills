@@ -85,7 +85,7 @@ quyền cho trước) giúp agent không phải đoán và không hỏi lại.
 | [`agent-skill-tester`](skills/agent-skill-tester) | Đánh giá một skill so với baseline (Outcome, Process, Style, Efficiency), LLM-as-a-judge. |
 | [`skill-creator`](skills/skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn cho Aizen-Skills: phỏng vấn, dựng đủ 8 phần, viết docs + prompt mẫu, đánh giá so với baseline, `npm test` rồi commit. |
 | [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/thư mục local về Aizen-Skills, chuẩn hoá cấu trúc + ghi nguồn/giấy phép, phỏng vấn để tuỳ biến, chứng minh bằng A/B test, viết docs rồi commit. |
-| [`tech-learning-tree`](skills/tech-learning-tree) | Nghiên cứu công nghệ mới và ghi lại thành cây kiến thức trên Notion. |
+| [`tech-learning-tree`](skills/tech-learning-tree) | Nghiên cứu sâu một công nghệ theo một workload cụ thể: đi từ tầng ứng dụng xuống runtime, kernel, network để giải thích vì sao nó hiệu quả, có sơ đồ kiến trúc Mermaid, so sánh đối thủ bằng kiến trúc; ghi file md đã kiểm tra rồi đăng lên Notion. |
 | [`video-to-skill`](skills/video-to-skill) | Biến video YouTube/file local thành skill (phụ đề → hoặc ffmpeg + speech-to-text). |
 
 Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có thể gọi trực tiếp (Claude Code: `/<tên-skill>`).

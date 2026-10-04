@@ -139,8 +139,11 @@ Nên kích hoạt: <2–3 prompt>  · Không nên kích hoạt: <2–3 prompt>
 
 ```text
 /tech-learning-tree
-Công nghệ: <tên + version>  · Mục đích: <đánh giá cho dự án X / học để dùng>
-Ghi vào Notion: <trang đích>
+Công nghệ: <tên + version>
+Workload tham chiếu: <một thao tác cụ thể, vd. "cache 100k GET/s, value 1KB, 1 node">
+Muốn hiểu: vì sao nó hiệu quả trong workload này, đi xuống tới kernel/network; khi nào nó hết hiệu quả
+So sánh kiến trúc với: <công nghệ A>, <công nghệ B>
+Ghi vào Notion dưới trang: <trang cha>  · File md: ./tech-tree/<tên>.md
 ```
 
 ```text
