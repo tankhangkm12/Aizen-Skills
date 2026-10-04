@@ -1,4 +1,4 @@
-# Asking, options and research — how decisions reach Cecilia (v21)
+# Asking, options and research — how decisions reach Cecilia (v22)
 
 Cecilia decides; a role's job is to make each decision easy to get right: researched, compared on
 numbers, several real options, a recommendation kept separate — and asked as few times as possible.

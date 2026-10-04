@@ -1,4 +1,4 @@
-# Planning — reduce uncertainty, not create paperwork (v21)
+# Planning — reduce uncertainty, not create paperwork (v22)
 
 ## Steps
 

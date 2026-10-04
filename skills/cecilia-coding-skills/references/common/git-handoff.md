@@ -1,4 +1,4 @@
-# Git hand-off — local-only, rebase, PR text (v21)
+# Git hand-off — local-only, rebase, PR text (v22)
 
 Open at the hand-off step. Branches, checkpoints, backup and rollback: `git.md`.
 

@@ -1,9 +1,9 @@
 ---
 name: cecilia-coding-skills
-description: Cecilia's production coding coordinator (v21). Small fixes are done directly; real features run planner -> one decision card -> parallel devs in worktrees -> tester -> independent reviewer -> fix loop (<= 2 rounds) -> local push/PR commands. 5 roles (planner, dev, tester, reviewer, devops), knowledge loaded per topic. Use for điều phối, vibe code, làm tính năng, sửa bug, từ ý tưởng tới PR, chạy nhiều agent, tiếp tục task, status.
+description: Cecilia's production coding coordinator (v22). Takes a coding task from request to a local branch + PR commands - small fixes done directly, real features via planner -> one decision card -> parallel devs in worktrees -> tester -> independent reviewer -> fix loop (<= 2 rounds). Use to implement a feature, fix a non-trivial bug, refactor, build from idea to PR, run several coding agents in parallel, or resume/check a Cecilia task in tensura/ (điều phối, vibe code, làm tính năng, sửa bug, từ ý tưởng tới PR, chạy nhiều agent, tiếp tục task Cecilia). Not for: a review-only request, CI/CD pipeline design alone, schema design alone, or questions about code.
 ---
 
-# Cecilia — production coding coordinator (v21)
+# Cecilia — production coding coordinator (v22)
 
 You are the main session. You pick the mode, dispatch roles, merge their branches and talk to Cecilia (the user).
 Rules for everyone: `rules/core.md` (read it first) and `rules/mcp.md`.
@@ -13,10 +13,11 @@ Rules for everyone: `rules/core.md` (read it first) and `rules/mcp.md`.
 | Mode | When | What happens | Dispatches |
 |---|---|---|---|
 | **FAST** | tiny, local, obvious; no CONTROLLED trigger | **You do it yourself**: task branch → minimal change → focused test → self-review the diff → `scripts/check.py` → 3-line summary + `Deviations:` | 0 |
-| **STANDARD** (default) | features, non-trivial bugs, refactors | `references/flow/standard.md` | ~4–6 |
-| **CONTROLLED** | auth, money/stock/quota, tenants, schema/data migration, concurrency, public contracts, CI/CD/IaC, live systems, secrets, destructive, production, multi-service | `references/flow/standard.md` + `references/flow/controlled.md` | ~6–8 |
+| **STANDARD** (default) | features, non-trivial bugs, refactors | `references/flow/standard.md` | ~4–6 (+3 per fix round) |
+| **CONTROLLED** | auth, money/stock/quota, tenants, schema/data migration, concurrency, public contracts, CI/CD/IaC, live systems, secrets, destructive, production, multi-service | `references/flow/standard.md` + `references/flow/controlled.md` | ~6–8 (+3 per fix round) |
 
-FAST that grows (cause unclear, > ~3 files, a trigger appears) → stop and move to STANDARD.
+FAST that grows (cause unclear, > ~3 files, a trigger appears) → stop, `state.py status --task <TASK> --mode standard`,
+continue at S1. FAST bug fix: `references/dev/bugfix.md`.
 
 ## Roles (`agents/`)
 
@@ -48,7 +49,18 @@ Dispatch mechanics, models and the card: `references/flow/platform-claude-code.m
 
 ## Knowledge map (load only what the step needs)
 
-`references/` is split by topic, not by role: `flow/` · `discover/` · `design/` · `plan/` · `backend/` ·
-`frontend/` · `ui/` · `db/` · `api-ux/` · `test/` · `review/` · `infra/` · `common/` (git, evidence, decisions,
-numbers, challenge, code-quality, parallel, workspace). Each folder's `method.md` is its entry point.
-Templates in `assets/`; tools in `scripts/` (`state.py`, `check.py`, `capacity.py`, `uikit.py`, `apikit.py`).
+Knowledge is split by topic into this skill and six packs installed next to it (`<SKILL_DIR>/../<pack>/`):
+
+| Skill | `references/` topics |
+|---|---|
+| `cecilia-coding-skills` (this) | `flow/` · `plan/` · `dev/` · `common/` (git, evidence, decisions, numbers, challenge, code-quality, parallel, workspace) |
+| `cecilia-discover-design` | `discover/` · `design/` |
+| `cecilia-backend` | `backend/` · `api-ux/` |
+| `cecilia-frontend` | `frontend/` · `ui/` |
+| `cecilia-db` | `db/` |
+| `cecilia-quality` | `test/` · `review/` |
+| `cecilia-infra` | `infra/` |
+
+A path `references/<topic>/…` in any doc resolves to the skill that owns `<topic>`; every brief prints the table
+with absolute paths. Each topic's `method.md` is its entry point. Templates (`assets/`), tools (`scripts/`: `state.py`,
+`check.py`, `capacity.py`, `uikit.py`, `apikit.py`), roles and rules stay in this skill.

@@ -1,0 +1,11 @@
+{
+  "name": "cecilia-frontend",
+  "version": "22.0.0",
+  "description": "Cecilia knowledge pack: frontend principles, React, API calls, accessibility, visual checks, style guides, UI design process, tokens and handoff",
+  "framework": "Aizen Universal Structure",
+  "partOf": "cecilia-coding-skills",
+  "topics": [
+    "frontend",
+    "ui"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "cecilia-quality",
+  "version": "22.0.0",
+  "description": "Cecilia knowledge pack: test strategy, levels, case design, bug reports, test lenses; review method, code/security/supply-chain/infra/ui/release review, verification",
+  "framework": "Aizen Universal Structure",
+  "partOf": "cecilia-coding-skills",
+  "topics": [
+    "test",
+    "review"
+  ]
+}

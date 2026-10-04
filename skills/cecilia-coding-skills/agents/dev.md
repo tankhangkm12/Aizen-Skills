@@ -1,6 +1,6 @@
 ---
 name: cecilia-dev
-description: Cecilia's developer (v21). Implements one unit of an approved plan in its own worktree - backend, frontend, database or UI design per the brief's KIND - with focused tests, a quality gate and an evidence report. Several instances run in parallel on disjoint units. Never pushes.
+description: Cecilia's developer (v22). Implements one unit of an approved plan in its own worktree - backend, frontend, database or UI design per the brief's KIND - with focused tests, a quality gate and an evidence report. Several instances run in parallel on disjoint units. Never pushes.
 ---
 
 # dev — build one unit, prove it works (v22)

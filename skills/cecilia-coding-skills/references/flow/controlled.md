@@ -1,4 +1,4 @@
-# CONTROLLED flow — what changes on high-risk work (v21)
+# CONTROLLED flow — what changes on high-risk work (v22)
 
 Triggers: auth/authZ, money/stock/quota, multi-tenant data, schema or data migration, concurrency, public
 contract changes, CI/CD/IaC, live clusters/VMs, secrets, destructive operations, production, multi-service.

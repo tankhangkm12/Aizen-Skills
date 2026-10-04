@@ -1,7 +1,9 @@
 [cecilia-brief TASK={{TASK}} ROLE={{ROLE}} KIND={{KIND}} UNIT={{UNIT}} STAGE={{STAGE}} LENS={{LENS}} ROUND={{ROUND}} MODE={{MODE}}]
 
 Read `agents/{{ROLE}}.md` and `rules/core.md` in the cecilia-coding-skills skill first and follow them.
-Paths: `agents/`, `rules/`, `references/`, `assets/`, `scripts/` are under {{SKILL_DIR}}.
+Paths: `agents/`, `rules/`, `assets/`, `scripts/` are under {{SKILL_DIR}}; each `references/<topic>/` path
+resolves through this table (knowledge packs installed next to the skill):
+{{PACKS}}
 `tensura/` is always {{ROOT}}/tensura, also when you work in a worktree.
 
 ## Task

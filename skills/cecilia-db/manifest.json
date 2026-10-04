@@ -1,0 +1,10 @@
+{
+  "name": "cecilia-db",
+  "version": "22.0.0",
+  "description": "Cecilia knowledge pack: schema design, migrations, concurrency, performance, connections, growth, partitioning, HA/DR, engines, compliance",
+  "framework": "Aizen Universal Structure",
+  "partOf": "cecilia-coding-skills",
+  "topics": [
+    "db"
+  ]
+}

@@ -31,6 +31,11 @@ STATUSES = ("planning", "building", "testing", "reviewing", "fixing", "blocked",
 MAX_ROUNDS = 2
 REPORT = {"planner": "plan", "dev": "dev", "tester": "test", "reviewer": "review", "devops": "devops"}
 ID = re.compile(r"^[A-Za-z0-9._-]+$")
+# topic folders under references/ → the skill that holds them (siblings of this skill once installed)
+PACKS = {"cecilia-coding-skills": ("flow", "common", "plan", "dev"),
+         "cecilia-discover-design": ("discover", "design"), "cecilia-backend": ("backend", "api-ux"),
+         "cecilia-frontend": ("frontend", "ui"), "cecilia-db": ("db",), "cecilia-quality": ("test", "review"),
+         "cecilia-infra": ("infra",)}
 NOTES = "\n## Notes\n"
 
 
@@ -113,6 +118,19 @@ def cmd_status(ws: Path, a) -> str:
     return (task_dir(ws, a.task) / "state.md").read_text(encoding="utf-8")
 
 
+def pack_table() -> str:
+    """One line per skill: absolute dir + the references/ topics it owns. Missing pack → stop, never guess."""
+    rows, missing = [], []
+    for name, topics in PACKS.items():
+        d = SKILL_DIR if name == SKILL_DIR.name else SKILL_DIR.parent / name
+        (rows if (d / "references" / topics[0]).is_dir() else missing).append(
+            f"  references/{{{','.join(topics)}}}/ → {d.as_posix()}/references/")
+    if missing:
+        raise SystemExit("knowledge pack(s) not installed next to this skill:\n" + "\n".join(missing)
+                         + "\nrun `node bin/cli.js sync` in the Aizen-Skills repo, then retry")
+    return "\n".join(rows)
+
+
 def cmd_brief(ws: Path, a) -> str:
     run = load(ws, a.task)
     if a.role in ("dev", "tester", "devops") and run["mode"] != "fast" and not run.get("decision"):
@@ -151,7 +169,7 @@ def cmd_brief(ws: Path, a) -> str:
         "PORTS": a.ports or "pick a free range of 10 and record it in your report",
         "DB": re.sub(r"[^a-z0-9]+", "_", f"{a.task}_{unit}".lower()).strip("_"),
         "CHECK_UNIT": a.unit or a.role,
-        "INPUTS": inputs, "A3": a.a3 or "none", "REPORT": report,
+        "INPUTS": inputs, "A3": a.a3 or "none", "REPORT": report, "PACKS": pack_table(),
     }
     text = (SKILL_DIR / "assets" / "agent-brief-template.md").read_text(encoding="utf-8")
     for k, v in fields.items():
@@ -247,6 +265,9 @@ def _selfcheck() -> None:
         expect_exit(["brief", *w, "--role", "dev", "--kind", "be"], "--unit")
         d1, d2 = brief("--role", "dev", "--kind", "be", "--unit", "u1"), brief("--role", "dev", "--kind", "fe", "--unit", "u2")
         assert "ROLE=dev KIND=be UNIT=u1" in d1 and "dev-u1.md" in d1 and "pr-body-u1.md" in d1
+        for line in d1.splitlines():  # every pack path printed in the brief exists
+            if "references/{" in line:
+                assert Path(line.split("→")[1].strip()).is_dir(), line
         assert "feature/T-1-u1" in d1 and ".worktrees/u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
         r2 = brief("--role", "reviewer", "--lens", "redteam")
         assert "review-redteam.md" in r2 and "READ-ONLY" in r2

@@ -9,6 +9,8 @@ const agentsConfig = require('./agents-config');
 const isWindows = process.platform === 'win32';
 const rootDir = path.resolve(__dirname, '..');
 const skillsDir = path.join(rootDir, 'skills');
+// Đánh dấu thư mục do installer copy (khi không tạo được link) để lần sync sau thay thế được.
+const COPY_MARKER = '.aizen-copy';
 
 // Đảm bảo quyền thực thi cho các script trên Linux / macOS
 function ensurePermissions(targetPath) {
@@ -130,9 +132,14 @@ function createLink(source, destination) {
       // Nếu trỏ sai đường dẫn hoặc bị đứt link, xóa để tạo lại
       safeRemoveLink(resolvedDest);
     } else if (destLstat.isDirectory()) {
-      // Thư mục thật (có thể là skill người dùng tự viết/sửa): không bao giờ tự xóa.
-      console.warn(`  ! Bỏ qua ${resolvedDest}: đã có thư mục thật. Xóa hoặc đổi tên thủ công nếu muốn Live-Sync.`);
-      return { status: 'directory-exists', type: 'directory' };
+      if (fs.existsSync(path.join(resolvedDest, COPY_MARKER))) {
+        // Bản copy do chính installer tạo (fallback): xóa và tạo lại để không giữ file đã bị xóa ở nguồn.
+        fs.rmSync(resolvedDest, { recursive: true, force: true });
+      } else {
+        // Thư mục thật (có thể là skill người dùng tự viết/sửa): không bao giờ tự xóa.
+        console.warn(`  ! Bỏ qua ${resolvedDest}: đã có thư mục thật. Xóa hoặc đổi tên thủ công nếu muốn Live-Sync.`);
+        return { status: 'directory-exists', type: 'directory' };
+      }
     } else {
       try {
         fs.unlinkSync(resolvedDest);
@@ -150,6 +157,7 @@ function createLink(source, destination) {
     // Fallback: Copy toàn bộ nếu hệ thống không cho phép symlink/junction
     try {
       copyRecursiveSync(resolvedSource, resolvedDest);
+      fs.writeFileSync(path.join(resolvedDest, COPY_MARKER), 'Copied by Aizen Skills installer; the next sync replaces this folder.\n');
       return { status: 'copied-fallback', type: 'copy' };
     } catch (copyErr) {
       throw new Error(`Không thể liên kết hoặc sao chép: ${err.message}`);
@@ -181,7 +189,12 @@ function pruneStaleLinks(targetDir, skills) {
   for (const name of entries) {
     const p = path.join(targetDir, name);
     try {
-      if (!fs.lstatSync(p).isSymbolicLink() || current.has(name)) continue;
+      if (current.has(name)) continue;
+      if (!fs.lstatSync(p).isSymbolicLink()) {
+        // Bản copy fallback của một skill đã bị xóa khỏi repo.
+        if (fs.existsSync(path.join(p, COPY_MARKER))) fs.rmSync(p, { recursive: true, force: true });
+        continue;
+      }
       const raw = fs.readlinkSync(p).replace(/^\\\\\?\\/, ''); // junction trên Windows có tiền tố \\?\
       const target = path.resolve(targetDir, raw) + path.sep;
       if (target.toLowerCase().startsWith(skillsRoot.toLowerCase())) safeRemoveLink(p);

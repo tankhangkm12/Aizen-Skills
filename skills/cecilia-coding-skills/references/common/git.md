@@ -1,4 +1,4 @@
-# Git flow, checkpoints, backup and rollback (v21)
+# Git flow, checkpoints, backup and rollback (v22)
 
 Every change is made so that Cecilia can undo it at any moment. Git is the backup for everything it
 tracks; `tensura/backups/` is the backup for what it does not.

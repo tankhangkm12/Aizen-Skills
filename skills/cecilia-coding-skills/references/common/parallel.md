@@ -1,4 +1,4 @@
-# Parallel work — units, isolation, integration, resuming (v21)
+# Parallel work — units, isolation, integration, resuming (v22)
 
 Independent units run at the same time; each runs its own checks; they meet in one integration step.
 

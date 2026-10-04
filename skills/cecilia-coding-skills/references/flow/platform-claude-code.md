@@ -1,4 +1,4 @@
-# Running Cecilia on Claude Code (v21)
+# Running Cecilia on Claude Code (v22)
 
 ## Dispatch
 

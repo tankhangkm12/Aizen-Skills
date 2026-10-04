@@ -1,4 +1,4 @@
-# STANDARD flow — the coordinator's steps (v21)
+# STANDARD flow — the coordinator's steps (v22)
 
 You are the main session. You run this flow, dispatch roles, merge branches and talk to Cecilia. Roles do the
 specialist work. Target: **4–6 dispatches** per task. State lives in `tensura/tasks/<TASK>/`.
