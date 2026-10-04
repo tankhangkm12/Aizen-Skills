@@ -1,0 +1,6 @@
+{
+  "name": "thanhtan-backend-coding-init",
+  "version": "1.0.0",
+  "description": "Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước tuần tự có checkpoint duyệt, workspace agent ở .thanhtan/.",
+  "framework": "Aizen Universal Structure"
+}

@@ -82,6 +82,7 @@ quyền cho trước) giúp agent không phải đoán và không hỏi lại.
 | [`adversarial-code-reviewer`](skills/adversarial-code-reviewer) | Review PR/diff/code do AI viết theo góc nhìn đối kháng: blast radius, lỗi logic, bảo mật. |
 | [`database-table-design`](skills/database-table-design) | Thiết kế schema quan hệ / bảng MySQL theo 9 nguyên tắc, viết DDL, review kiến trúc DB. |
 | [`devsecops-pipeline-flow`](skills/devsecops-pipeline-flow) | Dựng CI/CD bảo mật (GitHub Actions, GitLab CI, Jenkins, ArgoCD), quét Gitleaks/Trivy/Semgrep, có các bước xác nhận. |
+| [`thanhtan-backend-coding-init`](skills/thanhtan-backend-coding-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.thanhtan/`, khung code + health check, Docker/compose kèm infra, env + config tập trung, kết nối infra fail-fast, adapter qua interface, AOP + request-id + auth, README, rà lại bằng graphify. |
 | [`agent-skill-tester`](skills/agent-skill-tester) | Đánh giá một skill so với baseline (Outcome, Process, Style, Efficiency), LLM-as-a-judge. |
 | [`skill-creator`](skills/skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn cho Aizen-Skills: phỏng vấn, dựng đủ 8 phần, viết docs + prompt mẫu, đánh giá so với baseline, `npm test` rồi commit. |
 | [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/thư mục local về Aizen-Skills, chuẩn hoá cấu trúc + ghi nguồn/giấy phép, phỏng vấn để tuỳ biến, chứng minh bằng A/B test, viết docs rồi commit. |

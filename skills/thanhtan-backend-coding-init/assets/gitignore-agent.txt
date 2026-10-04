@@ -1,0 +1,11 @@
+# agent workspace, agent tool files and local secrets (thanhtan-backend-coding-init)
+.thanhtan/
+.claude/
+.agents/
+.cursor/
+.windsurf/
+.gemini/
+.codex/
+.aizen-work/
+graphify-out/
+.env

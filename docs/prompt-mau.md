@@ -101,6 +101,17 @@ Registry: <Docker Hub user/repo>  · Branch → môi trường: <main → prod, 
 Secret đã có (chỉ tên): <DOCKERHUB_TOKEN, SSH_KEY>
 ```
 
+## Khởi tạo dự án backend
+
+```text
+/thanhtan-backend-coding-init
+Repo: <https://github.com/team/project.git | git@gitlab.com:team/project.git>
+Tài liệu dự án: <./docs/SRS.md, ./docs/architecture.md | link Notion>
+Stack / infra (nếu tài liệu chưa ghi): <NestJS + PostgreSQL + Redis>
+Auth: <JWT access/refresh + RBAC>
+Push lên remote: <hỏi tôi mỗi lần>
+```
+
 ## Skill
 
 ```text

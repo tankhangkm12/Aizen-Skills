@@ -28,6 +28,7 @@ nghị cài khi cần — bạn duyệt một lần.
 | review PR / diff / code AI viết | `adversarial-code-reviewer` | "review PR", "audit diff" |
 | thiết kế bảng / schema MySQL | `database-table-design` | "thiết kế bảng", "DDL" |
 | CI/CD bảo mật, Docker, deploy | `devsecops-pipeline-flow` | "pipeline CI/CD", "DevSecOps" |
+| khởi tạo dự án backend mới cho team (khung, Docker, infra, health check) | `thanhtan-backend-coding-init` | "khởi tạo dự án backend", "dựng khung backend", "init backend" |
 | tạo skill mới / cải thiện skill trong repo | `skill-creator` | "tạo skill", "cải thiện skill <tên>" |
 | chép skill từ GitHub/thư mục khác rồi tuỳ biến | `skill-cloner` | "clone skill" + link |
 | đánh giá một skill | `agent-skill-tester` | "test skill", "benchmark skill" |
@@ -99,6 +100,7 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 | `adversarial-code-reviewer` | diff/PR (số PR, branch, hoặc `git diff base...head`), mục tiêu của thay đổi, phần nào là lõi |
 | `database-table-design` | engine + version, các thực thể và quan hệ, quy mô dữ liệu, truy vấn chính |
 | `devsecops-pipeline-flow` | repo, nền tảng CI, nơi deploy, registry, branch nào deploy đi đâu, secret đã có (chỉ tên) |
+| `thanhtan-backend-coding-init` | **URL repo GitHub/GitLab** + **tài liệu chi tiết dự án** (bắt buộc, thiếu thì skill dừng hỏi); nếu có: stack, infra, kiểu auth |
 | `skill-creator` | skill làm gì, 3 prompt phải kích hoạt + vài prompt không được kích hoạt, đầu ra mong muốn, việc nào cần hỏi bạn |
 | `skill-cloner` | link thư mục skill (`…/tree/<branch>/<path>`) hoặc đường dẫn local, tên skill đích, muốn đổi gì, một task mẫu để A/B test |
 | `agent-skill-tester` | tên skill, tiêu chí đạt, vài prompt nên/không nên kích hoạt |
