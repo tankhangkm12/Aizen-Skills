@@ -10,6 +10,7 @@ thư mục chuẩn `~/.agents/skills`. Mỗi skill là một thư mục tự ch�
 ## Mục lục
 
 - [Cài đặt](#cài-đặt)
+- [Hướng dẫn sử dụng và prompt mẫu](docs/huong-dan-su-dung.md)
 - [Danh sách skill](#danh-sách-skill)
 - [Cecilia — trợ lý production coding](#cecilia--trợ-lý-production-coding)
 - [Cấu trúc repo](#cấu-trúc-repo)
@@ -68,6 +69,10 @@ Cách này chép skill (không live-sync, không cài rules/plugin).
 
 Sau khi cài, khởi động lại agent (hoặc mở session mới) để nó nạp danh sách skill.
 
+**Dùng thế nào cho hiệu quả:** đọc [docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md) và copy prompt từ
+[docs/prompt-mau.md](docs/prompt-mau.md) — prompt đủ 6 phần (mục tiêu, tiêu chí xong, phạm vi, ràng buộc, tài liệu,
+quyền cho trước) giúp agent không phải đoán và không hỏi lại.
+
 ## Danh sách skill
 
 | Skill | Dùng khi |
@@ -87,23 +92,23 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 
 ## Cecilia — trợ lý production coding
 
-`cecilia-coding-skills` (v22) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
-`git push`; cuối task bạn nhận khối lệnh push/PR để tự chạy.
+`cecilia-coding-skills` (v23) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
+`git push`; cuối task bạn nhận khối lệnh push/PR để tự chạy. Hướng dẫn dùng và prompt mẫu:
+[docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md) · [docs/prompt-mau.md](docs/prompt-mau.md).
 
-**Chế độ**
+**Một luồng, hai pha** (không còn chế độ FAST/STANDARD/CONTROLLED)
 
-| Mode | Khi nào | Luồng | Số sub-agent |
-|---|---|---|---|
-| FAST | sửa nhỏ, rõ ràng | main session tự sửa và chạy test | 0 |
-| STANDARD | mặc định | planner → 1 decision card → `dev` song song (mỗi unit một worktree) → tích hợp `int/<TASK>` → tester → reviewer → fix ≤ 2 vòng | ~4–6 (+3 mỗi vòng fix) |
-| CONTROLLED | auth, tiền, migration, concurrency, contract public, infra, prod | như STANDARD + duyệt plan rõ ràng + reviewer thứ hai (`LENS=redteam`) + `devops` khi đụng hạ tầng | ~6–8 (+3 mỗi vòng fix) |
+| Pha | Làm gì | Bạn |
+|---|---|---|
+| **Thống nhất** | planner khảo sát + thiết kế, viết plan chia theo module (chốt sẵn tên, interface, dữ liệu, file, test) → Cecilia xác nhận **từng phần**: phạm vi → từng module → cách triển khai (các việc A3 duyệt trước) → `approve` | được hỏi chi tiết từng phần |
+| **Thực thi** | `dev` song song (mỗi module một worktree, viết code tối thiểu) → tích hợp `int/<TASK>` → tester → reviewer (+ `redteam` nếu có module rủi ro) → fix ≤ 2 vòng → tổng kết + lệnh push/PR | **không bị hỏi thêm**; chỉ khi `BLOCKED` (việc A3 chưa duyệt, A4, mất dữ liệu, plan không làm được) |
 
 **5 role** (`agents/`)
 
 | Role | Việc | Ghi code? |
 |---|---|---|
-| `planner` | khảo sát codebase, yêu cầu/thiết kế khi cần, kế hoạch chia unit + 2–3 phương án | không (chỉ docs/plan) |
-| `dev` | thực thi một unit; `KIND=be\|fe\|db\|ui` quyết định nạp kiến thức nào | có, trong worktree riêng |
+| `planner` | khảo sát codebase, yêu cầu/thiết kế khi cần, plan chia module kèm phương án + câu hỏi từng module | không (chỉ docs/plan) |
+| `dev` | làm đúng một module đã duyệt bằng code tối thiểu; `KIND=be\|fe\|db\|ui` quyết định nạp kiến thức nào | có, trong worktree riêng |
 | `tester` | viết/chạy test theo lens, báo bug có bằng chứng | test |
 | `reviewer` | review độc lập trên SHA đã tích hợp, read-only | không |
 | `devops` | CI/CD, Docker, IaC, deploy/rollback, sự cố | file hạ tầng |
@@ -121,14 +126,16 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 | `cecilia-quality` | `test`, `review` |
 | `cecilia-infra` | `infra` |
 
-**Quy tắc chính** (`rules/core.md`): mức quyền A0–A4 (việc rủi ro phải hỏi), không tự quyết thay người dùng, mọi kết
+**Quy tắc chính** (`rules/core.md`): mức quyền A0–A4 (việc A3 duyệt sẵn trong plan, A4 chỉ bạn làm), chỉ hỏi ở pha thống nhất, không tự quyết thay người dùng, mọi kết
 luận gắn nhãn `[verified]/[inferred]/[unverified]/[projected]`, kiểm diff/test/SHA thay vì tin báo cáo "DONE".
 
 **Scripts** (`scripts/`, Python 3, chạy từ thư mục project bằng đường dẫn tuyệt đối tới skill):
 
 ```bash
 S=~/.claude/skills/cecilia-coding-skills/scripts
-python $S/state.py init --task T-12 --goal "..." --mode standard   # trạng thái task để resume
+python $S/state.py init --task T-12 --goal "..."     # trạng thái task để resume
+python $S/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng module
+python $S/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
 python $S/check.py --task T-12 --unit api  # lint, typecheck, build, test, secrets, deps → evidence-api.json
 python $S/graph.py --project .             # code map graphify (AST, offline) → graphify-out/
 python $S/capacity.py --help               # ước lượng tải/dung lượng
@@ -150,6 +157,7 @@ Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`
 
 ```text
 .
+├── docs/                      # hướng dẫn sử dụng + prompt mẫu
 ├── skills/<skill>/            # mỗi skill tự chứa, đủ 8 phần:
 │   ├── SKILL.md               #   điểm vào: front-matter name/description + hướng dẫn
 │   ├── manifest.json          #   metadata, version

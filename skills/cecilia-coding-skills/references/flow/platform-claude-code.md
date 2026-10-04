@@ -1,4 +1,4 @@
-# Running Cecilia on Claude Code (v22)
+# Running Cecilia on Claude Code (v23)
 
 ## Dispatch
 
@@ -16,19 +16,21 @@
 | Role | Default | Why |
 |---|---|---|
 | planner | strongest (opus) | one plan drives every other dispatch; quality matters most here |
-| dev | sonnet | volume work; switch to opus for CONTROLLED units |
+| dev | sonnet | the plan already decided the design; opus only for risk modules |
 | tester | sonnet | |
 | reviewer | a different model than the devs (opus when devs ran sonnet) | independence comes from a different context **and** model |
 | devops | opus | blast radius |
 
-Cecilia may override any of these on the decision card.
+Cecilia may override any of these when she confirms delivery.
 
-## Card
+## Confirming the plan
 
-Use **AskUserQuestion**: options first with the recommended one labelled "(Recommended)", then the plan's
-questions (≤ 4 per call). Record the answer with `state.py answer`.
+One **AskUserQuestion** call per part (scope, each module, delivery): the module's options first with the
+recommended one labelled "(Recommended)", then its questions (≤ 4 per call; put the ≤ 15-line design summary in
+the question text or in a message just before). Record each with `state.py answer --module <part>`, then
+`state.py approve`.
 
 ## Dispatch failed
 
 Agent tool error, missing skill path, permission denial → stop, show the exact error, and tell Cecilia what to
-check. Do not silently do the role's work instead — but in FAST mode you do the work yourself by design.
+check. Do not silently do the role's work instead (a one-module task you chose to build yourself is the exception).

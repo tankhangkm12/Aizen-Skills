@@ -1,4 +1,4 @@
-# Asking, options and research — how decisions reach Cecilia (v22)
+# Asking, options and research — how decisions reach Cecilia (v23)
 
 Cecilia decides; a role's job is to make each decision easy to get right: researched, compared on
 numbers, several real options, a recommendation kept separate — and asked as few times as possible.
@@ -16,16 +16,16 @@ numbers, several real options, a recommendation kept separate — and asked as f
    Never an open "how do you want it?".
 4. **Every grouped gate is answerable in one line.** `theo đề xuất hết` must be a complete, valid answer.
    Cap: 6 rows; more → two gates, the blocking one first.
-5. **Material scope questions first.** Do not ask for formal scope metadata in FAST/STANDARD just to fill
-   a template.
+5. **Material scope questions first.** Do not ask for formal scope metadata just to fill a template.
 6. **Stop after asking.** No work in the meantime that the answer could invalidate.
 7. **Use the host's question tool if it has one** — one call for the whole gate, one question per row.
 
-FAST often asks nothing; STANDARD asks only real unknowns; CONTROLLED uses the full gate discipline.
-**In an orchestrated task (from STANDARD) a role never asks Cecilia directly:** its questions go into its
-report (`PENDING QUESTIONS`, or the plan's questions), and the coordinator puts them on the task's
-ONE decision card (defaults pre-selected, one reply answers all), recorded in `tensura/tasks/<TASK>/state.md`
-`## Decision` with `state.py answer`.
+**When to ask.** All questions belong to plan and design (S2 of `references/flow/method.md`): the coordinator
+asks them part by part — scope, then each module, then delivery — and records each answer with
+`state.py answer --module <part>`. A role never asks Cecilia directly: its questions go into the plan or its
+report. **After `state.py approve` nobody asks** — the plan is the contract; gaps are filled with the simplest
+option that fits it and listed under `Deviations:`. Only a `BLOCKED` (unapproved A3, A4, data loss, plan
+impossible) reopens one module.
 
 ## 2. Grouped gate
 
@@ -95,7 +95,7 @@ When a real choice exists (technology, design, data model, algorithm, infrastruc
    in the code only because it is there? Did I search for how others solved it? Is there a cheaper
    option I dismissed without numbers?
 
-Low-stakes conventions may be one "approve this table" question. FAST work states the one sensible way.
+Low-stakes conventions may be one "approve this table" question.
 
 ## 7. Research — search before proposing
 

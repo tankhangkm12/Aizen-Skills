@@ -57,7 +57,7 @@ Options: (a) conditional decrement (b) reservation + TTL (c) queue per SKU (d) k
 
 | Finding touches | Owner | Needs Cecilia? |
 |---|---|---|
-| contract shape, new endpoint, status codes, versioning | `planner` (design) | **yes** — public contract (CONTROLLED trigger) |
+| contract shape, new endpoint, status codes, versioning | `planner` (design) | **yes** — public contract (risk module) |
 | server-side N+1, lock scope, retry inside the service, missing index | `dev` (be) / `dev` (db) | no, inside the task envelope |
 | how the UI waits, retries, keeps input | `dev` (fe) | no, inside the task envelope |
 | NFR target itself (what "fast" means) | Cecilia | yes |

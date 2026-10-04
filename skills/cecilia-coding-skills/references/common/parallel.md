@@ -1,4 +1,4 @@
-# Parallel work — units, isolation, integration, resuming (v22)
+# Parallel work — units, isolation, integration, resuming (v23)
 
 Independent units run at the same time; each runs its own checks; they meet in one integration step.
 
@@ -6,7 +6,7 @@ Independent units run at the same time; each runs its own checks; they meet in o
 
 The plan's chosen option sets the number of `dev` instances. Limits that still apply: the host (Claude Code runs
 up to ~20 sub-agents at once), machine resources (each member needs its own ports, containers, DB), and any number
-Cecilia set on the card. Every extra unit costs a dispatch, a worktree and a merge — prefer fewer, larger units.
+Cecilia set when confirming delivery. Every extra unit costs a dispatch, a worktree and a merge — prefer fewer, larger units.
 
 ## 2. When two writers may run at the same time — all three, or sequence them
 
@@ -33,8 +33,8 @@ Creating a worktree is A2; deleting one that holds unpushed work is A3.
 
 A wave = members launched together because none can invalidate another: dependencies finished → write sets
 compared → isolation assigned. **Launch every member of a wave in one message.** A wave of one is normal.
-STANDARD continues after a clean wave; CONTROLLED stops after every wave. A question, failed check, A3 quote or
-`HANDOFF` stops both.
+The next wave starts after a clean wave without asking Cecilia. A failed check is fixed by the owning unit; an
+unapproved A3, an A4 or a plan that cannot work stops the flow (`BLOCKED`).
 
 ## 4. Integration
 

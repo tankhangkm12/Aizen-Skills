@@ -1,4 +1,4 @@
-# Lens: concurrency-perf (`tester` v22)
+# Lens: concurrency-perf (`tester` v23)
 
 Brief header `LENS=concurrency-perf`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

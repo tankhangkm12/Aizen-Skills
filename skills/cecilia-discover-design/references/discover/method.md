@@ -1,4 +1,4 @@
-# Discovery — what exists and what is needed (v22)
+# Discovery — what exists and what is needed (v23)
 
 Used by `planner` when `STAGE=discover`, or before planning in an unfamiliar repo.
 
@@ -15,7 +15,7 @@ Used by `planner` when `STAGE=discover`, or before planning in an unfamiliar rep
 6. **Scope out is written down**, each row with its reason and "revisit when".
 7. Reading source is free; **touching a running system** (run the app, any DB, logs, external APIs) is A3.
 
-## Scope (every STANDARD task, part of the plan)
+## Scope (every task, part of the plan)
 
 Turn the short prompt into facts without asking Cecilia: read README, `tensura/docs/`, the repo tree and
 `git log` of the named paths; measure versions, contracts, configs. Record in the plan:

@@ -1,6 +1,6 @@
 {
   "name": "cecilia-infra",
-  "version": "22.0.0",
+  "version": "23.0.0",
   "description": "Cecilia knowledge pack: pipelines, environments, deploy and rollback, secrets, observability, incidents, platform guides (Docker, GitHub Actions, GitLab CI, Kubernetes/Helm, Terraform)",
   "framework": "Aizen Universal Structure",
   "partOf": "cecilia-coding-skills",

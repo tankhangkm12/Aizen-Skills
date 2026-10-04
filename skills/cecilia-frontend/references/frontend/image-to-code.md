@@ -1,4 +1,4 @@
-# Image to code — build a screen from a picture (v22)
+# Image to code — build a screen from a picture (v23)
 
 For a screenshot, mockup, photo of a sketch or design export that Cecilia gives as the spec. The goal is
 the **design system behind the picture** — tokens and components the repo can reuse — not a pixel copy.

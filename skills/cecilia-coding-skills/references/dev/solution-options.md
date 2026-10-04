@@ -1,6 +1,9 @@
 # Solution options — non-CRUD logic the docs leave open
 
-Use when the LLD does not fix the algorithm/flow of something CORE: multi-step dependent operations
+**Planner's tool**: use it while planning when the LLD does not fix the algorithm/flow of something CORE —
+the result goes into the module as options for Cecilia. A dev who meets such an open core choice after
+`approve` returns `BLOCKED` with this question; a non-core gap → simplest option, listed under `Deviations:`.
+CORE = multi-step dependent operations
 with compensation · state machine or decision rules (price, discount, quota, allocation, ranking) ·
 money/stock/balance/quota · concurrency or retries (clients, queues, cron) · background jobs/external
 calls in the flow · a real algorithm choice. CRUD with validation/filter/pagination does not need this.

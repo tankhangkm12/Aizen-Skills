@@ -1,4 +1,4 @@
-# Numbers — measure, project, calculate (v22)
+# Numbers — measure, project, calculate (v23)
 
 Cecilia decides on numbers. A number is either **measured** (a tool read it) or **projected** (computed
 from stated inputs) — never guessed. Arithmetic is done by running code, not in the head.

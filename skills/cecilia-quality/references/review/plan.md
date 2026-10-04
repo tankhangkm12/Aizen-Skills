@@ -20,10 +20,12 @@ the repo structure, `tensura/tasks/<TASK>/state.md`, and the state of any wave a
    migration, CI step, alert an NFR needs) without an `infra` unit; behaviour changes with no test lens.
 6. **One purpose per unit**, reviewable in one pass; no refactor mixed into a feature.
 7. **Doc gaps settled, not deferred.** An open contradiction that a scheduled unit depends on is a BLOCKER.
-8. **CONTROLLED detail** (`references/plan/planning-method.md`): exact write set, commands, checks, backup and
+8. **Buildable without questions.** Each module fixes its interface, data, files and test cases; a design
+   choice left to the dev (a name, a status code, an algorithm for core logic) is a SHOULD-FIX.
+9. **Risk-module detail** (`references/plan/planning-method.md`): exact write set, commands, checks, backup and
    rollback per unit; destructive or recovery steps have a tested rollback.
-9. **No time estimates**, and no unit that is really a decision in disguise ("investigate whether…" is a
-   question for Cecilia).
+10. **No time estimates**, and no unit that is really a decision in disguise ("investigate whether…" is a
+   question for Cecilia in that module).
 
 ## 2. Severity
 

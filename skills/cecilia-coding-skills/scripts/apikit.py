@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""apikit — look at an API the way its consumers meet it (Cecilia reviewer, api-ux lens, v22).
+"""apikit — look at an API the way its consumers meet it (Cecilia reviewer, api-ux lens, v23).
 
     apikit.py summary  api.yaml               # consistency lint: naming, pagination, errors, formats, status codes
     apikit.py journey  --calls "GET /cart > GET /products/{id} x12, GET /vouchers > POST /orders" --latency-ms 80

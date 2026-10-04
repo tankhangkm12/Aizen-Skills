@@ -1,4 +1,4 @@
-# Visual check — see what you built (v22)
+# Visual check — see what you built (v23)
 
 Code that compiles is not a finished screen. This loop opens the running app in a real browser, captures
 every screen × state × breakpoint, and turns "looks right" into evidence: screenshots, console errors,
@@ -38,9 +38,9 @@ The MCP server is host configuration — Cecilia adds it herself; you only say w
   block, or your role name (`dev`, `tester`) when there is no brief. Never `close-all` / `kill-all` —
   they stop other members' browsers (A3). Start the dev server on your own port, check the port is free
   first, note its process id, and stop it when you finish — never leave it running when you report.
-- **CONTROLLED:** the dev server command, `playwright-cli -s=<member> *` and the `uikit.py` calls must be
+- **Risk modules:** the dev server command, `playwright-cli -s=<member> *` and the `uikit.py` calls must be
   in the plan unit's `Commands`; if they are not, the visual rows are `[unverified]` and the missing
-  commands are a scope question for Cecilia.
+  commands are listed under `Deviations:`.
 - **No real accounts.** Test users and seed data only. `state-save` files hold tokens: only when
   `.playwright-cli/` is in `.gitignore`; never commit or report their content.
 - **Evidence location.** `<main checkout>/tensura/reports/<TASK>/ui/` by absolute path — the main

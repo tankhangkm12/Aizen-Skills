@@ -1,4 +1,4 @@
-# Lens: security (`tester` v22)
+# Lens: security (`tester` v23)
 
 Brief header `LENS=security`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

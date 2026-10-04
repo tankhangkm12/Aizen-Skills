@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capacity calculator for Cecilia roles — numbers computed, not guessed (v22).
+"""Capacity calculator for Cecilia roles — numbers computed, not guessed (v23).
 
 Every command prints the formula, the inputs (with which ones are assumptions), a low / expected / high
 table and a sensitivity ranking (which input moves the result most). Results are PROJECTIONS: label them

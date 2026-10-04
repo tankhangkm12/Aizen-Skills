@@ -71,5 +71,5 @@ batches, stop when replication lag or load rises, resumable from the last key. N
 
 Partitioning a live table is a data migration (`migrations.md`): new partitioned table, dual-write or
 trigger-based copy, backfill in batches, verify counts and checksums per range, swap names in a short
-lock window, keep the old table until Cecilia approves dropping it. CONTROLLED, and the production run is
+lock window, keep the old table until Cecilia approves dropping it. A risk module, and the production run is
 Cecilia's.

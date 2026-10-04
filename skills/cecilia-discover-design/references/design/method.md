@@ -1,4 +1,4 @@
-# Design — how it will be built (v22)
+# Design — how it will be built (v23)
 
 Used by `planner` when `STAGE=design`. Output: docs in `tensura/docs/`, never code.
 

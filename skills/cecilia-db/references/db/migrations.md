@@ -55,7 +55,7 @@ infrastructure to run (`devops`).
 
 | Target | Authority |
 |---|---|
-| local container / Testcontainers | A2 (FAST/STANDARD task envelope; CONTROLLED scope) — run up, down, up |
+| local container / Testcontainers | A2 (inside the approved module) — run up, down, up |
 | shared dev/staging | A3 — quote the exact command, target and backup status |
 | production | A4 — Cecilia runs it. Hand over: the command, the pre-check queries, the expected lock/duration, the verification query, the rollback, and the backup taken in that session (`devops` §3) |
 

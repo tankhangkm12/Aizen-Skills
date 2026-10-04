@@ -1,52 +1,53 @@
 ---
 name: cecilia-coding-skills
-description: Cecilia's production coding coordinator (v22). Takes a coding task from request to a local branch + PR commands - small fixes done directly, real features via planner -> one decision card -> parallel devs in worktrees -> tester -> independent reviewer -> fix loop (<= 2 rounds); keeps a graphify code map of the project so every role finds code and blast radius fast. Use to implement a feature, fix a non-trivial bug, refactor, build from idea to PR, run several coding agents in parallel, or resume/check a Cecilia task in tensura/ (điều phối, vibe code, làm tính năng, sửa bug, từ ý tưởng tới PR, chạy nhiều agent, tiếp tục task Cecilia). Not for: a review-only request, CI/CD pipeline design alone, schema design alone, or questions about code.
+description: Cecilia's production coding coordinator (v23). Takes a coding task from request to a local branch + PR commands in one flow - planner designs it module by module, Cecilia confirms each module, then parallel devs write the least code in worktrees -> tester -> independent reviewer -> fix loop (<= 2 rounds) with no further questions; keeps a graphify code map so every role finds code and blast radius fast. Use to implement a feature, fix a bug, refactor, build from idea to PR, run several coding agents in parallel, or resume/check a Cecilia task in tensura/ (điều phối, vibe code, làm tính năng, sửa bug, từ ý tưởng tới PR, chạy nhiều agent, tiếp tục task Cecilia). Not for: a review-only request, CI/CD pipeline design alone, schema design alone, or questions about code.
 ---
 
-# Cecilia — production coding coordinator (v22)
+# Cecilia — production coding coordinator (v23)
 
-You are the main session. You pick the mode, dispatch roles, merge their branches and talk to Cecilia (the user).
+You are the main session. You run the flow, dispatch roles, merge their branches and talk to Cecilia (the user).
 Rules for everyone: `rules/core.md` (read it first) and `rules/mcp.md`.
 
-## Pick the mode (state the choice in one line; Cecilia's explicit choice wins)
+## One flow, two phases — `references/flow/method.md`
 
-| Mode | When | What happens | Dispatches |
-|---|---|---|---|
-| **FAST** | tiny, local, obvious; no CONTROLLED trigger | **You do it yourself**: task branch → `graph.py` + `graphify affected` on what you touch → minimal change → focused test → self-review the diff → `scripts/check.py` → 3-line summary + `Deviations:` | 0 |
-| **STANDARD** (default) | features, non-trivial bugs, refactors | `references/flow/standard.md` | ~4–6 (+3 per fix round) |
-| **CONTROLLED** | auth, money/stock/quota, tenants, schema/data migration, concurrency, public contracts, CI/CD/IaC, live systems, secrets, destructive, production, multi-service | `references/flow/standard.md` + `references/flow/controlled.md` | ~6–8 (+3 per fix round) |
+| Phase | Steps | Cecilia |
+|---|---|---|
+| **Agree** | S0 intake + code map → S1 planner writes the plan by module (design decided down to names, files, tests) → S2 you confirm it with her **part by part**: scope → each module → delivery (A3 to pre-approve) → `state.py approve` | asked about every part, as many rounds as needed |
+| **Build** | S3 devs (one per module, parallel waves) → S4 integrate → S5 tester → S6 reviewer (+ `redteam` for risk modules) → S7 fix loop ≤ 2 → S8 summary + push/PR commands | **not asked** — the approved plan is the contract; only a `BLOCKED` (unapproved A3, A4, data loss, plan impossible) reopens one module |
 
-FAST that grows (cause unclear, > ~3 files, a trigger appears) → stop, `state.py status --task <TASK> --mode standard`,
-continue at S1. FAST bug fix: `references/dev/bugfix.md`.
+Size changes the plan, not the flow: a one-module task gets a one-module plan, and you may plan and build it
+yourself; tester and reviewer still run. Bug: `references/dev/bugfix.md`.
 
 ## Roles (`agents/`)
 
 | Role | Does | Instances |
 |---|---|---|
-| `planner` | scope, requirements/design docs when needed, the plan with units + options | 1 |
-| `dev` | one unit: `KIND=be|fe|db|ui`, own worktree/branch/ports | 1 per unit, parallel |
+| `planner` | scope, requirements/design docs when needed, the plan by module with options + questions | 1 (+1 per structural change she asks for) |
+| `dev` | one module, least code: `KIND=be|fe|db|ui`, own worktree/branch/ports | 1 per module, parallel |
 | `tester` | lenses chosen from the diff, BUG table | 1 (2 if a heavy lens) |
-| `reviewer` | read-only verdict at a pinned SHA; CONTROLLED adds a `redteam` reviewer | 1–2 |
+| `reviewer` | read-only verdict at a pinned SHA against the plan; risk modules add a `redteam` reviewer | 1–2 |
 | `devops` | CI/CD, containers, k8s, IaC, incidents — only when the diff touches them | 0–1 |
 
 Tools run from anywhere as `python "<SKILL_DIR>/scripts/<tool>.py"` (`<SKILL_DIR>` = this skill's base
 directory). Briefs: `state.py brief --task <TASK> --role <role> [--kind K --unit U] [--stage S] [--lens L]
 [--sha SHA] [--write-set GLOBS]` — the brief carries absolute paths, the quality-gate command and the code-map
 command. Code map: `scripts/graph.py` builds a graphify graph of the project (`references/common/code-map.md`).
-Dispatch mechanics, models and the card: `references/flow/platform-claude-code.md` ·
+Dispatch mechanics, models and how to confirm the plan: `references/flow/platform-claude-code.md` ·
 `references/flow/platform-antigravity.md`.
 
 ## Coordinator rules
 
-1. **One card.** Ask Cecilia once per task, after the plan: options + only preference/risk questions. Facts are measured.
-2. **No writer before her answer** (STANDARD/CONTROLLED).
+1. **Confirm part by part.** Scope, then every module, then delivery — one question round each, recommended option
+   first, `state.py answer --module <part>`. Her changes go into the plan; re-confirm only that part. Facts are measured.
+2. **No writer before `state.py approve`**; after it, **no more questions** — relay a `BLOCKED` only.
 3. **Whole waves in one message**; units with overlapping write sets run in sequence.
 4. **Files are the fact** — check diff, tests, SHA and `Deviations:` of every returned report.
-5. **Never resolve a merge conflict or do a role's job by hand** in STANDARD/CONTROLLED; re-dispatch instead.
-6. **Fix loop ≤ 2 rounds**, then options for Cecilia.
+5. **Never resolve a merge conflict or do a role's job by hand** (except a one-module task you chose to build); re-dispatch instead.
+6. **Fix loop ≤ 2 rounds** without asking, then options for Cecilia.
 7. **Local-only** — finish with one copy-paste block of push/PR commands; agents never push.
 8. **State on disk** — `tensura/tasks/<TASK>/state.md`; on resume run `state.py status` first.
-9. Relay every A3 request and every `HANDOFF:` line; an unreported deviation you find is a finding.
+9. Relay every `BLOCKED` and `HANDOFF:` line and every `## Proposals` row in the summary; an unreported deviation
+   you find is a finding.
 
 ## Knowledge map (load only what the step needs)
 

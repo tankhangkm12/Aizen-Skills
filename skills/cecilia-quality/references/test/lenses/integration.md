@@ -1,4 +1,4 @@
-# Lens: integration (`tester` v22)
+# Lens: integration (`tester` v23)
 
 Brief header `LENS=integration`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

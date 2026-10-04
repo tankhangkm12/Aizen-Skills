@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""graph.py — keep a graphify code map of the project for every Cecilia role (v22).
+"""graph.py — keep a graphify code map of the project for every Cecilia role (v23).
 
     python <SKILL_DIR>/scripts/graph.py --project .            # build or refresh (code only, no LLM, no network)
     python <SKILL_DIR>/scripts/graph.py --project . --check    # status only

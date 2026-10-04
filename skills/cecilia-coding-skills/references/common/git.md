@@ -1,4 +1,4 @@
-# Git flow, checkpoints, backup and rollback (v22)
+# Git flow, checkpoints, backup and rollback (v23)
 
 Every change is made so that Cecilia can undo it at any moment. Git is the backup for everything it
 tracks; `tensura/backups/` is the backup for what it does not.
@@ -32,7 +32,7 @@ A team convention (branch pattern such as `feature/{ticket}-{slug}`, commit subj
 Never create `develop`, `release/*` or any branch on the remote (A4 — Cecilia creates remote branches). Creating `develop`
 locally for a repo that has none is a decision — ask once, record it as `D-nn`.
 
-## 2. Before the first edit — every task, every mode
+## 2. Before the first edit — every task
 
 ```
 git status --porcelain            # unrelated changes? → ask; never stash or commit Cecilia's work silently

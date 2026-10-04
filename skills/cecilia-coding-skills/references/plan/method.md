@@ -1,48 +1,60 @@
-# Planning — reduce uncertainty, not create paperwork (v22)
+# Planning — a plan Cecilia can confirm module by module (v23)
+
+The plan is what Cecilia confirms part by part and what every role then follows without asking. Write it so
+each module can be read, judged and approved on its own, and so a dev can build it without thinking twice.
 
 ## Steps
 
-1. **Locate.** Read only the docs and code needed for this change; `tensura/tasks/<TASK>/state.md` when resuming.
-2. **Measure, never ask facts.** Paths, versions, config, how code behaves → read-only tools, labelled. An
-   unverified assumption becomes the first (measurement) step. Only preferences/risk choices become questions,
-   each with choices and a recommended default.
-3. **Root cause first** for bugs and incidents: `[verified]` only when reproduced or the causing line was read at
-   this SHA; otherwise step 1 is a read-only measurement (failing test, `EXPLAIN`, logs) naming the result that
-   would change the plan.
-4. **Write the plan** to `tensura/plans/<TASK>.md` (STANDARD shape below; CONTROLLED: `planning-method.md`).
-5. **Self-challenge**: is there a simpler plan? which step is most likely wrong? (`references/common/challenge.md`).
-6. **Return** ≤ 15 lines: plan path, units, options, questions.
+1. **Locate.** Read only the docs and code this change needs (code map first: `references/common/code-map.md`);
+   `tensura/tasks/<TASK>/state.md` when resuming — `## Agreed` is settled, do not reopen it.
+2. **Measure, never ask facts.** Paths, versions, config, current behaviour → read-only tools, labelled. An
+   unverified assumption becomes a measurement module first. Only preferences and risk choices become
+   questions, each with choices and a recommended default.
+3. **Root cause first** for bugs: `[verified]` only when reproduced or the causing line was read at this SHA.
+4. **Split into modules** (below) and write `tensura/plans/<TASK>.md`. Risk module → add the fields of
+   `planning-method.md`.
+5. **Decide the details now.** Anything a dev would otherwise have to think about — names, signatures, status
+   codes, columns, file paths, edge cases, test cases — goes in the module. Open choices go to Cecilia as
+   questions with a default; the dev never chooses between designs.
+6. **Self-challenge**: is there a simpler plan? which module is most likely wrong? (`references/common/challenge.md`).
+7. **Return** ≤ 15 lines: plan path, modules, questions per module.
 
-## STANDARD plan shape
+## Plan shape
 
 ```text
+# <TASK> — <goal>                                   Plan vN · Base: <branch> @ <sha>
+## Scope
 Goal: <one checkable sentence>
-Plan:
-1. <step>   [unit · after: <step> | parallel]
-2. <step>
+In: <…>   Out: <…>
+Acceptance: AC-1 <given/when/then> · AC-2 …
 Simpler option: <the simplest approach that would also work; why this plan is not simpler>
-Units:  <id · kind be|fe|db|ui (dev) or infra (devops) · write set (globs) · seams relied on · after: <unit>>
-Test lenses: <functional + …>
-Checks: <tests/lint/build commands>
-Backup: <DB dump / none, why>
-Rollback: <how>
-Stop if: <contract/schema/security/infra trigger>
-Options:
-  A (recommended): <units per wave, parallel or sequential, models> — why
-  B: <…>
-Questions for Cecilia: <preference/risk only, choices + default>
+
+## Module <unit-id> — <name>          kind be|fe|db|ui (dev) or infra (devops) · after: <unit> | parallel
+Does: <behaviour in 2–4 lines, which AC it covers>
+Interface: <endpoint / function signatures / events / screen states — exact>
+Data: <tables, columns, migrations, cache keys — exact; or none>
+Files (write set): <globs>
+Tests: <cases that prove it, incl. the failure cases>
+Risk: <none | trigger + what could go wrong> (risk → planning-method.md fields)
+Options: A (recommended) … · B … — only when there is a real choice
+Questions: <preference/risk only, choices + default>
+
+## Delivery
+Order / waves: <unit, unit → unit>
+A3 to pre-approve: <exact actions: installs, local DB, downloads — or none>
+Checks: <commands>  ·  Backup: <what / none, why>  ·  Rollback: <how>
 ```
 
-## Units — how parallel work stays safe
+## Modules — how parallel work stays safe
 
-- Each unit has a **disjoint write set**. Shared hot files (router, DI module, lockfile, migration registry,
-  i18n bundle) get one owner; others list the lines they need in their report.
-- Units that share only **settled** seams (approved contract version, schema, env names) may run in the same wave.
-- Cannot be made disjoint → sequence them. Prefer fewer, larger units over many tiny ones: every unit costs a
-  dispatch, a worktree and a merge.
+- A module = one unit = one dev (or devops) with a **disjoint write set**. Shared hot files (router, DI module,
+  lockfile, migration registry, i18n bundle) get one owner; others list the lines they need.
+- Modules that share only **settled** seams (the contract/schema written in the plan) may run in one wave.
+- Cannot be made disjoint → sequence them. Prefer fewer, larger modules: each costs a dispatch, a worktree, a merge.
 - Detail: `references/common/parallel.md`.
 
-## Track and adjust
+## Changes after approval
 
-Status = measured: done / failing / next, branch + SHA, open findings. When facts change, show before → after for
-the affected steps and why; CONTROLLED scope changes need Cecilia's approval again (`planning-method.md` §4).
+Facts changed (a module is impossible, a BUG has no owner, Cecilia asks for more) → show that module before →
+after and why, re-confirm **only that module** (`state.py answer --module <unit>`), bump the plan version.
+Never rewrite history: retired modules get `~~id~~ replaced by …`.

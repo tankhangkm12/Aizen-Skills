@@ -1,4 +1,4 @@
-# Evidence, numbers and reports (v22)
+# Evidence, numbers and reports (v23)
 
 Cecilia steers from what agents report. A confident wrong number, or a claim of DONE that the files
 do not support, steers her wrong. So claims carry evidence proportionate to the work, and reports are short enough to actually be read.
@@ -31,9 +31,9 @@ warm-up").
 
 ## 2. Evidence records
 
-**FAST/STANDARD:** record enough to reproduce the relevant check: command/method, result, changed files, target revision when meaningful, and the Rollback block (`git.md` §5). Do not create a formal evidence appendix for a two-line fix unless it helps.
+**Every check:** record enough to reproduce the relevant check: command/method, result, changed files, target revision when meaningful, and the Rollback block (`git.md` §5). Do not create a formal evidence appendix for a two-line fix unless it helps.
 
-**CONTROLLED / merge-release readiness:** every check, run or review names: task · role/instance · time · source SHA (and contract hash or
+**Risk modules / merge-release readiness:** every check, run or review names: task · role/instance · time · source SHA (and contract hash or
 artifact digest when relevant) · environment · command or method · exit status · raw output path ·
 limitations. Redact credentials and personal data when collecting, not later. Template:
 `assets/evidence-record.json`; `check.py` writes `evidence[-<unit>].json` in this shape.
@@ -82,9 +82,10 @@ Caps: chat return ≤ 15 lines, Deviations line included (it says where the repo
 appendix · one finding ≤ 6 lines (problem · scenario · evidence · direction) · quoted output ≤ 10
 lines in the body.
 
-**Deviations line — every finish, every mode.** FAST and STANDARD end in chat with the changed files,
-the checks and `Deviations: none` (or the list). A deviation is anything done differently from what
-Cecilia asked or what the docs say: a different approach, an extra file, a skipped check, a guess.
+**Deviations line — every finish.** Every report ends with the changed files, the checks and
+`Deviations: none` (or the list). A deviation is anything done differently from what
+Cecilia agreed or what the docs say: a different approach, an extra file, a skipped check, a detail the plan
+left open and you chose.
 It is how Cecilia audits obedience in one glance; an unreported deviation is a defect of the report.
 
 Writing rules: numbers over adjectives · name things by ID · bad news first · no effort, no

@@ -1,4 +1,4 @@
-# Lens: infra (`tester` v22)
+# Lens: infra (`tester` v23)
 
 Brief header `LENS=infra`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

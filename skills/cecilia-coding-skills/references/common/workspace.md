@@ -1,4 +1,4 @@
-# Workspace — where things live (v22)
+# Workspace — where things live (v23)
 
 Everything Cecilia's roles write lives under `tensura/` at the workspace root (the project root unless
 `CLAUDE.md`/`AGENTS.md` names another). `tensura/`, `.worktrees/` are local-only: add them to `.git/info/exclude`,

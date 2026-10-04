@@ -1,7 +1,7 @@
-# Delivery path — steps (v22)
+# Delivery path — steps (v23)
 
 Used by `devops`. Build the path from commit to running service, prove it works, hand Cecilia the trigger.
-CI/CD, manifests and IaC are CONTROLLED by default.
+CI/CD, manifests and IaC are risk modules by default (`references/plan/planning-method.md`).
 
 ## Rules
 

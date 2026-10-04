@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""state.py — task state and briefs for the Cecilia coordinator (v22).
+"""state.py — task state and briefs for the Cecilia coordinator (v23).
 
     S=<SKILL_DIR>/scripts/state.py
-    python $S init   --task SHOP-42 --mode standard --goal "add coupon to checkout"
-    python $S brief  --task SHOP-42 --role planner --stage design
-    python $S answer --task SHOP-42 --text "A; keep legacy endpoint"
+    python $S init    --task SHOP-42 --goal "add coupon to checkout"
+    python $S brief   --task SHOP-42 --role planner --stage design
+    python $S answer  --task SHOP-42 --module coupon-api --text "B: one endpoint, keep legacy"   # one per module
+    python $S approve --task SHOP-42 --text "plan v2 approved"   # the contract: roles never ask again
     python $S brief  --task SHOP-42 --role dev --kind be --unit coupon-api --sha 1a2b3c --write-set "src/coupon/**"
     python $S round  --task SHOP-42          # exit 3 past the fix-loop limit
-    python $S status --task SHOP-42 [--set done] [--mode standard]
+    python $S status --task SHOP-42 [--set done]
 
 Files: <workspace>/tensura/tasks/<TASK>/state.md (human-readable; a `## Notes` section you add is kept)
 and run.json (machine state). Workspace = --workspace or the current directory. Standard library only.
@@ -25,7 +26,6 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent
 ROLES = ("planner", "dev", "tester", "reviewer", "devops")
 KINDS = ("be", "fe", "db", "ui", "-")
-MODES = ("fast", "standard", "controlled")
 STAGES = ("discover", "design", "plan", "-")
 STATUSES = ("planning", "building", "testing", "reviewing", "fixing", "blocked", "done", "stopped")
 MAX_ROUNDS = 2
@@ -71,26 +71,38 @@ def save(ws: Path, task: str, run: dict) -> None:
     notes = old[old.index(NOTES):] if NOTES in old else NOTES + "(roles: add notes here; state.py keeps this section)\n"
     write(d / "run.json", json.dumps(run, indent=2, ensure_ascii=False))
     log = "\n".join(f"- {e}" for e in run["log"]) or "- (none)"
+    agreed = "\n".join(f"- {m}: {t}" for m, t in run.get("agreed", {}).items()) or "- (nothing confirmed yet)"
     write(d / "state.md",
           f"# {task} — {run['status']}\n\n"
-          f"Goal: {run['goal']}\nMode: {run['mode']} · Round: {run['round']}/{MAX_ROUNDS} · Updated: {now()}\n\n"
-          f"## Decision\n{run.get('decision') or '(not answered yet)'}\n\n## Log\n{log}\n{notes}")
+          f"Goal: {run['goal']}\nRound: {run['round']}/{MAX_ROUNDS} · Updated: {now()}\n\n"
+          f"## Agreed (per module)\n{agreed}\n\n## Approval\n{run.get('decision') or '(plan not approved yet)'}\n\n"
+          f"## Log\n{log}\n{notes}")
 
 
 def cmd_init(ws: Path, a) -> str:
     if (task_dir(ws, a.task) / "run.json").exists():
-        raise SystemExit(f"{a.task} exists — use `status` (and `status --mode` to change mode)")
-    save(ws, a.task, {"task": a.task, "goal": a.goal, "mode": a.mode, "status": "planning",
-                      "round": 0, "decision": None, "log": [f"{now()} init ({a.mode})"]})
+        raise SystemExit(f"{a.task} exists — use `status`")
+    save(ws, a.task, {"task": a.task, "goal": a.goal, "status": "planning", "round": 0,
+                      "agreed": {}, "decision": None, "log": [f"{now()} init"]})
     return f"created {task_dir(ws, a.task) / 'state.md'}"
 
 
 def cmd_answer(ws: Path, a) -> str:
     run = load(ws, a.task)
-    run.update(decision=a.text, status="building")
-    run["log"].append(f"{now()} decision: {a.text}")
+    run.setdefault("agreed", {})[a.module] = a.text
+    run["log"].append(f"{now()} agreed {a.module}: {a.text}")
     save(ws, a.task, run)
-    return "decision recorded"
+    return f"{a.module} recorded — next module, or `approve` once every module is agreed"
+
+
+def cmd_approve(ws: Path, a) -> str:
+    run = load(ws, a.task)
+    if not run.get("agreed"):
+        raise SystemExit("nothing agreed yet — confirm each module with `answer --module` first")
+    run.update(decision=f"{now()} {a.text}", status="building")
+    run["log"].append(f"{now()} plan approved: {a.text}")
+    save(ws, a.task, run)
+    return "plan approved — build without further questions"
 
 
 def cmd_round(ws: Path, a) -> str:
@@ -107,13 +119,9 @@ def cmd_round(ws: Path, a) -> str:
 
 def cmd_status(ws: Path, a) -> str:
     run = load(ws, a.task)
-    for key, val in (("status", a.set), ("mode", a.mode)):
-        if val and val != run[key]:
-            run["log"].append(f"{now()} {key} {run[key]} → {val}")
-            run[key] = val
-            if key == "mode" and val != "fast" and run["status"] == "building" and not run.get("decision"):
-                run["status"] = "planning"  # escalated FAST work goes back through the card
-    if a.set or a.mode:
+    if a.set and a.set != run["status"]:
+        run["log"].append(f"{now()} status {run['status']} → {a.set}")
+        run["status"] = a.set
         save(ws, a.task, run)
     return (task_dir(ws, a.task) / "state.md").read_text(encoding="utf-8")
 
@@ -141,8 +149,9 @@ def code_map(root: Path) -> str:
 
 def cmd_brief(ws: Path, a) -> str:
     run = load(ws, a.task)
-    if a.role in ("dev", "tester", "devops") and run["mode"] != "fast" and not run.get("decision"):
-        raise SystemExit("no decision yet — show the card and run `state.py answer` before any writer")
+    design_work = a.role == "dev" and a.kind == "ui"  # UI design is design: confirmed stage by stage, before approve
+    if a.role in ("dev", "tester", "devops") and not design_work and not run.get("decision"):
+        raise SystemExit("plan not approved — confirm each module with Cecilia, then `state.py approve`")
     if a.role == "dev" and (a.kind == "-" or not a.unit):
         raise SystemExit("dev needs --kind be|fe|db|ui and --unit")
     root = ws.resolve()
@@ -162,7 +171,7 @@ def cmd_brief(ws: Path, a) -> str:
         inputs += f"\nRound {run['round']}: fix/re-check only the open finding ids in tensura/reports/{a.task}/review*.md"
     fields = {
         "TASK": a.task, "ROLE": a.role, "KIND": a.kind, "UNIT": unit, "STAGE": a.stage, "LENS": lens,
-        "ROUND": str(run["round"]), "MODE": run["mode"], "GOAL": run["goal"],
+        "ROUND": str(run["round"]), "GOAL": run["goal"],
         "PART": a.part or (f"unit `{unit}` of the plan" if a.unit else
                            "the whole task" if a.role == "planner" else f"{a.role} pass over the integrated branch"),
         "DONE": a.done or ("the plan exists with units, options and questions" if a.role == "planner"
@@ -199,12 +208,11 @@ def main(argv=None) -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "round", "status")}
+    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "approve", "round", "status")}
     for p in ps.values():
         p.add_argument("--task", required=True)
         p.add_argument("--workspace", default=".")
     ps["init"].add_argument("--goal", required=True)
-    ps["init"].add_argument("--mode", choices=MODES, default="standard")
     b = ps["brief"]
     b.add_argument("--role", choices=ROLES, required=True)
     b.add_argument("--kind", choices=KINDS, default="-")
@@ -220,14 +228,15 @@ def main(argv=None) -> int:
     b.add_argument("--ports", help="port range, e.g. 4100-4109")
     b.add_argument("--inputs", help="docs, contract version, finding ids, earlier reports")
     b.add_argument("--a3", help="the exact A3 actions Cecilia approved")
+    ps["answer"].add_argument("--module", default="scope", help="plan part/module this answer settles")
     ps["answer"].add_argument("--text", required=True)
+    ps["approve"].add_argument("--text", default="plan approved")
     ps["status"].add_argument("--set", choices=STATUSES)
-    ps["status"].add_argument("--mode", choices=MODES, help="escalate, e.g. FAST that grew → standard")
     a = ap.parse_args(argv)
-    for v in (a.task, getattr(a, "unit", None)):
+    for v in (a.task, getattr(a, "unit", None), getattr(a, "module", None)):
         if v and not ID.match(v):
             raise SystemExit(f"invalid id {v!r} — use letters, digits, . _ -")
-    fn = {"init": cmd_init, "brief": cmd_brief, "answer": cmd_answer, "round": cmd_round, "status": cmd_status}
+    fn = {"init": cmd_init, "brief": cmd_brief, "answer": cmd_answer, "approve": cmd_approve, "round": cmd_round, "status": cmd_status}
     print(fn[a.cmd](Path(a.workspace), a))
     return 0
 
@@ -255,22 +264,24 @@ def _selfcheck() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         w = ["--workspace", tmp, "--task", "T-1"]
         with contextlib.redirect_stdout(io.StringIO()):
-            main(["init", *w, "--goal", "g", "--mode", "fast"])
+            main(["init", *w, "--goal", "g"])
         expect_exit(["init", *w, "--goal", "g"], "exists")
         expect_exit(["init", "--workspace", tmp, "--task", "../x", "--goal", "g"], "invalid id")
-        # FAST that grows: escalation puts the decision gate back
-        with contextlib.redirect_stdout(io.StringIO()):
-            main(["status", *w, "--mode", "standard"])
-        expect_exit(["brief", *w, "--role", "dev", "--kind", "be", "--unit", "u1"], "no decision")
-        expect_exit(["brief", *w, "--role", "dev", "--kind", "be"], "no decision")
+        expect_exit(["brief", *w, "--role", "dev", "--kind", "be", "--unit", "u1"], "not approved")
+        expect_exit(["approve", *w], "nothing agreed")
+        assert "UNIT=look" in brief("--role", "dev", "--kind", "ui", "--unit", "look")
         out = brief("--role", "planner", "--stage", "design")
         assert "STAGE=design" in out and "{{" not in out and "<" not in out.split("## Task")[1], out
         # roles' notes survive state.py rewrites
         sm = Path(tmp, "tensura", "tasks", "T-1", "state.md")
         sm.write_text(sm.read_text(encoding="utf-8") + "- planner: keep v1 endpoint\n", encoding="utf-8")
         with contextlib.redirect_stdout(io.StringIO()):
-            main(["answer", *w, "--text", "A"])
-        assert "keep v1 endpoint" in sm.read_text(encoding="utf-8")
+            main(["answer", *w, "--module", "api", "--text", "B"])
+        expect_exit(["brief", *w, "--role", "tester"], "not approved")
+        with contextlib.redirect_stdout(io.StringIO()):
+            main(["approve", *w])
+        st = sm.read_text(encoding="utf-8")
+        assert "keep v1 endpoint" in st and "- api: B" in st and "plan approved" in st, st
         expect_exit(["brief", *w, "--role", "dev", "--kind", "be"], "--unit")
         d1, d2 = brief("--role", "dev", "--kind", "be", "--unit", "u1"), brief("--role", "dev", "--kind", "fe", "--unit", "u2")
         assert "ROLE=dev KIND=be UNIT=u1" in d1 and "dev-u1.md" in d1 and "pr-body-u1.md" in d1

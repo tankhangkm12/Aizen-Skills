@@ -1,10 +1,11 @@
-# Bug fix — diagnose, approve, then fix
+# Bug fix — diagnose in the plan, then fix without asking (v23)
 
-A bug fix starts from a running system and a hypothesis about where it breaks. A wrong hypothesis hides
-the real bug. So: present cause and fix options first, wait for approval, then change code.
+A wrong hypothesis hides the real bug, so the cause is settled before code changes. **Phase 1 is planning**
+(planner, or you when you plan a one-module fix): its output is the bug's module in the plan, and Cecilia picks
+the fix option when she confirms that module. **Phase 2 is the dev's**, after `approve`, with no questions.
 
-Inputs usually: a `BUG-nn` report from `tester`, a review finding, or Cecilia's description. Interview
-first (grouped gate, `references/common/decisions.md`) for anything missing below.
+Inputs usually: a `BUG-nn` report from `tester`, a review finding, or Cecilia's description. Missing facts
+are measured; preferences go into the module's questions.
 
 ## Phase 1 — Diagnose (change nothing, not even one character)
 
@@ -21,11 +22,11 @@ first (grouped gate, `references/common/decisions.md`) for anything missing belo
    at line 42") and **root cause** ("the join does not select children", "the cancel mutation never
    invalidates the orders query"). Fixing the crash site is fixing a symptom — not allowed.
 4. **Check the docs:** is the code wrong, or are the docs wrong/silent? Docs wrong/silent → a doc issue:
-   ask Cecilia with options; never decide the correct behaviour yourself.
+   a question with options in the module; never decide the correct behaviour yourself.
 5. **Search** (`references/common/decisions.md` §7) when the bug touches a library, framework or engine: known issues,
    changelogs, fixed versions.
 
-## Phase 1 output (report + chat) · 🛑
+## Phase 1 output — the bug's module in the plan
 
 ```markdown
 **Symptom:** expected … / actual …
@@ -46,11 +47,12 @@ I lean to A because …
 ```
 Code follows project convention but the convention is risky → frame as (A) deviate / (B) keep and accept.
 
-## Phase 2 — Fix (after approval)
+## Phase 2 — Fix (dev, after `approve`)
 
 - Task branch `bugfix/<TASK>-<desc>` (released code under gitflow: `hotfix/<TASK>-<desc>` from `main`),
-  start SHA recorded (`references/common/git.md` §2). In CONTROLLED the files must be in the approved write set.
-- Implement exactly the approved option at the root cause; a better idea mid-way → back to Phase 1.
+  start SHA recorded (`references/common/git.md` §2). The files must be in the approved write set.
+- Implement exactly the approved option at the root cause, with the least code. A better idea mid-way →
+  `## Proposals`; the approved option cannot work → `BLOCKED`.
 - Smallest diff (`references/common/code-quality.md`): no reformatting, renaming or tidying outside the fix; other smells →
   report only.
 - A focused regression test that fails before the fix and passes after, when its path is in the task

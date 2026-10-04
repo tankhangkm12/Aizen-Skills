@@ -1,29 +1,30 @@
-# Backend implementation — steps (v22)
+# Backend implementation — steps (v23)
 
 Used by `dev` with `KIND=be`.
 
 ## Rules
 
 1. **Plan + docs are the spec.** Every change traces to a requirement, step or finding id. Nothing invented.
-2. **Missing, ambiguous or contradictory → stop and ask** with options, mid-coding too.
+2. **Missing or ambiguous → simplest option that fits the plan**, listed under `Deviations:`; never ask mid-build.
+   Contradicts the agreed plan or contract → `BLOCKED`.
 3. **The API contract is frozen.** A contract that does not fit is a change request with reason and cost — never a
    quiet edit or an extra field "while here".
-4. **Schema changes** follow `references/db/method.md` (migration with rollback, lock budget). In CONTROLLED they
-   belong to a `db` unit.
+4. **Schema changes** follow `references/db/method.md` (migration with rollback, lock budget). They belong to a
+   `db` unit.
 5. **Stay inside the task**: nearby tests/types/fixtures needed for the behaviour are fine; unrelated cleanup is not.
 6. **Tests**: run the existing ones; add focused regression tests for what you changed. Existing tests failing
-   because behaviour was meant to change → stop and ask who updates them.
+   because behaviour was meant to change → update them when the plan says so, else `BLOCKED`.
 
 ## Steps
 
 - **D0 Locate.** Code, tests, docs, `git status`; branch/worktree from the brief; record the start SHA.
-- **D1 Read.** The brief's doc sections and the **nearest similar module** (the pattern to copy). List behaviour
-  the docs do not settle (error precedence, trimming, repeat calls, concurrency, limits, empty states) — ask only
-  what changes the code; default the rest and list them under `Deviations`.
+- **D1 Read.** The brief's doc sections and the **nearest similar module** (the pattern to copy). Behaviour the plan
+  does not settle (error precedence, trimming, repeat calls, limits, empty states) → the simplest default, listed
+  under `Deviations`.
 - **D2 Task type**: bug → `references/dev/bugfix.md` · refactor → `references/dev/refactor.md` · new module →
-  `references/dev/scaffold.md` · open choice → `references/dev/solution-options.md` · outside the plan →
+  `references/dev/scaffold.md` · open core choice → `BLOCKED` (`references/dev/solution-options.md`) · outside the plan →
   `references/dev/out-of-scope.md`.
-- **D3 Code.** Small clean code (`principles.md`, `references/common/code-quality.md`), commit each green step;
+- **D3 Code.** The least code that meets the module's Done (`principles.md`, `references/common/code-quality.md`), commit each green step;
   back up what git does not hold before touching it.
 - **D4 Quality gate.** Build/type-check, lint+format (touched files), tests — commands quoted with counts.
   Red already on the base → report, do not fix silently. Self-review the diff with `checklist.md`.

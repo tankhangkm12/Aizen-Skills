@@ -1,9 +1,9 @@
 ---
 name: cecilia-db
-description: Knowledge pack of cecilia-coding-skills (v22) — schema design, migrations, concurrency, performance, connections, growth, partitioning, HA/DR, engines, compliance. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
+description: Knowledge pack of cecilia-coding-skills (v23) — schema design, migrations, concurrency, performance, connections, growth, partitioning, HA/DR, engines, compliance. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
 ---
 
-# Database knowledge — Cecilia knowledge pack (v22)
+# Database knowledge — Cecilia knowledge pack (v23)
 
 Part of `cecilia-coding-skills` (the coordinator, roles, rules, assets and scripts live there). This pack holds
 only `references/` for: `db`.

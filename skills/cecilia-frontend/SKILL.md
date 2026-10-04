@@ -1,9 +1,9 @@
 ---
 name: cecilia-frontend
-description: Knowledge pack of cecilia-coding-skills (v22) — frontend principles, React, API calls, accessibility, visual checks, style guides, UI design process, tokens and handoff. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
+description: Knowledge pack of cecilia-coding-skills (v23) — frontend principles, React, API calls, accessibility, visual checks, style guides, UI design process, tokens and handoff. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
 ---
 
-# Frontend and UI design knowledge — Cecilia knowledge pack (v22)
+# Frontend and UI design knowledge — Cecilia knowledge pack (v23)
 
 Part of `cecilia-coding-skills` (the coordinator, roles, rules, assets and scripts live there). This pack holds
 only `references/` for: `frontend`, `ui`.

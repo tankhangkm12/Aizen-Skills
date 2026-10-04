@@ -1,6 +1,6 @@
 {
   "name": "cecilia-coding-skills",
-  "version": "22.0.0",
+  "version": "23.0.0",
   "description": "Cecilia: production coding coordinator with 5 roles (planner, dev, tester, reviewer, devops); topic knowledge in six cecilia-* packs",
   "framework": "Aizen Universal Structure"
 }

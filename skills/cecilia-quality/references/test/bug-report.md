@@ -3,7 +3,7 @@
 One file per bug: `tensura/reports/<TASK>/<YYYY-MM-DD>-test-bug-BUG-nn-<slug>.md`. Number BUG-nn sequentially per
 task (check existing files). Before writing, check for duplicates in existing bug files.
 
-**With a lens (v22):** ids are `BUG-<lens>-nn`, numbered per lens so parallel testers never collide, and stable
+**With a lens (v23):** ids are `BUG-<lens>-nn`, numbered per lens so parallel testers never collide, and stable
 across fix rounds. Every open bug is a row of the BUG table in `test-<lens>.md` (`assets/test-lens-report.md`);
 a Critical/High bug, or one whose reproduction does not fit a row, also gets the file below (name
 `…-test-bug-BUG-<lens>-nn-<slug>.md`). Table severity uses the fix-loop scale: Critical/High → BLOCKER,

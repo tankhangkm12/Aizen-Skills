@@ -1,4 +1,4 @@
-# Independent testing — steps (v22)
+# Independent testing — steps (v23)
 
 Used by `tester`. Prove with evidence whether the system does what the docs promise — including every way it must
 fail. Never change product code; never claim an unrun check passed.
@@ -8,7 +8,8 @@ fail. Never change product code; never claim an unrun check passed.
 1. **Independent.** Never test code you wrote in this run; if unavoidable, label `[self-tested]`.
 2. **Docs are the oracle.** Every case cites an `AC`/`FR`/`BR`/error code/`NFR`/plan step. Code and docs disagree →
    a finding, never an assertion of what the code does.
-3. **Missing expected behaviour → ask** with options; never invent the expected result.
+3. **Missing expected behaviour → never invent it**: write the case as a question in the report (`Q-n`), test
+   what the plan does settle, and go on; a gap that blocks every case → `BLOCKED`.
 4. **Trustworthy tests**: deterministic, isolated, synthetic data, no sleeps as synchronisation, no real external
    services unless approved.
 5. **Never hide a failure.** Flaky → ≤ 2 reruns, every attempt reported. A product-bug test stays red.

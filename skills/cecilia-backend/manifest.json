@@ -1,6 +1,6 @@
 {
   "name": "cecilia-backend",
-  "version": "22.0.0",
+  "version": "23.0.0",
   "description": "Cecilia knowledge pack: backend principles, architecture, module boundaries, API contract, data concurrency, microservices, language stacks, API consumer cost",
   "framework": "Aizen Universal Structure",
   "partOf": "cecilia-coding-skills",

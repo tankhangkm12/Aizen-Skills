@@ -1,4 +1,4 @@
-# Lens: ui (`tester` v22)
+# Lens: ui (`tester` v23)
 
 Brief header `LENS=ui`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

@@ -1,10 +1,10 @@
-# Independent review — steps (v22)
+# Independent review — steps (v23)
 
 Used by `reviewer`. Find what is wrong, missing or risky, precisely enough to act on. Read-only.
 
 ## Rules
 
-1. **Independent or labelled** — authored the target in this run → `[self-review]`, never counts for CONTROLLED.
+1. **Independent or labelled** — authored the target in this run → `[self-review]`, never counts for a risk module.
 2. **Pin the target** — SHA, digest or doc version.
 3. **Fix the oracle before judging** — plan, docs, `code-standards.md`.
 4. **Judge first, read the author's claims second.** Agreement you did not reach independently is not evidence.
@@ -41,7 +41,7 @@ Verdict: **PASS** · **CHANGES_REQUIRED** · **INCOMPLETE**.
 | as-built docs | `asbuilt.md` |
 | CI/IaC/incidents | `infra.md` |
 | release readiness, reports/packets | `release.md`, `verification-method.md` |
-| `redteam` (CONTROLLED 2nd reviewer) | data loss, secrets, irreversible steps, authZ bypass across all of the above |
+| `redteam` (2nd reviewer for risk modules) | data loss, secrets, irreversible steps, authZ bypass across all of the above |
 
 ## Steps
 

@@ -1,4 +1,4 @@
-# Lens: functional (`tester` v22)
+# Lens: functional (`tester` v23)
 
 Brief header `LENS=functional`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 

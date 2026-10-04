@@ -1,9 +1,9 @@
 ---
 name: cecilia-discover-design
-description: Knowledge pack of cecilia-coding-skills (v22) — scope, legacy onboarding (as-built docs), idea/SRS requirements, HLD/LLD, API contract, frontend architecture, threat model. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
+description: Knowledge pack of cecilia-coding-skills (v23) — scope, legacy onboarding (as-built docs), idea/SRS requirements, HLD/LLD, API contract, frontend architecture, threat model. Loaded only by Cecilia roles through their brief; not a standalone skill, do not trigger it directly — use cecilia-coding-skills.
 ---
 
-# Discovery and design knowledge — Cecilia knowledge pack (v22)
+# Discovery and design knowledge — Cecilia knowledge pack (v23)
 
 Part of `cecilia-coding-skills` (the coordinator, roles, rules, assets and scripts live there). This pack holds
 only `references/` for: `discover`, `design`.

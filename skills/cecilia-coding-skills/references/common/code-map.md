@@ -1,4 +1,4 @@
-# Code map — graphify knowledge graph of the project (v22)
+# Code map — graphify knowledge graph of the project (v23)
 
 A graph of the project's code (files, classes, functions, imports, calls) built by
 [graphify](https://github.com/Graphify-Labs/graphify) from the AST: offline, no LLM, incremental. It answers
@@ -12,8 +12,8 @@ python "<SKILL_DIR>/scripts/graph.py" --project <ROOT>      # build or refresh <
 ```
 
 - Exit 0 → the map is ready; every brief now prints the `Code map:` command with the absolute graph path.
-- Exit 3 → graphify is not installed. Installing is **A3**: put the printed command on the decision card
-  (FAST: ask once). After her yes: `graph.py --project <ROOT> --install`. Until then everyone uses grep/glob.
+- Exit 3 → graphify is not installed. Installing is **A3**: put the printed command in the delivery
+  confirmation (S2). After her yes: `graph.py --project <ROOT> --install`. Until then everyone uses grep/glob.
 - The script adds `graphify-out/` to `.git/info/exclude` — no tracked file changes, never commit the map.
 - Refresh is cheap (only changed files are re-parsed): run it at S0 of every task, never inside a worktree's
   own copy. The map shows the **base** checkout, not your unit's uncommitted edits — read your own files.
@@ -37,7 +37,7 @@ before planning a large change.
 
 | Role | Use it to |
 |---|---|
-| planner | size the change: `affected` on each symbol the goal touches; draw units along communities so write sets stay disjoint; `path` between two units = the seam to settle first; hubs in the write set → CONTROLLED signal |
+| planner | size the change: `affected` on each symbol the goal touches; draw units along communities so write sets stay disjoint; `path` between two units = the seam to settle first; hubs in the write set → mark the module as a risk module |
 | dev | `query` before opening files; `affected` on every function/type you change → callers to update and test |
 | tester | `affected` on changed symbols → integration cases and which lenses the diff really needs |
 | reviewer | `affected` on every changed public symbol → callers outside the diff that are not tested are finding candidates |

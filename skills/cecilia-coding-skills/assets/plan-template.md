@@ -1,6 +1,6 @@
 # Plan — <TASK> — <title>
 
-> Mode: CONTROLLED · State: `DRAFT` | `APPROVED <date>` · Base: `<branch>` @ `<sha>` · Updated: <YYYY-MM-DD>
+> Plan vN · State: `DRAFT` | `APPROVED <date>` · Base: `<branch>` @ `<sha>` · Updated: <YYYY-MM-DD>
 > Integration branch: `int/<TASK>` · Finish: push + `gh pr create --draft … --body-file tensura/reports/<TASK>/pr-body.md`
 > commands for Cecilia (agents never push) · State: `tensura/tasks/<TASK>/state.md`
 > Environments for agents: `local` <, `ENV-02 staging` — every apply still A3> · Production: never agents (A4)
@@ -22,8 +22,9 @@ Simpler option considered: <the simplest approach that would also work; why this
 | web | fe | SCR-02 | `web/src/order/**` | `pnpm test order`, `pnpm build` | states × breakpoints screenshots | — | revert commit | measure |
 | deploy | infra (devops) | NFR-03, `ORDER_TTL` | `deploy/order/**`, `.github/workflows/order.yml` | `helm lint deploy/order`, `actionlint` | lint green, non-prod apply via A3 | state backup path | `helm rollback order <rev>` | api |
 
-Waves: 1 = measure · 2 = api ‖ web · 3 = deploy. Check-in with Cecilia after each wave.
-Test lenses: <functional + …> · Second reviewer: `redteam` · No infra unit: <say so when none>
+Waves: 1 = measure · 2 = api ‖ web · 3 = deploy (no check-in: the approved plan runs to the end).
+Test lenses: <functional + …> · Second reviewer: `redteam` when a risk module exists · No infra unit: <say so when none>
+Each unit also gets its design block from `references/plan/method.md` (Does / Interface / Data / Tests / Questions).
 
 ## 4. Requirements traceability
 | Id | Doc § | Requirement (near-verbatim) | Unit | Test | Status |
@@ -43,4 +44,10 @@ A (recommended): <waves, parallel or sequential, models> — why · B: <…>
 |---|---|---|---|
 
 ## 8. Approval
-Approved by Cecilia on the decision card: <date, her quoted words>.
+| Part | Confirmed by Cecilia (date, her words) |
+|---|---|
+| scope | |
+| <unit> | |
+| delivery | |
+
+Plan approved: <date, her quoted words> (`state.py approve`).

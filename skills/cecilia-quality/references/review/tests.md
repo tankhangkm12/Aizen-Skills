@@ -30,8 +30,8 @@ no duplicates, redacted data; run report numbers add up; release verdict support
 ## 4. Test PR hygiene
 No product code changes; test dependencies approved; branch/commit conventions; CI config untouched unless approved.
 
-## 5. Test lens reports (v22)
-From STANDARD each tester runs one lens and writes `tensura/reports/<TASK>/test-<lens>.md` (lens guide:
+## 5. Test lens reports (v23)
+Each tester runs its lenses and writes `tensura/reports/<TASK>/test-<lens>.md` (lens guide:
 `tester` `references/test/lenses/<lens>.md`). Review each report against its own lens, and the set as a whole:
 
 | Check | Finding when |

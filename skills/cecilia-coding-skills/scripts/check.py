@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""check — run the repository's own quality checks and record what really happened (v22).
+"""check — run the repository's own quality checks and record what really happened (v23).
 
     python <SKILL_DIR>/scripts/check.py --task SHOP-42 --unit api   # detect, run, write evidence
     python <SKILL_DIR>/scripts/check.py --task SHOP-42 --plan       # print the commands only
@@ -43,7 +43,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-VERSION = "22.0.0"
+VERSION = "23.0.0"
 STEPS = ("lint", "typecheck", "build", "test", "secrets", "deps", "size")
 MANIFESTS = {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb", "requirements.txt",
              "requirements-dev.txt", "pyproject.toml", "poetry.lock", "uv.lock", "Pipfile", "Pipfile.lock", "pom.xml",

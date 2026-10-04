@@ -1,4 +1,4 @@
-# Database work — steps (v22)
+# Database work — steps (v23)
 
 Used by `dev` with `KIND=db`, and by `planner`/`reviewer` for DB questions. Correct first, then fast, then cheap
 to keep — every claim with a number.

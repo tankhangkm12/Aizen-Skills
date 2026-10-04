@@ -1,6 +1,7 @@
-# UI design — steps (v22)
+# UI design — steps (v23)
 
-Used by `dev` with `KIND=ui` (design files, not repo code). Cecilia chooses the tool and approves each stage.
+Used by `dev` with `KIND=ui` (design files, not repo code). UI design is **design**: it runs before
+`state.py approve`, and Cecilia confirms each stage through the coordinator (like a module).
 
 ## Rules
 

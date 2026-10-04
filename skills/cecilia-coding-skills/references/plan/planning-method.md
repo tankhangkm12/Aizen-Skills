@@ -1,15 +1,17 @@
-# CONTROLLED plan — exact enough to approve line by line (v22)
+# Risk modules — exact enough to approve line by line (v23)
 
-The STANDARD shape (`method.md`) plus the detail Cecilia needs to approve a high-risk change in one read.
+The module shape (`method.md`) plus the detail Cecilia needs to approve a high-risk module (auth, money/stock/quota,
+tenants, schema/data migration, concurrency, public contract, CI/CD/IaC, live systems, secrets, destructive,
+production, multi-service).
 Template: `assets/plan-template.md`.
 
-## 1. What CONTROLLED adds per unit
+## 1. What a risk module adds
 
 | Field | Rule |
 |---|---|
 | Unit | `id · kind be|fe|db|ui` (dev) or `infra` (devops) · branch `feature/<TASK>-<unit>` · worktree `.worktrees/<unit>` |
 | Covers | requirement / finding ids, doc sections |
-| Write set | exact paths or `dir/**` — becomes `--write-set` in the brief; anything outside → stop and ask |
+| Write set | exact paths or `dir/**` — becomes `--write-set` in the brief; anything outside → stop (`BLOCKED`) |
 | Commands | every command the unit runs (tests, builds, local services); anything else is A3 |
 | Checks | the green signal (test names, `check.py` result, screens) |
 | Backup | DB dump / state backup path before any migration or data change — or `none` and why |
@@ -28,15 +30,14 @@ Template: `assets/plan-template.md`.
   real-environment migration, CI step or alert → an `infra` unit for `devops`. None → say "no infra unit" so
   nobody looks for one. Infra units never contain application code; an app change the delivery path needs is a
   `dev` unit sequenced before it.
-- **Waves**: each wave ends with a check-in (`references/flow/controlled.md` §3). A wave is safe to run in
-  parallel only under `references/common/parallel.md`.
+- **Waves**: a wave is safe to run in parallel only under `references/common/parallel.md`.
 - **Local-only**: no unit pushes; the finish block carries the push / `gh pr create --draft` commands.
 - Work outside the docs (refactor, perf, a bug found) is never planned silently → "Proposals" with options.
 
 ## 3. Approval
 
-Cecilia approves the whole plan on the decision card ("approve plan <TASK>"), recorded with `state.py answer`.
-Devs write only the approved write sets and run only the listed commands.
+Cecilia confirms each risk module on its own (`state.py answer --module <unit>`) and then the whole plan
+(`state.py approve`). Devs write only the approved write sets and run only the listed commands.
 
 ## 4. Re-plan (facts changed mid-task)
 
@@ -45,7 +46,7 @@ Devs write only the approved write sets and run only the listed commands.
    approval, an open BUG with no owning unit, a requirement id covered twice or not at all.
 3. Show the plan diff (units before → after) with 2–3 options; never rewrite history — retired units get
    `~~id~~ replaced by …` and a "Plan changes" row (date, change, reason, approved by).
-4. A changed write set, command list or rollback in CONTROLLED needs Cecilia's approval again.
+4. A changed write set, command list or rollback of a risk module needs Cecilia's confirmation again.
 
 ## 5. Docs written by others
 

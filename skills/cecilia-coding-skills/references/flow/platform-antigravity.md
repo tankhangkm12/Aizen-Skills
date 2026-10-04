@@ -1,4 +1,4 @@
-# Running Cecilia on Antigravity (v22)
+# Running Cecilia on Antigravity (v23)
 
 ## Dispatch
 
@@ -16,10 +16,10 @@ Main session and `planner`/`reviewer`/`devops` on `pro`; `dev`/`tester` may run 
 for the planner, say once that planning is weaker. The reviewer should not run on the same model as the devs
 when a choice exists.
 
-## Card
+## Confirming the plan
 
-Show the ONE decision card with `ask_question` (recommended option first). Record her answer with
-`state.py answer`.
+Confirm the plan part by part with `ask_question` (scope, each module, delivery; recommended option first).
+Record each answer with `state.py answer --module <part>`, then `state.py approve`.
 
 ## Dispatch failed
 

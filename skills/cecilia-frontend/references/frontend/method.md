@@ -1,4 +1,4 @@
-# Frontend implementation — steps (v22)
+# Frontend implementation — steps (v23)
 
 Used by `dev` with `KIND=fe`.
 
@@ -21,8 +21,9 @@ Used by `dev` with `KIND=fe`.
 - **F0 Locate.** Branch/worktree, start SHA; frontend doc, UI design (`<app>-ui.md`, `design-tokens.json`,
   `ui-exports/`), contract + version.
 - **F1 Read.** Screens and every endpoint they touch, incl. the error list. List what the design does not settle
-  (focus, stale list after mutation, double submit, optimistic rollback, partial failure); ask only what changes code.
-- **F2 Build.** Mock from the contract, own dev-server port, small clean code (`principles.md`), commit each
+  (focus, stale list after mutation, double submit, optimistic rollback, partial failure) → simplest default,
+  listed under `Deviations`; never ask mid-build.
+- **F2 Build.** Mock from the contract, own dev-server port, the least code that meets the module's Done (`principles.md`), commit each
   green step. Spec is an image → `image-to-code.md`.
 - **F3 Quality gate.** Build, type-check, lint, tests with counts; bundle budget; self-review with `checklist.md`
   and `web-interface-guidelines.md`.

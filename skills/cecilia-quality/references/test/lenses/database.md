@@ -1,4 +1,4 @@
-# Lens: database (`tester` v22)
+# Lens: database (`tester` v23)
 
 Brief header `LENS=database`. Shared lens rules (files, isolation, report, lane): `references/test/method.md`.
 
