@@ -1,5 +1,5 @@
 {
   "name": "aizen-skills",
-  "description": "Universal AI Agent Skills, Knowledge Base, and Cecilia OS Framework.",
+  "description": "Aizen Skills: self-contained agent skills, including the Cecilia production coding coordinator.",
   "version": "1.0.0"
 }

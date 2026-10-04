@@ -16,7 +16,7 @@
 
 <Rough shares, honestly estimated. A document over ~40% inferred is not yet a safe oracle — say so.>
 
-## Honesty tests (`references/onboard/confidence-labels.md` §5)
+## Honesty tests (`references/discover/onboard/confidence-labels.md` §5)
 - Flows followed completely: <list> · sampled only: <list>
 - `[verified]` claims resting on a single reading: <list>
 - Where the thread was lost: <list>

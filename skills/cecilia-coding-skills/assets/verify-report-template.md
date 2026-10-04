@@ -5,7 +5,7 @@
 > Commission: <n> claims — <p> PASS · <f> FAIL · <u> UNSUPPORTED
 > Omission: <n> items in sources — <k> missing from the briefing
 > Blockers: <the one that matters most, named — or "none">
-> Next: <cecilia-orchestrator (briefing) fixes and re-submits | publish approved>
+> Next: <the coordinator (briefing) fixes and re-submits | publish approved>
 
 Independence: <checked by a different agent than the author | `[self-verified — weaker]`>
 
@@ -18,7 +18,7 @@ Independence: <checked by a different agent than the author | `[self-verified �
 | 3 | payment area reviewed, no blockers | — | no review report exists for payment | **UNSUPPORTED** |
 
 Verdicts: `PASS` (source says exactly this) · `FAIL` (source says otherwise) · `UNSUPPORTED` (no source
-says it). See `references/verify/verification-method.md` §2.
+says it). See `references/review/verification-method.md` §2.
 
 ## 2. Omission — what the sources hold and the briefing must carry
 

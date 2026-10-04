@@ -33,7 +33,7 @@
 |---|---|---|---|---|---|---|
 | B-01 | | | — | — | `order-api.yaml` v3 (sha256 …) | `<TASK>-B01` |
 
-Sequence per batch: `G2 → BE ‖ FE → integration candidate → TEST → REV → G3 → Cecilia merges`
+Sequence per batch: `plan approved → BE ‖ FE → integration candidate → TEST → REV → merge-ready → Cecilia merges`
 `[→ OPS → REV(infra) → A3 applies to ENV-nn → rollback rehearsed]` <or the variant Cecilia chose>
 
 Batches with no delivery-path work: <list, so nobody looks for a missing OPS row>
@@ -50,7 +50,7 @@ Each role edits only its own row.
 | OPS-B01 | devops | NFR-03, env var `ORDER_TTL` | LLD §7, infrastructure doc §3 | `.github/workflows/order.yml`, `deploy/order/**` | `actionlint`, `helm lint deploy/order` | `infra/<TASK>-01-…` | BE-B01 merged | applied to ENV-02 via A3 + rollback rehearsed | TODO | | |
 | DOC-B01 | design | P-D01, C-07 | LLD §4.1 | `tensura/docs/modules/order/order-api.md` | — | — | — | doc updated, gate re-run | TODO | | |
 
-Status: `TODO` → `IN_PROGRESS` → `READY_FOR_REVIEW` → `READY_FOR_CECILIA` (G3 packet) → `MERGED` → `DONE`,
+Status: `TODO` → `IN_PROGRESS` → `READY_FOR_REVIEW` → `READY_FOR_CECILIA` (merge-ready packet) → `MERGED` → `DONE`,
 or `BLOCKED: <reason>`. Ops rows add `APPLIED (<ENV-nn>)`; `DONE` needs the rollback rehearsed.
 
 ## 7. Risks
@@ -69,16 +69,12 @@ or `BLOCKED: <reason>`. Ops rows add `APPLIED (<ENV-nn>)`; `DONE` needs the roll
 | Date | Change | Reason | Approved by |
 |---|---|---|---|
 
-## 11. Approvals (filled after Cecilia approves — never by an agent on its own)
-| Scope id | Approved at | By | Evidence (`.cecilia/approvals/<id>.json` or her quoted words) | Expires |
-|---|---|---|---|---|
+## 11. Approval
+Approved by Cecilia on the decision card: <date, her quoted words>.
 
-## 12. Scope blocks — what Cecilia approves (G2)
+## 12. Scope per batch — what Cecilia approves
 
-Approve a batch by running in your own terminal:
-`cecilia approve tensura/plans/<this file> --task <TASK>-B01`
-
-```cecilia-scope
+```json
 {
   "task": "<TASK>-B01",
   "write": [
@@ -89,7 +85,7 @@ Approve a batch by running in your own terminal:
     "tensura/reports/<TASK>/**"
   ],
   "commands": ["npm test -- order", "npm run lint", "pnpm test order", "pnpm build", "npm run test:int -- order",
-               "PORT=3100 npm run dev", "playwright-cli -s=<TASK>-fe *", "python3 .claude/skills/cecilia-dev-fe/scripts/uikit.py *"],
+               "PORT=3100 npm run dev", "playwright-cli -s=<TASK>-fe *", "python3 .claude/scripts/uikit.py *"],
   "environments": ["local"],
   "expires_hours": 72
 }

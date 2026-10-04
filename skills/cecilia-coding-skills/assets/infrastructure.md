@@ -1,6 +1,6 @@
 # Infrastructure — <system or service>
 
-> Task: <TASK> · Owner: cecilia-devops · Updated: <YYYY-MM-DD> · Status: DRAFT | APPROVED
+> Task: <TASK> · Owner: `devops` · Updated: <YYYY-MM-DD> · Status: DRAFT | APPROVED
 > Sources: `tensura/docs/system/architecture.md` §7 (infrastructure components), §10 (environments + delivery expectations),
 > §11 (NFR mechanisms) · `tensura/plans/<TASK>-<slug>.md` `OPS-Bnn`
 > Every resource, environment and alert below traces to one of: a flow in the HLD, an `NFR-nn`, an

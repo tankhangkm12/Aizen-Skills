@@ -8,10 +8,10 @@
 <exact commands, one per line, runnable from the worktree>
 
 ## Coverage
-<the lens's own table (see `references/lenses/<lens>.md` §Report); uncovered IDs with the reason>
+<the lens's own table (see `references/test/lenses/<lens>.md` §Report); uncovered IDs with the reason>
 
 ## Bugs (open at this SHA)
-<!-- Parsed by `workflow.py merge-tests`: keep the header and 5 columns exactly; one row per open bug; none → keep the header, no rows.
+<!-- Keep the header and 5 columns exactly; one row per open bug; none → keep the header, no rows.
      Severity uses the fix-loop scale: BLOCKER (Critical/High) · SHOULD-FIX (Medium) · SUGGESTION (Low). -->
 | ID | Title | Severity | Repro | Evidence |
 |---|---|---|---|---|
@@ -27,4 +27,3 @@
 ## For other roles
 <`HANDOFF: needs <role> — <what>` lines for anything outside this lens or outside the test lane>
 
-Rules: <hash> (<PR-ids applied>)

@@ -1,6 +1,4 @@
-# Challenge — use challenge where it pays (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Challenge — use challenge where it pays (v21)
 
 Challenge is a tool, not mandatory ceremony. Use it for CONTROLLED work, CORE/high-risk artifacts, or when a second viewpoint materially reduces risk. FAST work normally self-checks; STANDARD work challenges only the uncertain or consequential parts. Agreement nobody tested on high-risk work is momentum, not agreement.
 
@@ -14,12 +12,12 @@ Challenge is a tool, not mandatory ceremony. Use it for CONTROLLED work, CORE/hi
 | **API contract** | design | **dev-fe** · dev-be · test |
 | Frontend architecture | design | dev-fe · test |
 | UI design, tokens, exports | ui | dev-fe · test · review(ui) |
-| **Execution plan** | plan | CONTROLLED: **dev-be · dev-fe · test · review** before G2; STANDARD: only relevant roles |
+| **Execution plan** | plan | CONTROLLED: **dev-be · dev-fe · test · review** before plan approval; STANDARD: only relevant roles |
 | Code / PR | dev-be · dev-fe | review · test |
 | Tests, test plan | test | review · dev |
 | Infra diff | devops | review(infra) · dev-be |
 | Review findings | review | the artifact's owner |
-| Briefing / G3 / G4 packet | orchestrator · devops | review(verify) |
+| Merge or release packet | coordinator · devops | review(verify) |
 
 ## 2. The duty — before consuming an upstream artifact
 
@@ -55,7 +53,7 @@ the challenger never edits the artifact · attack the artifact, not the agent �
 ## 4. Record
 
 `tensura/reports/<TASK>/challenges.md` — append whole rows, never rewrite others' rows. Under the
-orchestrator, agents return rows and the orchestrator appends them.
+coordinator, agents return rows and the coordinator appends them.
 
 ```
 | # | Date | Artifact / ID | Challenger → Owner | Claim (failure scenario) | Response | Status | Decided by |
@@ -69,4 +67,4 @@ challenge is closed by the file changing, not by the conversation.
 
 Challenge what you consume (§2), then challenge your own output once in writing — the two or three
 ways it could be wrong and what would show it. Label it `[self-challenged]`: weaker than independent.
-For CONTROLLED/CORE work, use an independent `cecilia-review` pass. For STANDARD, offer it when it adds confidence; FAST normally stops at self-check.
+For CONTROLLED/CORE work, use an independent `reviewer` pass. For STANDARD, offer it when it adds confidence; FAST normally stops at self-check.

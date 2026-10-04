@@ -1,6 +1,4 @@
-# Evidence, numbers and reports (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Evidence, numbers and reports (v21)
 
 Cecilia steers from what agents report. A confident wrong number, or a claim of DONE that the files
 do not support, steers her wrong. So claims carry evidence proportionate to the work, and reports are short enough to actually be read.
@@ -61,7 +59,6 @@ File: `tensura/reports/<TASK>/<YYYY-MM-DD>-<role>-<topic>.md`, plus one row in t
 > Decide: <numbered items for Cecilia — or "nothing">
 > Next: <one action, and who does it>
 > Deviations: <none — or each place the work differs from Cecilia's instruction or the docs, and why>
-> Rules: <hash from the brief header> (<PR-ids applied, or "none apply">)
 > HANDOFF: needs <role> — <what>          (only when the lane stopped the work; one line per handoff)
 
 ## Needs your decision     — `[agent-chosen]` first; each with options + recommendation
@@ -76,17 +73,14 @@ File: `tensura/reports/<TASK>/<YYYY-MM-DD>-<role>-<topic>.md`, plus one row in t
 `STATUS` ∈ `WAITING_FOR_CECILIA` · `BLOCKED` · `DONE` · `IN_PROGRESS`. A role stopped by its lane returns
 `BLOCKED` with its `HANDOFF` line(s) and whatever it finished inside the lane.
 
-**Rules line — every report, every mode.** `Rules: <hash> (PR-ids)` names the rules hash the role worked under
-(the `RULES=` of its brief header, or the hash `cecilia_check.py` prints when there was no brief) and the project
-rule ids that applied to this work. A hash that differs from the current one means the rules changed during the
-work — re-read them and say what changed. **HANDOFF line** — `HANDOFF: needs <role> — <what>` when the work
-needs another role's lane or specialist work; the orchestrator dispatches that role, the reporting role never
+**HANDOFF line** — `HANDOFF: needs <role> — <what>` when the work
+needs another role's lane or specialist work; the coordinator dispatches that role, the reporting role never
 does the work itself.
 
-In a fix round (`ROUND=1..3` in the brief) the report lists, per finding id, `fixed @<sha>` / `not fixed — why`
+In a fix round (`ROUND≥1` in the brief) the report lists, per finding id, `fixed @<sha>` / `not fixed — why`
 and the checks re-run on the new SHA.
 
-Caps: chat summary ≤ 9 lines, Deviations and Rules lines included (it says where the report is) · report body ≈ 120 lines before the
+Caps: chat summary ≤ 9 lines, Deviations line included (it says where the report is) · report body ≈ 120 lines before the
 appendix · one finding ≤ 6 lines (problem · scenario · evidence · direction) · quoted output ≤ 10
 lines in the body.
 

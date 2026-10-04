@@ -1,24 +1,13 @@
-# Git hand-off — local-only, rebase, PR text (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Git hand-off — local-only, rebase, PR text (v21)
 
 Open at the hand-off step. Branches, checkpoints, backup and rollback: `git.md`.
 
 ## 1. Local-only: nothing leaves the machine from an agent
 
-Everything an agent does stays local — commits, task branches, `tensura/`, `.cecilia/`, `rules/`, worktrees.
+Everything an agent does stays local — commits, task branches, `tensura/`, worktrees. `tensura/` and `.worktrees/`
+are listed in `.git/info/exclude` and never committed.
 
-- **Workspace mode (default):** every Cecilia file lives in the workspace next to the project
-  (`<project>.cecilia/`, `workspace.md` §2.4). The project holds **nothing** of Cecilia's — no `tensura/`, no
-  skills, no hooks, and no entries in `.git/info/exclude`; there is nothing to exclude and nothing to leak.
-  Worktrees for parallel writers live in `<workspace>/.worktrees/`.
-- **In-project layout (legacy option):** older installs keep `tensura/`, `.cecilia/`, `.worktrees/` and the
-  skills inside the project; those paths are then listed in `.git/info/exclude` and never committed.
-
-In both, the optional push lock (`cecilia push-lock on`, Cecilia's command) makes every `git push` from the
-project fail until Cecilia runs `cecilia push …` herself.
-
-A4 for agents (the guard denies them): `git push` in any form · creating/deleting remote branches or tags ·
+A4 for agents (never): `git push` in any form · creating/deleting remote branches or tags ·
 opening, editing, approving, merging a PR/MR · review comments · releases · changing remotes, push URLs or
 `pushInsteadOf` · `git add -f` of an excluded path.
 
@@ -28,12 +17,11 @@ Allowed: `git fetch` (A0) · read-only `gh pr view --comments` / `gh api` GET of
 What the agent does instead — in the report, as a copy-paste block for Cecilia, with **absolute paths** (she may
 run it from any folder; `gh` must run inside the project):
 ```
-cecilia push -u origin <task-branch>
+git push -u origin <task-branch>
 cd "<project>" && gh pr create --draft --base <target> --head <task-branch> --title "<title>" --body-file "<workspace>/tensura/reports/<TASK>/pr-body.md"
 ```
-Before handing over, confirm no Cecilia file is staged or committed (`scripts/cecilia_check.py --task <TASK>`
-checks it). The active flow shapes the hand-off (`flows/<flow>.md` § handoff): `personal` → the commands above;
-`team` → branch, commit and PR-body rules from `flows.team`, PR size limit, stacked PRs when too big.
+Before handing over, confirm no `tensura/` file is staged or committed. Repo PR templates and branch/commit
+conventions (`CONTRIBUTING.md`, `.github/pull_request_template.md`) win over these defaults.
 
 ## 2. Rebase before a Draft PR
 
@@ -45,8 +33,7 @@ Migration numbering clash: renumber **yours**, never a merged one. Re-run the qu
 
 ## 3. Draft PR content
 
-Write the full description from the role's PR template (`pr-draft-template.md` in its assets; in the `team`
-flow the project's template at `flows.team.pr_template` wins) to
+Write the full description from `assets/pr-draft-template.md` (the repo's own PR template wins) to
 `tensura/reports/<TASK>/pr-body.md`, including the Rollback block. Hand Cecilia the push and
 `gh pr create --draft … --body-file …` / `glab mr create --draft …` commands (§1); she runs them. No reviewers
 unless she names them.

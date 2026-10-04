@@ -64,7 +64,7 @@ Put results in `<skill-name>-workspace/` as a sibling to the skill directory. Or
 
 ### Step 1: Spawn all runs (with-skill AND baseline)
 
-For each test case, spawn subagents using `invoke_subagent`.
+For each test case, spawn subagents (Antigravity: `invoke_subagent`; Claude Code: the Agent tool; no sub-agent tool: run them yourself one by one and say the baseline is not independent).
 - **With-skill run**: Delegate to a subagent, explicitly telling it to use the new skill path.
 - **Baseline run**: Delegate to another subagent without the skill (or using the old version of the skill).
 
@@ -77,7 +77,7 @@ Draft quantitative assertions for each test case. Update `eval_metadata.json` an
 Once all runs are done:
 
 1. **Grade each run**: Evaluate each assertion against the outputs.
-2. **Present via Artifact**: Bạn **KHÔNG ĐƯỢC** sử dụng web server (`generate_review.py`) vì không tương thích. Thay vào đó, hãy dùng tool `write_to_file` (với ArtifactMetadata) để tạo một báo cáo bằng Markdown sinh động.
+2. **Present via Artifact**: Bạn **KHÔNG ĐƯỢC** sử dụng web server (`generate_review.py`) vì không tương thích. Thay vào đó, hãy tạo một báo cáo Markdown. Antigravity: dùng tool `write_to_file` (với ArtifactMetadata). Agent khác: ghi vào `<skill-name>-workspace/iteration-<N>/review.md` và đưa đường dẫn cho user.
    - Tên Artifact: `<skill-name>-review-iteration-<N>.md`
    - Nội dung: 
      - So sánh Output của bản cũ vs bản mới.

@@ -1,6 +1,6 @@
 # <app> — UI design
 
-> Version <x.y> · Updated: <YYYY-MM-DD> · Owner: cecilia-ui
+> Version <x.y> · Updated: <YYYY-MM-DD> · Owner: `dev` (ui)
 > Tool: <Penpot project "<name>" | Figma file <url> | Markdown> (`D-nn`) · Design file version/date: <…>
 > Inputs: `requirements.md` §<n> · `<app>-frontend.md` v<n> · `<unit>-api.yaml` v<n> · tokens: `design-tokens.json`
 > Accessibility target: WCAG 2.2 AA · Breakpoints: <e.g. 360, 768, 1280> · Themes: <light | light+dark>
@@ -54,7 +54,7 @@ Other checks (target size, reflow 320 px, not colour alone, labels, errors): <re
 | Key | Text (vi) | Text (other languages) | Status |
 |---|---|---|---|
 
-## 8. Gaps *(to cecilia-design)*
+## 8. Gaps *(to `planner` (design))*
 | # | Screen | Needs | Contract / frontend architecture provides | Proposed change | Blocks |
 |---|---|---|---|---|---|
 

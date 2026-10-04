@@ -1,6 +1,6 @@
 {
   "name": "cecilia-coding-skills",
-  "version": "20.2.0",
-  "description": "Cecilia orchestrator: coordinates specialist sub-agents from idea to local PR",
+  "version": "21.0.0",
+  "description": "Cecilia: production coding coordinator with 5 roles (planner, dev, tester, reviewer, devops) and topic-split knowledge",
   "framework": "Aizen Universal Structure"
 }

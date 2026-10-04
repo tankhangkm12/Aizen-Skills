@@ -1,7 +1,7 @@
 {
   "name": "aizen-skills",
   "version": "1.0.0",
-  "description": "Multi-agent skill suite with auto-installation and live-sync for Antigravity, Claude Code, Cursor, Windsurf, Cline, and Copilot.",
+  "description": "Agent skill suite with auto-installation and live-sync for Claude Code, Antigravity / Gemini CLI, Cursor and Windsurf.",
   "main": "bin/cli.js",
   "bin": {
     "aizen": "./bin/cli.js",

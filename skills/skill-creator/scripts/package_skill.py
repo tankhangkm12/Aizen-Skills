@@ -14,6 +14,7 @@ import fnmatch
 import sys
 import zipfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # chạy trực tiếp hoặc qua -m đều được
 from scripts.quick_validate import validate_skill
 
 # Patterns to exclude when packaging skills.

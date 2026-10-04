@@ -1,6 +1,4 @@
-# Asking, options and research — how decisions reach Cecilia (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Asking, options and research — how decisions reach Cecilia (v21)
 
 Cecilia decides; a role's job is to make each decision easy to get right: researched, compared on
 numbers, several real options, a recommendation kept separate — and asked as few times as possible.
@@ -25,13 +23,13 @@ numbers, several real options, a recommendation kept separate — and asked as f
 
 FAST often asks nothing; STANDARD asks only real unknowns; CONTROLLED uses the full gate discipline.
 **In an orchestrated task (from STANDARD) a role never asks Cecilia directly:** its questions go into its
-report (`PENDING QUESTIONS`, or the merged plan's open points), and the orchestrator puts them on the task's
+report (`PENDING QUESTIONS`, or the merged plan's open points), and the coordinator puts them on the task's
 ONE decision card (`tensura/decisions/<TASK>.md`, defaults pre-selected, one reply answers all).
 
 ## 2. Grouped gate
 
 ```
-**[cecilia-dev-be · D1 · SHOP-42 B-01] Gate 1/~2 — 3 câu độc lập**
+**[`dev` (be) · D1 · SHOP-42 B-01] Gate 1/~2 — 3 câu độc lập**
 
 Đã đọc: plan §B-01, order-design.md, order-api.yaml. Đã tìm: <sources, §7>. Các file không trả lời những câu dưới.
 
@@ -46,7 +44,7 @@ Trả lời gọn: `1B 2B`, hoặc `theo đề xuất hết`.
 ## 3. Dependent question — the full option table
 
 ```
-**[cecilia-design · S2 · order] Q2/~3 — Chống ghi đè trạng thái đơn đồng thời bằng gì?**
+**[`planner` (design) · S2 · order] Q2/~3 — Chống ghi đè trạng thái đơn đồng thời bằng gì?**
 
 Vì sao: <1–2 dòng>. Đã tìm: <nguồn, ngày>.
 
@@ -75,7 +73,7 @@ Vì sao: <1–2 dòng>. Đã tìm: <nguồn, ngày>.
 
 A sub-agent cannot reach Cecilia. It does all work possible before its gate, returns its questions
 already sorted (one independent group + the dependent ones, each with options, research and a
-recommendation), and stops. The orchestrator relays them. Never pass a gate by guessing.
+recommendation), and stops. The coordinator relays them. Never pass a gate by guessing.
 
 ## 6. Options — more than one, honestly compared
 

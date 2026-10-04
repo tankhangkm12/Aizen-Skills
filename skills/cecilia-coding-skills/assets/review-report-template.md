@@ -44,4 +44,3 @@
 ## Next step
 <who does what>
 
-Rules: <hash> (PR-ids applied)

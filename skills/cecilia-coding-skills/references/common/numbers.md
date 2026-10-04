@@ -1,6 +1,4 @@
-# Numbers — measure, project, calculate (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Numbers — measure, project, calculate (v21)
 
 Cecilia decides on numbers. A number is either **measured** (a tool read it) or **projected** (computed
 from stated inputs) — never guessed. Arithmetic is done by running code, not in the head.

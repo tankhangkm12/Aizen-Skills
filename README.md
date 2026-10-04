@@ -1,125 +1,190 @@
-# 🌟 Aizen Skills
+# Aizen Skills
 
 [![skills.sh](https://skills.sh/b/tankhangkm12/Aizen-Skills)](https://skills.sh/tankhangkm12/Aizen-Skills)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho các AI Agent: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, cùng mọi agent đọc thư mục chuẩn `~/.agents/skills`. 
-> Đặc biệt, toàn bộ kho lưu trữ này hoạt động như một **Native Antigravity Plugin** và đã được tích hợp sức mạnh của hệ điều hành **Cecilia v20.2.0**.
+Bộ skill cho AI coding agent: **Claude Code**, **Antigravity / Gemini CLI**, **Cursor**, **Windsurf** và mọi agent đọc
+thư mục chuẩn `~/.agents/skills`. Mỗi skill là một thư mục tự chứa (`SKILL.md` + tài nguyên), cài bằng liên kết
+(junction/symlink) nên sửa trong repo là agent thấy ngay.
 
----
+## Mục lục
 
-## 🚀 Cài Đặt (Installation)
+- [Cài đặt](#cài-đặt)
+- [Danh sách skill](#danh-sách-skill)
+- [Cecilia — trợ lý production coding](#cecilia--trợ-lý-production-coding)
+- [Cấu trúc repo](#cấu-trúc-repo)
+- [CLI](#cli)
+- [Phát triển skill](#phát-triển-skill)
+- [Gỡ cài đặt](#gỡ-cài-đặt)
+- [Giấy phép](#giấy-phép)
 
-Bạn có thể cài đặt theo nhiều cách linh hoạt:
+## Cài đặt
 
-### Cách 1: Cài đặt trực tiếp qua `skills.sh` (Hỗ trợ toàn bộ Agent)
-Sử dụng công cụ chính thức của hệ sinh thái **skills.sh**:
+Yêu cầu: Node.js ≥ 18, Git. Một số skill dùng thêm Python 3 (scripts) — không bắt buộc để cài.
 
-```bash
-# Xem danh sách skills có sẵn trong repo:
-npx skills add tankhangkm12/Aizen-Skills --list
-
-# Cài đặt tất cả skills:
-npx skills add tankhangkm12/Aizen-Skills
-```
-
-### Cách 2: Cài đặt toàn cục cho cả máy kèm Live-Sync (Khuyến nghị)
-Tự động quét và liên kết toàn bộ kỹ năng, copy rules, đồng thời **đăng ký Aizen-Skills như một Plugin gốc** cho Antigravity trên máy tính của bạn:
+### Cách 1 — Clone và liên kết (khuyến nghị)
 
 ```bash
-npm install -g aizen-skills
+git clone https://github.com/tankhangkm12/Aizen-Skills.git
+cd Aizen-Skills
+npm install          # postinstall tự chạy bộ cài (global)
+# hoặc chạy tay:
+node bin/cli.js sync
 ```
-*(Nếu bạn đã clone repository này về máy, chỉ cần chạy `npm install` ngay tại thư mục repo hoặc gõ `node bin/cli.js sync`)*.
 
----
+Bộ cài liên kết từng thư mục trong `skills/` vào:
 
-## 📁 Kiến Trúc Phẳng & Độc Lập (Self-Contained Anthropics Standard)
+| Agent | Thư mục |
+|---|---|
+| Universal (`.agents`) | `~/.agents/skills` |
+| Claude Code | `~/.claude/skills` |
+| Antigravity CLI | `~/.gemini/antigravity-cli/skills` |
+| Gemini CLI | `~/.gemini/skills` |
+| Antigravity config | `~/.gemini/config/skills` |
+| Cursor | `~/.cursor/skills` |
+| Windsurf | `~/.codeium/windsurf/skills` |
 
-Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến trúc mở của **[anthropics/skills](https://github.com/anthropics/skills)**. Không có sự phụ thuộc chéo. Không có cấu trúc rườm rà. Mọi thứ là các Module độc lập (Self-contained).
+Ngoài ra nó chép `rules/*.md` vào `~/.gemini/config/rules/` và đăng ký cả repo làm plugin Antigravity tại
+`~/.gemini/config/plugins/aizen-skills`.
+
+- **Windows** dùng NTFS junction (không cần quyền Admin); **Linux/macOS** dùng symlink và `chmod 755` cho scripts.
+- Thư mục thật trùng tên (skill bạn tự viết) **không bị ghi đè** — bộ cài chỉ cảnh báo.
+- Liên kết trỏ tới skill đã xóa/đổi tên được dọn khi chạy `sync`.
+
+Cài cho riêng một project (`./.agents/skills`, `./.claude/skills`, `./.cursor/rules/*.mdc`):
+
+```bash
+node /path/to/Aizen-Skills/bin/cli.js sync --project
+```
+
+### Cách 2 — Qua skills.sh
+
+```bash
+npx skills add tankhangkm12/Aizen-Skills --list   # xem danh sách
+npx skills add tankhangkm12/Aizen-Skills          # cài tất cả
+```
+
+Cách này chép skill (không live-sync, không cài rules/plugin).
+
+Sau khi cài, khởi động lại agent (hoặc mở session mới) để nó nạp danh sách skill.
+
+## Danh sách skill
+
+| Skill | Dùng khi |
+|---|---|
+| [`cecilia-coding-skills`](skills/cecilia-coding-skills) | Làm tính năng/bug fix production: lập kế hoạch, code song song, test, review, PR. Xem [bên dưới](#cecilia--trợ-lý-production-coding). |
+| [`adversarial-code-reviewer`](skills/adversarial-code-reviewer) | Review PR/diff/code do AI viết theo góc nhìn đối kháng: blast radius, lỗi logic, bảo mật. |
+| [`database-table-design`](skills/database-table-design) | Thiết kế schema quan hệ / bảng MySQL theo 9 nguyên tắc, viết DDL, review kiến trúc DB. |
+| [`devsecops-pipeline-flow`](skills/devsecops-pipeline-flow) | Dựng CI/CD bảo mật (GitHub Actions, GitLab CI, Jenkins, ArgoCD), quét Gitleaks/Trivy/Semgrep, có các bước xác nhận. |
+| [`agent-skill-tester`](skills/agent-skill-tester) | Đánh giá một skill so với baseline (Outcome, Process, Style, Efficiency), LLM-as-a-judge. |
+| [`skill-creator`](skills/skill-creator) | Tạo/cải thiện skill theo cấu trúc Aizen, chạy eval. |
+| [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/đường dẫn local, phỏng vấn để tùy biến rồi đồng bộ. |
+| [`tech-learning-tree`](skills/tech-learning-tree) | Nghiên cứu công nghệ mới và ghi lại thành cây kiến thức trên Notion. |
+| [`video-to-skill`](skills/video-to-skill) | Biến video YouTube/file local thành skill (phụ đề → hoặc ffmpeg + speech-to-text). |
+
+Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có thể gọi trực tiếp (Claude Code: `/<tên-skill>`).
+
+## Cecilia — trợ lý production coding
+
+`cecilia-coding-skills` (v21) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
+`git push`; cuối task bạn nhận khối lệnh push/PR để tự chạy.
+
+**Chế độ**
+
+| Mode | Khi nào | Luồng | Số sub-agent |
+|---|---|---|---|
+| FAST | sửa nhỏ, rõ ràng | main session tự sửa và chạy test | 0 |
+| STANDARD | mặc định | planner → 1 decision card → `dev` song song (mỗi unit một worktree) → tích hợp `int/<TASK>` → tester → reviewer → fix ≤ 2 vòng | ~4–6 |
+| CONTROLLED | auth, tiền, migration, concurrency, contract public, infra, prod | như STANDARD + duyệt plan rõ ràng + reviewer thứ hai (`LENS=redteam`) + `devops` khi đụng hạ tầng | ~6–8 |
+
+**5 role** (`agents/`)
+
+| Role | Việc | Ghi code? |
+|---|---|---|
+| `planner` | khảo sát codebase, yêu cầu/thiết kế khi cần, kế hoạch chia unit + 2–3 phương án | không (chỉ docs/plan) |
+| `dev` | thực thi một unit; `KIND=be\|fe\|db\|ui` quyết định nạp kiến thức nào | có, trong worktree riêng |
+| `tester` | viết/chạy test theo lens, báo bug có bằng chứng | test |
+| `reviewer` | review độc lập trên SHA đã tích hợp, read-only | không |
+| `devops` | CI/CD, Docker, IaC, deploy/rollback, sự cố | file hạ tầng |
+
+**Kiến thức chia theo chủ đề** trong `references/<topic>/` — mỗi thư mục có `method.md` làm điểm vào, agent chỉ
+nạp file cần cho việc đang làm: `flow`, `discover`, `design`, `plan`, `backend`, `frontend`, `ui`, `db`, `api-ux`,
+`test`, `review`, `infra`, `common`.
+
+**Quy tắc chính** (`rules/core.md`): mức quyền A0–A4 (việc rủi ro phải hỏi), không tự quyết thay người dùng, mọi kết
+luận gắn nhãn `[verified]/[inferred]/[unverified]/[projected]`, kiểm diff/test/SHA thay vì tin báo cáo "DONE".
+
+**Scripts** (`scripts/`, Python 3):
+
+```bash
+python scripts/state.py init --task T-12 --goal "..." --mode standard   # trạng thái task để resume
+python scripts/check.py --task T-12        # lint, typecheck, build, test, secrets, deps → evidence.json
+python scripts/capacity.py --help          # ước lượng tải/dung lượng
+```
+
+Trạng thái và báo cáo ghi vào `tensura/` ở gốc project (local-only, nên thêm vào `.git/info/exclude`).
+
+Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
+`references/flow/platform-*.md`.
+
+## Cấu trúc repo
 
 ```text
 .
-├── skills/                     # Thư mục cốt lõi chứa 9 skills độc lập
-│   ├── cecilia-coding-skills/  # Ví dụ về một Skill chuẩn Aizen
-│   │   ├── SKILL.md            # (Bắt buộc) Não bộ: Lệnh điều khiển chính của Agent
-│   │   ├── manifest.json       # (Bắt buộc) Khai báo Metadata và Version
-│   │   ├── rules/              # (Bắt buộc) Các luật thép (VD: mcp.md ép dùng công cụ)
-│   │   ├── agents/             # (Bắt buộc) Chứa prompt của các Sub-agents con
-│   │   ├── references/         # (Bắt buộc) Kho tri thức, tài liệu chuyên ngành
-│   │   ├── tools/              # (Bắt buộc) Các công cụ (Tool definitions)
-│   │   ├── scripts/            # (Bắt buộc) Các mã nguồn thực thi (Python, JS)
-│   │   └── assets/             # (Bắt buộc) Các file tĩnh, template
-│   ├── skill-cloner/           # (Tương tự, đầy đủ 8 thành phần)
-│   ├── devsecops-pipeline-flow/# (Tương tự, đầy đủ 8 thành phần)
-│   └── ... 
-├── rules/                      # Quy tắc hệ thống toàn cục (VD: Continuous Improvement Loop)
-├── plugin.json                 # Manifest khai báo Aizen-Skills là một Antigravity Plugin
-├── bin/                        # Bộ cài đặt & CLI đa nền tảng
-├── package.json                # Cấu hình NPM
-└── README.md                   # Hướng dẫn sử dụng
+├── skills/<skill>/            # mỗi skill tự chứa, đủ 8 phần:
+│   ├── SKILL.md               #   điểm vào: front-matter name/description + hướng dẫn
+│   ├── manifest.json          #   metadata, version
+│   ├── rules/                 #   luật bắt buộc
+│   ├── agents/                #   prompt sub-agent
+│   ├── references/            #   kiến thức nạp theo nhu cầu
+│   ├── tools/                 #   định nghĩa tool
+│   ├── scripts/               #   mã chạy được (Python/JS)
+│   └── assets/                #   template, file tĩnh
+├── rules/                     # rule toàn cục (continuous-improvement.md)
+├── bin/                       # cli.js, install.js, updater.js, agents-config.js
+├── tests/                     # check-skills.js (lint cấu trúc), test-installer.js
+├── plugin.json                # manifest plugin Antigravity
+└── package.json
 ```
 
-**Tại sao phải là Aizen Universal Structure?**
-- **Đồng nhất tuyệt đối (Convention over Configuration):** Mọi skill đều phải có đủ 8 thành phần này dù bên trong trống rỗng (thư mục rỗng giữ bằng `.gitkeep`; `npm test` kiểm tra tự động). Agent sẽ không bao giờ bị lạc lối khi nhảy từ skill này sang skill khác.
-- **Tiến trình hiển vi (Progressive Disclosure):** Tách bạch rõ ràng giữa lệnh điều khiển (`SKILL.md`), tri thức (`references/`) và luật lệ (`rules/`).
-- **Dễ mang vác (Portable):** Bạn có thể copy đúng 1 thư mục skill ném sang máy khác và nó sẽ chạy hoàn hảo vì nó đã "Tự đóng gói" (Self-contained).
+Thư mục rỗng giữ bằng `.gitkeep`. `tests/check-skills.js` bắt buộc đủ 8 phần và kiểm mọi đường dẫn
+`` `references/….md` `` được nhắc trong skill đều tồn tại.
 
----
+## CLI
 
-## 🔄 Vòng Lặp Cải Thiện Liên Tục (Continuous Improvement Loop)
+Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `npm link`):
 
-Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông minh tại `rules/continuous-improvement.md`. Khi được đồng bộ vào máy, nó ép buộc mọi AI Agent phải tuân thủ:
-1. **Self-Evaluate**: Đánh giá độ hiệu quả của code/prompt ngay sau khi thực hiện xong task.
-2. **Proposal**: Tự động phát hiện điểm yếu, đề xuất cập nhật Công cụ, Kiến thức hoặc Quy trình.
-3. **Execution**: Sau khi người dùng duyệt, cập nhật file của skill tương ứng, chạy `npm test` + `sync`, commit; chỉ `git push` khi người dùng đồng ý.
+| Lệnh | Việc |
+|---|---|
+| `status` | liệt kê skill và số liên kết ở từng agent |
+| `sync` / `install` | liên kết skills, chép rules, đăng ký plugin; `--project` để cài vào project hiện tại |
+| `check` | kiểm tra có bản mới không |
+| `update` | kéo bản mới (git) rồi sync |
+| `auto-update enable\|disable` | bật/tắt cập nhật ngầm hằng ngày (Task Scheduler / cron) |
+| `help` | trợ giúp |
 
----
+## Phát triển skill
 
-## 📦 Danh Sách Kỹ Năng Sẵn Có (9 Skills)
-
-### Kỹ năng Chiến thuật (Aizen Native)
-- **`database-table-design`**: Thiết kế DB chuẩn 9 nguyên tắc Enterprise.
-- **`devsecops-pipeline-flow`**: Xây dựng CI/CD bảo mật đa nền tảng.
-- **`adversarial-code-reviewer`**: Đóng vai Hacker/Reviewer bắt lỗi logic và bảo mật.
-- **`video-to-skill`**: Trích xuất tri thức từ YouTube thành Agent Skill.
-- **`agent-skill-tester`**: Công cụ kiểm thử tự động các Agent Skills.
-- **`tech-learning-tree`**: Xây dựng lộ trình học công nghệ.
-- **`skill-cloner`**: Nhân bản, tinh chỉnh và test một skill từ Github vào workspace.
-- **`skill-creator`**: Tạo và cải thiện skill mới với chuẩn cấu trúc Aizen, test A/B qua Artifacts.
-
-### Kỹ năng Chiến lược (Master Skill)
-- **`cecilia-coding-skills`**: Một Siêu kỹ năng (Super-Agent) tự động điều phối toàn bộ vòng đời phần mềm. Nó được trang bị sẵn 11 Sub-agents bên trong thư mục `agents/` của nó, chạy ở portable mode khi máy không có CLI `cecilia` (xem SKILL.md). Các sub-agent gồm:
-  - Lập kế hoạch & Thiết kế (`cecilia-plan`, `cecilia-design`)
-  - Lập trình (`cecilia-dev-be`, `cecilia-dev-fe`, `cecilia-ui`, `cecilia-db`)
-  - Kiểm thử & Triển khai (`cecilia-test`, `cecilia-api-ux`, `cecilia-devops`)
-  - Hội đồng duyệt (`cecilia-review`, `cecilia-discovery`)
-
----
-
-## ⚡ Tối Ưu Cho Cả Windows và Linux (Cross-Platform)
-
-Hệ thống hoạt động hoàn hảo 100% trên mọi HĐH:
-1. **Windows:** Cơ chế **NTFS Directory Junction** cực nhanh, không cần quyền Admin.
-2. **Linux & macOS:** **Symbolic Links** tự động cấp quyền thực thi (`chmod 755`) cho các scripts.
-3. **Native Plugin:** Repo được định nghĩa là một Antigravity Plugin chuẩn.
-4. **Live-Sync:** Sửa file ở repo gốc ➔ Toàn bộ Agent trên máy tự động cập nhật ngay tức thì.
-5. **An toàn:** Installer không bao giờ ghi đè thư mục thật trùng tên (skill bạn tự viết) mà chỉ cảnh báo; link tới skill đã xóa/đổi tên được dọn tự động khi `sync`.
-
----
-
-## 🛠️ Các Lệnh CLI
+1. Tạo skill mới bằng `skill-creator` hoặc chép một skill có sẵn, giữ đủ 8 phần.
+2. `description` trong `SKILL.md` quyết định khi nào agent chọn skill — viết rõ "dùng khi…".
+3. Giữ `SKILL.md` ngắn; kiến thức dài đưa vào `references/` và chỉ dẫn khi nào đọc.
+4. Kiểm tra rồi đồng bộ:
 
 ```bash
-aizen status          # Kiểm tra trạng thái liên kết của các Agent
-aizen sync            # Đồng bộ đệ quy toàn bộ skills, rules & plugins vào hệ thống
-aizen check           # Chỉ kiểm tra có bản mới hay không
-aizen update          # Kiểm tra và tải bản cập nhật mới nhất
-aizen auto-update     # Bật/tắt lịch cập nhật ngầm hàng ngày (Windows task / Linux cron)
-aizen help            # Xem hướng dẫn chi tiết
+npm test               # check-skills.js + test-installer.js
+node bin/cli.js sync
 ```
 
----
+Rule `rules/continuous-improvement.md` yêu cầu agent sau mỗi lần dùng skill tự đánh giá, đề xuất cải tiến, và chỉ
+sửa skill khi bạn đồng ý.
 
-## 📄 Bản Quyền & Giấy Phép
+## Gỡ cài đặt
 
-Phát hành dưới giấy phép [MIT](LICENSE). Riêng `skills/skill-creator` dựa trên skill của Anthropic và giữ giấy phép Apache 2.0 trong `skills/skill-creator/LICENSE.txt`.
+Xóa các liên kết (không xóa repo): các mục trùng tên skill trong những thư mục ở bảng [Cài đặt](#cài-đặt),
+`~/.gemini/config/plugins/aizen-skills` và `~/.gemini/config/rules/continuous-improvement.md`. Trên Windows dùng
+`rmdir <link>` (xóa junction, không đụng thư mục gốc). Tắt cập nhật ngầm: `node bin/cli.js auto-update disable`.
+
+## Giấy phép
+
+[MIT](LICENSE). Riêng `skills/skill-creator` dựa trên skill của Anthropic, giữ giấy phép Apache 2.0 trong
+`skills/skill-creator/LICENSE.txt`.

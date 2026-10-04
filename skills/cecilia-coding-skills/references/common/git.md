@@ -1,13 +1,11 @@
-# Git flow, checkpoints, backup and rollback (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Git flow, checkpoints, backup and rollback (v21)
 
 Every change is made so that Cecilia can undo it at any moment. Git is the backup for everything it
 tracks; `tensura/backups/` is the backup for what it does not.
 
 ## 1. Branch model
 
-`git.model` in `.cecilia/config.json`: `auto` (default) · `gitflow` · `github`. The repository's own
+`git.model` in `tensura/conventions.md`: `auto` (default) · `gitflow` · `github`. The repository's own
 convention (CONTRIBUTING, `git branch -r`, history) wins; note it once in the report.
 
 | Model | Long-lived | Task branches from | Merge target |
@@ -28,9 +26,8 @@ Task branch names — `<type>/<TASK>-<nn>-<desc>`:
 Parallel writers on one task use one branch each, per role and unit: `feature/SHOP-42-01-dev-be-order`,
 `feature/SHOP-42-01-dev-be-payment`, `feature/SHOP-42-01-dev-fe-web`.
 
-In the `team` flow the branch name follows `flows.team.branch_pattern` (e.g. `feature/{ticket}-{slug}`) and
-every commit subject must match `flows.team.commit_pattern` (`flows/team.md`); that replaces the defaults
-here where they differ.
+A team convention (branch pattern such as `feature/{ticket}-{slug}`, commit subject format) in `CONTRIBUTING.md` or
+`tensura/conventions.md` replaces the defaults here where they differ.
 
 Never create `develop`, `release/*` or any branch on the remote (A4 — Cecilia creates remote branches). Creating `develop`
 locally for a repo that has none is a decision — ask once, record it as `D-nn`.
@@ -44,8 +41,7 @@ git switch -c <task-branch> origin/<base>     # or from local base if there is n
 git rev-parse HEAD                # record: start SHA  → report "Rollback" section
 ```
 
-The guard refuses edits on protected branches, on a detached HEAD and outside a git repository (while
-`git.require_task_branch` is true). Worktrees for parallel roles are created the same way:
+Never edit on a protected branch, on a detached HEAD or outside a git repository. Worktrees for parallel roles are created the same way:
 `git worktree add .worktrees/<role>-<scope> -b <task-branch> <base>`.
 
 ## 3. Checkpoints during the work

@@ -1,6 +1,6 @@
 # API experience report — <TASK> · <API/service> @ <contract version or SHA>
 
-Date · reviewer `cecilia-api-ux` · oracles: <requirements, contract, screens, load assumptions>
+Date · reviewer `reviewer` (api-ux lens) · oracles: <requirements, contract, screens, load assumptions>
 
 ## 1. Verdict
 <PASS / CHANGES_REQUIRED / INCOMPLETE> · BLOCKER n · SHOULD-FIX n · SUGGESTION n · QUESTION n

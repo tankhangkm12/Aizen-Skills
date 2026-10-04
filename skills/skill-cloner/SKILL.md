@@ -32,6 +32,7 @@ You are the `skill-cloner`. Your job is to fetch an existing skill from anywhere
    - Update `SKILL.md`, `references/`, and `scripts/`.
 
 5. **Step 5: A/B Testing & Evaluation (Sub-agent Dispatch)**
+   - Tool names below are Antigravity's. Claude Code: use the Agent tool with the agent file's content as the prompt. No sub-agent tool: play the three roles yourself one after another and tell the user the test was not independent.
    - You MUST use `define_subagent` to dynamically create 3 subagents from the `agents/` directory:
      - `baseline-runner`: Read `agents/baseline-runner.md` for its prompt.
      - `improved-runner`: Read `agents/improved-runner.md` for its prompt.

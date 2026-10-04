@@ -1,6 +1,4 @@
-# Code quality — small, clear, fast where it matters (common v20)
-
-<!-- common v20 — canonical copy in shared/, synced into every skill by tools/sync_common.py. Do not edit a copy. -->
+# Code quality — small, clear, fast where it matters (v21)
 
 Applies to every role that writes code, tests, migrations, pipelines or IaC. The repository's linter,
 formatter and conventions win on style; these rules win on substance unless the docs say otherwise.
@@ -46,4 +44,4 @@ formatter and conventions win on style; these rules win on substance unless the 
 [ ] optimisation claims have numbers     [ ] Deviations line written
 ```
 
-`cecilia-review` judges the same list (review-code §quality); a failed item is a finding, not a style note.
+`reviewer` judges the same list (review-code §quality); a failed item is a finding, not a style note.

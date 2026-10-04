@@ -26,14 +26,14 @@
 | THR | Boundary/flow | STRIDE | Scenario (1 line) | Likelihood + reason | Impact + reason | Control | Status |
 |---|---|---|---|---|---|---|---|
 
-<Each Critical/High threat written out in full per `references/security/threat-model.md` §3.>
+<Each Critical/High threat written out in full per `references/design/threat-model.md` §3.>
 
 ## 5. Controls
 | CTL | Threat(s) | Control | Level (structural/systematic/per-endpoint/procedural) | Lives in | Implemented by | Test that keeps it fixed |
 |---|---|---|---|---|---|---|
 
 ## 6. Authorization matrix
-<per `references/security/authz-matrix.md` — every endpoint × actor, ownership condition, deny response>
+<per `references/design/authz-matrix.md` — every endpoint × actor, ownership condition, deny response>
 
 ## 7. Supply chain
 | Metric | Value | Tool + version | Date |

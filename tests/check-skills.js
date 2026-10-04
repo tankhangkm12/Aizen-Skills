@@ -33,9 +33,19 @@ for (const id of fs.readdirSync(skillsDir)) {
     errors.push(`${id}/manifest.json: còn placeholder {{...}}`);
   }
 
-  for (const f of walk(dir).filter(f => f.endsWith('.md'))) {
-    if (/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(fs.readFileSync(f, 'utf8'))) {
-      errors.push(`${path.relative(skillsDir, f)}: chứa ký tự điều khiển (escape hỏng?)`);
+  for (const f of walk(dir).filter(f => /\.(md|py)$/.test(f))) {
+    const text = fs.readFileSync(f, 'utf8');
+    const rel = path.relative(skillsDir, f);
+    if (f.endsWith('.md') && /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(text)) {
+      errors.push(`${rel}: chứa ký tự điều khiển (escape hỏng?)`);
+    }
+    // Đường dẫn `skills/<x>/...` tới skill không tồn tại (sót lại từ bố cục cũ).
+    for (const [, other] of text.matchAll(/\bskills\/([a-z0-9-]+)\/(?:references|scripts|agents|assets)\//g)) {
+      if (!fs.existsSync(path.join(skillsDir, other))) errors.push(`${rel}: trỏ tới skill không tồn tại "skills/${other}/"`);
+    }
+    // `references/...` trong backtick phải tồn tại trong skill.
+    for (const [, ref] of text.matchAll(/`(references\/[A-Za-z0-9_./-]+\.md)`/g)) {
+      if (!fs.existsSync(path.join(dir, ref))) errors.push(`${rel}: tham chiếu hỏng ${ref}`);
     }
   }
 }

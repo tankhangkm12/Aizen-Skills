@@ -1,8 +1,3 @@
-<!-- scoped source: shared/scoped/git/pr-draft-template.md — synced into dev-be, dev-fe, test and db. Do not edit a copy.
-     Full Draft PR description for Cecilia, saved as tensura/reports/<TASK>/pr-body.md; she pushes and opens
-     the PR herself (local-only). Chat language. Drop sections that do not apply, keep order.
-     Write for someone who has not read the code: short sentences, file paths, requirement IDs. -->
-
 ## 1. Context
 - **Task / issue:** <TASK> · #<issue>
 - **Plan:** `tensura/plans/<file>.md` — **Batch <n>/<total>:** <one-sentence goal> · role: <dev-be|dev-fe|test|db>

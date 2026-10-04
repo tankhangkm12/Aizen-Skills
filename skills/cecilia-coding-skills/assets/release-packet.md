@@ -1,8 +1,8 @@
-# Release packet / G4
+# Release packet
 Task / release ID:
 Source SHA / artifact digest / config identity:
 Target environment and authorized human operator:
-G3 merge evidence and post-merge candidate checks:
+Merge evidence and post-merge candidate checks:
 Staging evidence and production differences:
 Migration / compatibility / restore proof / RPO / RTO:
 Deployment plan and protected pipeline reference:

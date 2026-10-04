@@ -1,6 +1,6 @@
 # ADR-<nn>: Database for <workload> — <status: proposed | accepted | superseded>
 
-Date · Deciders: Cecilia · Prepared by: cecilia-db
+Date · Deciders: Cecilia · Prepared by: `dev` (db)
 
 ## Context
 Workload profile (engine-selection.md §1) and forecast summary with numbers.

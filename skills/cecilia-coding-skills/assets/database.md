@@ -1,8 +1,6 @@
 # <unit> — database
 
-<!-- scoped source: shared/scoped/database/database-template.md — synced into cecilia-db and cecilia-design. -->
-
-> Updated: <YYYY-MM-DD> · Owner: cecilia-db (or cecilia-design while cecilia-db is off) · Input: `<module>-design.md` · Engine: <DBMS + version> · Schema: `<name>`
+> Updated: <YYYY-MM-DD> · Owner: `dev` (db) (or `planner` (design) while `dev` (db) is off) · Input: `<module>-design.md` · Engine: <DBMS + version> · Schema: `<name>`
 
 ## 1. Conventions
 | Item | Rule |
