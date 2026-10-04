@@ -103,7 +103,10 @@ git push -u origin <branch>
 gh pr create --draft --base <target> --head <branch> --title "<title>" --body-file tensura/reports/<TASK>/pr-body.md
 ```
 
-Collect `L-nn` lessons into `tensura/lessons.md`; `state.py status --task <TASK> --set done`.
+Collect `L-nn` lessons into `tensura/lessons.md`. A lesson about Cecilia herself (a step, brief, script or rule
+that was wrong or missing) also goes to the skill feedback log: `feedback.py log --skill cecilia-coding-skills …`
+(`skill-creator/scripts/feedback.py`, see the repo's `continuous-improvement` rule). Then
+`state.py status --task <TASK> --set done`.
 
 ## Checks between steps
 

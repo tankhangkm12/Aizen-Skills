@@ -1,6 +1,6 @@
 {
   "name": "skill-creator",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Create or improve Aizen-Skills skills to the Aizen Universal Structure, with docs, evals and npm test",
   "framework": "Aizen Universal Structure"
 }

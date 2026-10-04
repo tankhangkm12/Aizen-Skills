@@ -119,6 +119,9 @@ Cả hai skill làm việc ngay trong repo Aizen-Skills và theo [chuẩn skill 
 
 - Cải thiện skill đã có trong repo: dùng `skill-creator` ("cải thiện skill <tên>: <vấn đề>"); nó lưu bản cũ vào
   `.aizen-work/<tên>/baseline/`, đề xuất thay đổi, rồi so sánh bản mới với bản cũ.
+- Skill tự cải thiện: khi skill làm chưa tốt, agent ghi sổ phản hồi (`feedback.py log`) rồi báo bạn một dòng. Vấn
+  đề lặp ≥ 2 lần (hoặc bạn phàn nàn) → agent đề xuất sửa qua `skill-creator`, thêm eval case để lỗi không quay lại.
+  Xem sổ: `python skills/skill-creator/scripts/feedback.py list --open`.
 - Không bao giờ ghi đè skill trùng tên; thư mục tạm nằm ở `.aizen-work/` (đã git-ignore).
 - Skill chép về không có giấy phép → agent báo trước khi tuỳ biến; bạn quyết định giữ riêng hay không.
 

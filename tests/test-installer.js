@@ -4,7 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { discoverSkills, createLink, pruneStaleLinks, safeRemoveLink } = require('../bin/install');
+const { discoverSkills, createLink, pruneStaleLinks, safeRemoveLink, installGlobalRules, updateAgentsMd } = require('../bin/install');
 
 console.log('[TEST] Bắt đầu kiểm tra hệ thống Aizen Skills Installer...\n');
 
@@ -88,6 +88,26 @@ try {
     if (fs.lstatSync(p).isSymbolicLink()) safeRemoveLink(p);
   }
   fs.rmSync(pruneDir, { recursive: true, force: true });
+}
+
+// 4. Rules tới Antigravity + Claude Code; AGENTS.md cập nhật tại chỗ khi sync lại
+console.log('\n[TEST 4] Kiểm tra cài rules và AGENTS.md...');
+const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'aizen-home-'));
+try {
+  installGlobalRules(false, fakeHome);
+  for (const dir of [['.gemini', 'config', 'rules'], ['.claude', 'rules']]) {
+    assert(fs.existsSync(path.join(fakeHome, ...dir, 'continuous-improvement.md')), `Thiếu rule trong ${dir.join('/')}`);
+  }
+  fs.writeFileSync(path.join(fakeHome, 'AGENTS.md'), '# Mine\n\nkeep me\n');
+  updateAgentsMd([dbSkill], fakeHome, false);
+  updateAgentsMd(skills, fakeHome, false);
+  const md = fs.readFileSync(path.join(fakeHome, 'AGENTS.md'), 'utf8');
+  assert.strictEqual(md.split('## Available Skills').length, 2, 'Sync lại không được nhân đôi mục skill');
+  assert(md.includes('video-to-skill/SKILL.md'), 'Sync lại phải cập nhật danh sách skill');
+  assert(md.includes('keep me') && md.includes('continuous-improvement.md'), 'AGENTS.md phải giữ nội dung cũ và trỏ tới rule');
+  console.log('  ✓ Rules toàn cục + AGENTS.md: OK');
+} finally {
+  fs.rmSync(fakeHome, { recursive: true, force: true });
 }
 
 function skillsRoot() { return path.join(__dirname, '..', 'skills'); }

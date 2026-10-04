@@ -1,40 +1,41 @@
-# Vòng Lặp Cải Thiện Kỹ Năng (Continuous Skill Improvement Loop)
+# Vòng lặp cải thiện skill (Continuous Skill Improvement)
 
-**Mục tiêu:** Đảm bảo mọi agent skills (trong Aizen-Skills) đều liên tục được học hỏi, tiến hóa và tự động hoá sau mỗi lần sử dụng thực tế.
+**Mục tiêu:** mỗi lần một skill Aizen làm chưa tốt, vấn đề được ghi lại; vấn đề lặp lại hoặc nghiêm trọng được
+sửa có kiểm chứng (baseline + eval), không sửa vội theo một trường hợp.
 
-**Trigger (Khi nào kích hoạt):** 
-BẮT BUỘC KÍCH HOẠT TỰ ĐỘNG sau khi Agent hoàn thành một task có sử dụng bất kỳ skill nào từ hệ thống, hoặc khi người dùng phàn nàn/cảm thấy cách xử lý hiện tại của hệ thống/skill chưa tối ưu.
+`FB` = `python "<skill-creator>/scripts/feedback.py"` (`<skill-creator>` = thư mục skill `skill-creator` đã cài,
+vd. `~/.claude/skills/skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen-work/feedback/<skill>.jsonl`.
 
-**Quy trình thực thi bắt buộc đối với Agent:**
+## Khi nào kích hoạt — chỉ khi có tín hiệu
 
-## Bước 1: Đánh giá hiệu quả (Self-Evaluation)
-- Tự động phân tích lại quá trình giải quyết vấn đề vừa xong: Skill đã dùng có thực sự hiệu quả không? Có bước nào phải làm thủ công không?
-- Nhận diện lỗ hổng: Logic nào bị sai hoặc cũ? Đoạn code nào bị sai hoàn toàn? Có use case mới nào vừa phát sinh chưa được hỗ trợ không?
+Trong task có dùng một skill Aizen và xảy ra ít nhất một điều:
+- người dùng sửa lại / phàn nàn cách skill làm;
+- một bước hoặc script của skill lỗi, hoặc hướng dẫn của skill sai so với thực tế (lệnh, đường dẫn, API);
+- phải làm tay việc mà skill lẽ ra lo, hoặc gặp trường hợp skill không phủ.
 
-## Bước 2: Đề xuất cải tiến & Xin phép (Proposal & Approval)
-- Agent **phải in ra màn hình Đề xuất nâng cấp skill**, nêu rõ:
-  - Tên skill cần sửa (hoặc đề xuất tạo một nhánh skill mới nếu là use case hoàn toàn khác).
-  - Trình bày ngắn gọn phương án giải quyết (Cập nhật hoàn toàn file nào? Sửa logic gì?).
-  - **In ra markdown diff thay đổi dự kiến** để người dùng xem trước.
-- Hỏi ý kiến người dùng (Chờ người dùng xác nhận "Proceed/Chấp thuận" hoặc yêu cầu chỉnh sửa thêm trước khi ghi đè file).
+Không có tín hiệu → không làm gì. Không tự đánh giá sau mọi task.
 
-## Bước 3: Thực thi cập nhật & Triển khai (Execution & Deploy)
-CHỈ THỰC HIỆN KHI ĐƯỢC NGƯỜI DÙNG CHẤP THUẬN:
-1. **Cập nhật nội dung theo chuẩn Aizen Universal Structure:** 
-   - Nếu là sửa/thêm Quy trình (Process Prompt): Sửa file `SKILL.md`.
-   - Nếu là sửa/thêm Công cụ (Tools/Code): Thêm hoặc sửa file trong thư mục `scripts/` hoặc `tools/`.
-   - Nếu là sửa/thêm Tri thức (Knowledge): Thêm hoặc sửa file trong thư mục `references/`.
-   - Nếu là sửa/thêm Luật thép bắt buộc (Constraints): Thêm hoặc sửa file trong thư mục `rules/`.
-   - Nếu là sửa/thêm Sub-agent phụ trợ: Thêm hoặc sửa file prompt trong thư mục `agents/`.
-   Đảm bảo tuyệt đối không phá vỡ cấu trúc gốc (không được xóa các thư mục bắt buộc này dù nó rỗng).
-2. **Triển khai:** Chạy trong thư mục gốc của repo Aizen-Skills (thư mục chứa `bin/cli.js`; tìm qua đích của link skill, ví dụ `~/.claude/skills/<skill>`, hoặc hỏi người dùng nếu không chắc):
-   ```bash
-   # 1. Kiểm tra cấu trúc và cập nhật link cục bộ
-   npm test
-   node bin/cli.js sync
-   # 2. Commit đúng các file vừa sửa (không dùng `git add .`)
-   git add <các file đã sửa>
-   git commit -m "fix(<tên-skill>): <mô tả ngắn cải tiến>"
-   ```
-   **Push:** chỉ chạy `git push` khi người dùng đồng ý rõ ràng cho lần push này; nếu không, in sẵn lệnh để họ tự chạy.
-3. **Báo cáo:** Thông báo hoàn tất quá trình cập nhật cho người dùng.
+## Bước A — Ghi nhận (luôn làm, không hỏi, không chen ngang task)
+
+Cuối task, mỗi vấn đề một lệnh, rồi báo người dùng một dòng:
+
+```bash
+FB log --skill <id> --kind bug|gap|friction|wrong-doc --text "<vấn đề, 1 câu>" \
+  --evidence "<lỗi/lệnh/file>" --prompt "<prompt tái hiện được>"
+```
+
+Không tìm thấy repo → bỏ qua và nói một dòng; không bao giờ chặn task chính.
+
+## Bước B — Đề xuất sửa (chỉ khi một trong các điều sau đúng)
+
+- người dùng phàn nàn trực tiếp về skill;
+- `FB list --skill <id> --open` cho thấy cùng vấn đề `x2` trở lên;
+- lỗi làm skill cho ra kết quả sai (không chỉ chậm/vụng).
+
+Đề xuất ≤ 15 dòng: skill, các entry `#id`, file sẽ sửa, diff dự kiến, cách kiểm. Chờ người dùng nói "ok".
+
+## Bước C — Sửa (sau khi được duyệt)
+
+Theo "Workflow — improve an existing skill" của `skill-creator`: baseline → sửa → bump `manifest.json` → thêm
+eval case từ `--prompt` đã ghi → eval với vs không → `npm test` → `node bin/cli.js sync` → commit đúng file đã sửa
+→ `FB resolve --skill <id> --id <n> --commit <sha>`. Không `git push` trừ khi người dùng cho phép lần push đó.

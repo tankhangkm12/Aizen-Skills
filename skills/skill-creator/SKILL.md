@@ -3,7 +3,7 @@ name: skill-creator
 description: Create a new skill for the Aizen-Skills repo, or improve an existing one, following the Aizen Universal Structure - interview, scaffold all 8 parts, write SKILL.md/rules/references/scripts, register it in README and docs (usage guide + prompt template), evaluate it against a baseline, then npm test, sync and commit. Use when the user wants to create, write, edit, improve, benchmark or evaluate a skill for Aizen-Skills (tạo skill, viết skill, sửa skill, cải thiện skill, đánh giá skill). Not for: copying a skill from GitHub or another folder (skill-cloner), testing a skill without changing it (agent-skill-tester), or using an existing skill.
 ---
 
-# skill-creator — build Aizen skills that pass the standard (v2)
+# skill-creator — build Aizen skills that pass the standard (v2.1)
 
 You create and improve skills **inside the Aizen-Skills repo** so that every skill has the same shape, is
 documented for the user, and passes `npm test`.
@@ -35,12 +35,15 @@ documented for the user, and passes `npm test`.
 
 ## Workflow — improve an existing skill
 
-1. Read the whole skill and the user's complaint or goal; reproduce the weakness with one prompt if you can.
+1. Read the whole skill, the user's complaint or goal, and its open feedback
+   (`python "<SKILL_DIR>/scripts/feedback.py" list --skill <name> --open`); reproduce the weakness with one prompt.
 2. Copy the current version to `<REPO>/.aizen-work/<name>/baseline/` (never inside `skills/`).
 3. Propose the change as a short diff summary (files, what changes, why) → wait for "ok".
 4. Edit; bump `manifest.json` version (patch / minor / major) and any `(vN)` in headings to match; update the
    docs rows if triggers or usage changed.
-5. Evaluate against the baseline, then step 7 above (`fix(<name>): …` or `feat(<name>): …`).
+5. Add one case per fixed problem to `skills/<name>/evals/evals.json` (the logged `prompt`), so the eval set grows
+   into a regression suite. Evaluate against the baseline, then step 7 above (`fix(<name>): …` or `feat(<name>): …`).
+6. Mark the fixed entries: `feedback.py resolve --skill <name> --id <n> --commit <sha>`.
 
 ## Evaluate — with skill vs baseline
 
@@ -69,5 +72,6 @@ documented for the user, and passes `npm test`.
 |---|---|
 | structure, manifest, docs rows, git rules | `<REPO>/docs/aizen-skill-standard.md` |
 | eval JSON formats | `references/schemas.md` |
+| skill feedback log (`log` / `list` / `resolve`) | `scripts/feedback.py`, `<REPO>/rules/continuous-improvement.md` |
 | grading a run | `agents/grader.md` |
 | skeleton files | `assets/skill-template.md`, `assets/mcp-rule.md` |

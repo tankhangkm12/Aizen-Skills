@@ -45,7 +45,7 @@ Bộ cài liên kết từng thư mục trong `skills/` vào:
 | Cursor | `~/.cursor/skills` |
 | Windsurf | `~/.codeium/windsurf/skills` |
 
-Ngoài ra nó chép `rules/*.md` vào `~/.gemini/config/rules/` và đăng ký cả repo làm plugin Antigravity tại
+Ngoài ra nó chép `rules/*.md` vào `~/.gemini/config/rules/` (Antigravity) và `~/.claude/rules/` (Claude Code), và đăng ký cả repo làm plugin Antigravity tại
 `~/.gemini/config/plugins/aizen-skills`.
 
 - **Windows** dùng NTFS junction (không cần quyền Admin); **Linux/macOS** dùng symlink và `chmod 755` cho scripts.
@@ -210,13 +210,17 @@ npm test               # check-skills.js + check-scripts.js + test-installer.js
 node bin/cli.js sync
 ```
 
-Rule `rules/continuous-improvement.md` yêu cầu agent sau mỗi lần dùng skill tự đánh giá, đề xuất cải tiến, và chỉ
-sửa skill khi bạn đồng ý.
+**Skill tự cải thiện** (`rules/continuous-improvement.md`): khi một skill làm chưa tốt (bạn phàn nàn, script lỗi,
+hướng dẫn sai, phải làm tay), agent ghi một dòng vào sổ `.aizen-work/feedback/<skill>.jsonl` bằng
+`skill-creator/scripts/feedback.py` — không hỏi, không chen task. Chỉ khi bạn phàn nàn trực tiếp, vấn đề lặp ≥ 2
+lần, hoặc skill ra kết quả sai, agent mới đề xuất sửa; sửa đi qua quy trình improve của `skill-creator` (baseline,
+eval case mới từ prompt đã ghi, bump version, `npm test`, commit). Xem sổ: `python skills/skill-creator/scripts/feedback.py list --open`.
+Cursor (`sync --project`) nhận rule dưới dạng `.mdc` `alwaysApply`; Windsurf/Gemini CLI chưa được cài rule tự động.
 
 ## Gỡ cài đặt
 
 Xóa các liên kết (không xóa repo): các mục trùng tên skill trong những thư mục ở bảng [Cài đặt](#cài-đặt),
-`~/.gemini/config/plugins/aizen-skills` và `~/.gemini/config/rules/continuous-improvement.md`. Trên Windows dùng
+`~/.gemini/config/plugins/aizen-skills`, `~/.gemini/config/rules/continuous-improvement.md` và `~/.claude/rules/continuous-improvement.md`. Trên Windows dùng
 `rmdir <link>` (xóa junction, không đụng thư mục gốc). Tắt cập nhật ngầm: `node bin/cli.js auto-update disable`.
 
 ## Giấy phép

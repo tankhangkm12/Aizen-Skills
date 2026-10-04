@@ -264,6 +264,10 @@ ${fs.readFileSync(skillMd, 'utf8')}
 `;
           fs.writeFileSync(mdcPath, mdcContent, 'utf8');
         }
+        for (const src of repoRules()) {
+          const mdcPath = path.join(targetDir, path.basename(src, '.md') + '.mdc');
+          fs.writeFileSync(mdcPath, `---\nalwaysApply: true\n---\n${fs.readFileSync(src, 'utf8')}`, 'utf8');
+        }
         results.push({ agent: agent.name, path: targetDir, installed: skills.length, ok: true });
         if (verbose) console.log(`  ✓ [${agent.name}] Đã tạo ${skills.length} Cursor rules (.mdc) -> ${targetDir}`);
       }
@@ -282,6 +286,8 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
   const agentsMdFile = path.join(projectDir, 'AGENTS.md');
   const sectionHeader = '## Available Skills (Auto-managed by Aizen Skills)';
   const skillList = skills.map(s => `- **${s.name}** (\`.agents/skills/${s.id}/SKILL.md\`): ${s.description}`).join('\n');
+  const ruleList = repoRules().map(r => `- Luôn áp dụng rule: \`${r}\``).join('\n');
+  const block = [skillList, ruleList].filter(Boolean).join('\n\n');
 
   try {
     let existingContent = '';
@@ -290,10 +296,11 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
     }
 
     if (existingContent.includes(sectionHeader)) {
-      const regex = new RegExp(`${sectionHeader}[\\s\\S]*?(?=\\n## |$)`);
-      existingContent = existingContent.replace(regex, `${sectionHeader}\n\n${skillList}\n`);
+      const escaped = sectionHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`${escaped}[\\s\\S]*?(?=\\n## |$)`);
+      existingContent = existingContent.replace(regex, () => `${sectionHeader}\n\n${block}\n`);
     } else {
-      existingContent = existingContent ? `${existingContent.trim()}\n\n${sectionHeader}\n\n${skillList}\n` : `# Project Agents Guide\n\n${sectionHeader}\n\n${skillList}\n`;
+      existingContent = existingContent ? `${existingContent.trim()}\n\n${sectionHeader}\n\n${block}\n` : `# Project Agents Guide\n\n${sectionHeader}\n\n${block}\n`;
     }
 
     fs.writeFileSync(agentsMdFile, existingContent, 'utf8');
@@ -303,30 +310,28 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
   }
 }
 
-// Cài đặt system-rules toàn cục cho Antigravity (Nếu có)
-function installGlobalRules(verbose = true) {
+// rules/*.md của repo (luật áp cho mọi skill, vd. continuous-improvement.md)
+function repoRules() {
   const rulesDir = path.join(rootDir, 'rules');
-  if (!fs.existsSync(rulesDir)) return;
+  return fs.existsSync(rulesDir) ? fs.readdirSync(rulesDir).filter(f => f.endsWith('.md')).map(f => path.join(rulesDir, f)) : [];
+}
 
-  const homedir = os.homedir();
-  const targetRulesDir = path.join(homedir, '.gemini', 'config', 'rules');
-
-  try {
-    fs.mkdirSync(targetRulesDir, { recursive: true });
-    const rules = fs.readdirSync(rulesDir).filter(f => f.endsWith('.md'));
-    
-    let count = 0;
-    for (const rule of rules) {
-      const src = path.join(rulesDir, rule);
-      const dest = path.join(targetRulesDir, rule);
-      fs.copyFileSync(src, dest);
-      count++;
+// Cài system-rules toàn cục: Antigravity (~/.gemini/config/rules) và Claude Code (~/.claude/rules)
+function installGlobalRules(verbose = true, homedir = os.homedir()) {
+  const rules = repoRules();
+  if (!rules.length) return;
+  const targets = [
+    ['Antigravity Rules', path.join(homedir, '.gemini', 'config', 'rules')],
+    ['Claude Code Rules', path.join(homedir, '.claude', 'rules')],
+  ];
+  for (const [name, dir] of targets) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      for (const src of rules) fs.copyFileSync(src, path.join(dir, path.basename(src)));
+      if (verbose) console.log(`  ✓ [${name}] Đã sao chép ${rules.length} system rules -> ${dir}`);
+    } catch (err) {
+      if (verbose) console.warn(`  ! [${name}] Lỗi: ${err.message}`);
     }
-    if (verbose && count > 0) {
-      console.log(`  ✓ [Antigravity Rules] Đã sao chép ${count} system rules -> ${targetRulesDir}`);
-    }
-  } catch (err) {
-    if (verbose) console.warn(`  ! [Antigravity Rules] Lỗi: ${err.message}`);
   }
 }
 
@@ -391,6 +396,8 @@ module.exports = {
   discoverSkills,
   installGlobal,
   installProject,
+  installGlobalRules,
+  updateAgentsMd,
   createLink,
   safeRemoveLink,
   pruneStaleLinks,
