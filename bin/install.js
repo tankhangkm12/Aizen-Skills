@@ -172,6 +172,23 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
+// Xóa các link trỏ vào repo nhưng skill không còn tồn tại (đổi tên/xóa skill). Chỉ đụng tới link, không đụng thư mục thật.
+function pruneStaleLinks(targetDir, skills) {
+  const current = new Set(skills.map(s => s.id));
+  const skillsRoot = path.resolve(skillsDir) + path.sep;
+  let entries = [];
+  try { entries = fs.readdirSync(targetDir); } catch (e) { return; }
+  for (const name of entries) {
+    const p = path.join(targetDir, name);
+    try {
+      if (!fs.lstatSync(p).isSymbolicLink() || current.has(name)) continue;
+      const raw = fs.readlinkSync(p).replace(/^\\\\\?\\/, ''); // junction trên Windows có tiền tố \\?\
+      const target = path.resolve(targetDir, raw) + path.sep;
+      if (target.toLowerCase().startsWith(skillsRoot.toLowerCase())) safeRemoveLink(p);
+    } catch (e) {}
+  }
+}
+
 // Cài đặt toàn cục (Global - Cho mọi AI Agent trên máy)
 function installGlobal(skills, verbose = true) {
   const results = [];
@@ -179,6 +196,7 @@ function installGlobal(skills, verbose = true) {
   for (const agent of agentsConfig.global) {
     try {
       fs.mkdirSync(agent.targetDir, { recursive: true });
+      pruneStaleLinks(agent.targetDir, skills);
       let count = 0;
       for (const skill of skills) {
         const dest = path.join(agent.targetDir, skill.id);
@@ -211,6 +229,7 @@ function installProject(skills, projectDir = process.cwd(), verbose = true) {
       fs.mkdirSync(targetDir, { recursive: true });
 
       if (agent.type === 'skill-dir') {
+        pruneStaleLinks(targetDir, skills);
         let count = 0;
         for (const skill of skills) {
           const dest = path.join(targetDir, skill.id);
@@ -361,5 +380,6 @@ module.exports = {
   installProject,
   createLink,
   safeRemoveLink,
+  pruneStaleLinks,
   runInstall
 };

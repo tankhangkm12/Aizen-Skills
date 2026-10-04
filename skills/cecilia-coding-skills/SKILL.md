@@ -53,6 +53,22 @@ card) · `assets/decision-card.md` · `references/presets.md` + `assets/options-
 17. **Local-only** — never push; finish with one copy-paste block of push/PR commands.
 18. **Sub-agents Dispatch** — All specialist roles (backend, frontend, testing, etc.) are stored in the `agents/` directory (e.g., `agents/cecilia-dev-be.md`). To invoke one, FIRST read its .md file, then dispatch it with your platform's sub-agent mechanism (Antigravity: `define_subagent` then `invoke_subagent`; Claude Code: the Agent tool with the file's content as the prompt).
 
+## Portable mode (no `cecilia` CLI installed)
+
+This skill ships without the Cecilia OS CLI and hooks. Run `cecilia --version` once; if it is missing, use these
+equivalents and never invent the missing command's output:
+
+| CLI command | Portable equivalent |
+|---|---|
+| `cecilia mode <M>` | `workflow.py suggest-mode`; put the suggested mode on the card; her answer is the mode |
+| `cecilia approve <plan> --all` | an explicit "approve" answer on the card, recorded with `workflow.py answer` |
+| `cecilia doctor` | report the exact error and stop; ask Cecilia to check the agent's sub-agent tool and paths |
+| `cecilia push` / `push-lock` | not available: finish with the copy-paste push/PR block (rule 17) |
+| `cecilia flow` / `rules` / `init` / `extension` / `mcp` / `open` | not available: say so and continue without it |
+
+Hooks do not exist in portable mode, so rules 1, 12 and 13 are enforced by you alone. Scripts live in this skill's
+`scripts/` (`python scripts/workflow.py …`).
+
 ## Workflow (summary)
 
 O0 intake (discovery) · O1 voted plan → options · O2 ONE card 🛑 (CONTROLLED: `cecilia approve` 🛑) ·

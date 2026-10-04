@@ -1,0 +1,6 @@
+{
+  "name": "skill-creator",
+  "version": "1.0.0",
+  "description": "Create, edit and benchmark agent skills that follow the Aizen Universal Structure",
+  "framework": "Aizen Universal Structure"
+}

@@ -4,7 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { discoverSkills, createLink } = require('../bin/install');
+const { discoverSkills, createLink, pruneStaleLinks, safeRemoveLink } = require('../bin/install');
 
 console.log('[TEST] Bắt đầu kiểm tra hệ thống Aizen Skills Installer...\n');
 
@@ -56,5 +56,40 @@ try {
     fs.rmSync(tempDir, { recursive: true, force: true });
   } catch (e) {}
 }
+
+// 3. Test pruneStaleLinks + không xóa thư mục thật
+console.log('\n[TEST 3] Kiểm tra dọn link cũ và bảo vệ thư mục người dùng...');
+const pruneDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aizen-prune-'));
+const ghost = path.join(skillsRoot(), '__ghost_skill__');
+try {
+  fs.mkdirSync(ghost);
+  const linkType = process.platform === 'win32' ? 'junction' : 'dir';
+  fs.symlinkSync(ghost, path.join(pruneDir, '__ghost_skill__'), linkType);
+  fs.symlinkSync(dbSkill.path, path.join(pruneDir, 'database-table-design'), linkType);
+  fs.mkdirSync(path.join(pruneDir, 'my-own-skill'));
+  fs.writeFileSync(path.join(pruneDir, 'my-own-skill', 'SKILL.md'), 'x');
+  fs.mkdirSync(path.join(pruneDir, 'video-to-skill'));
+  fs.writeFileSync(path.join(pruneDir, 'video-to-skill', 'SKILL.md'), 'user edit');
+
+  pruneStaleLinks(pruneDir, skills);
+  assert(!fs.existsSync(path.join(pruneDir, '__ghost_skill__')), 'Link tới skill đã xóa phải bị dọn');
+  assert(fs.existsSync(path.join(pruneDir, 'database-table-design', 'SKILL.md')), 'Link hợp lệ phải được giữ');
+  assert(fs.existsSync(path.join(pruneDir, 'my-own-skill', 'SKILL.md')), 'Thư mục người dùng phải được giữ');
+
+  const res = createLink(videoSkill.path, path.join(pruneDir, 'video-to-skill'));
+  assert.strictEqual(res.status, 'directory-exists');
+  assert.strictEqual(fs.readFileSync(path.join(pruneDir, 'video-to-skill', 'SKILL.md'), 'utf8'), 'user edit',
+    'createLink không được ghi đè thư mục thật trùng tên');
+  console.log('  ✓ Dọn link cũ / giữ thư mục thật: OK');
+} finally {
+  fs.rmSync(ghost, { recursive: true, force: true });
+  for (const n of fs.readdirSync(pruneDir)) {
+    const p = path.join(pruneDir, n);
+    if (fs.lstatSync(p).isSymbolicLink()) safeRemoveLink(p);
+  }
+  fs.rmSync(pruneDir, { recursive: true, force: true });
+}
+
+function skillsRoot() { return path.join(__dirname, '..', 'skills'); }
 
 console.log('\n[TEST] 🎉 Toàn bộ automated tests đã VƯỢT QUA thành công!\n');

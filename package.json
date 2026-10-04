@@ -34,6 +34,9 @@
   "files": [
     "bin",
     "skills",
-    "README.md"
+    "rules",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
   ]
 }

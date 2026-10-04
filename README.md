@@ -3,7 +3,7 @@
 [![skills.sh](https://skills.sh/b/tankhangkm12/Aizen-Skills)](https://skills.sh/tankhangkm12/Aizen-Skills)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho tất cả các AI Agent phổ biến: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, **Cline / Roo Code**, và **Copilot**. 
+> Bộ kỹ năng AI Agent đa năng tự động cài đặt và đồng bộ hóa tức thì (Live-Sync & Auto-Update) cho các AI Agent: **Antigravity / Gemini CLI**, **Claude Code**, **Cursor**, **Windsurf**, cùng mọi agent đọc thư mục chuẩn `~/.agents/skills`. 
 > Đặc biệt, toàn bộ kho lưu trữ này hoạt động như một **Native Antigravity Plugin** và đã được tích hợp sức mạnh của hệ điều hành **Cecilia v20.2.0**.
 
 ---
@@ -39,7 +39,7 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 
 ```text
 .
-├── skills/                     # Thư mục cốt lõi chứa 8 skills độc lập
+├── skills/                     # Thư mục cốt lõi chứa 9 skills độc lập
 │   ├── cecilia-coding-skills/  # Ví dụ về một Skill chuẩn Aizen
 │   │   ├── SKILL.md            # (Bắt buộc) Não bộ: Lệnh điều khiển chính của Agent
 │   │   ├── manifest.json       # (Bắt buộc) Khai báo Metadata và Version
@@ -60,7 +60,7 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 ```
 
 **Tại sao phải là Aizen Universal Structure?**
-- **Đồng nhất tuyệt đối (Convention over Configuration):** Mọi skill đều phải có đủ 8 thành phần này dù bên trong trống rỗng. Agent sẽ không bao giờ bị lạc lối khi nhảy từ skill này sang skill khác.
+- **Đồng nhất tuyệt đối (Convention over Configuration):** Mọi skill đều phải có đủ 8 thành phần này dù bên trong trống rỗng (thư mục rỗng giữ bằng `.gitkeep`; `npm test` kiểm tra tự động). Agent sẽ không bao giờ bị lạc lối khi nhảy từ skill này sang skill khác.
 - **Tiến trình hiển vi (Progressive Disclosure):** Tách bạch rõ ràng giữa lệnh điều khiển (`SKILL.md`), tri thức (`references/`) và luật lệ (`rules/`).
 - **Dễ mang vác (Portable):** Bạn có thể copy đúng 1 thư mục skill ném sang máy khác và nó sẽ chạy hoàn hảo vì nó đã "Tự đóng gói" (Self-contained).
 
@@ -71,11 +71,11 @@ Kho lưu trữ này được thiết kế tuân thủ 100% tiêu chuẩn kiến 
 Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông minh tại `rules/continuous-improvement.md`. Khi được đồng bộ vào máy, nó ép buộc mọi AI Agent phải tuân thủ:
 1. **Self-Evaluate**: Đánh giá độ hiệu quả của code/prompt ngay sau khi thực hiện xong task.
 2. **Proposal**: Tự động phát hiện điểm yếu, đề xuất cập nhật Công cụ, Kiến thức hoặc Quy trình.
-3. **Execution**: Nắm quyền tự cập nhật file (trong `scripts/` hoặc `references/` của skill tương ứng), gọi lệnh `sync` và `git push` lên nhánh `main`.
+3. **Execution**: Sau khi người dùng duyệt, cập nhật file của skill tương ứng, chạy `npm test` + `sync`, commit; chỉ `git push` khi người dùng đồng ý.
 
 ---
 
-## 📦 Danh Sách Kỹ Năng Sẵn Có (18 Skills)
+## 📦 Danh Sách Kỹ Năng Sẵn Có (9 Skills)
 
 ### Kỹ năng Chiến thuật (Aizen Native)
 - **`database-table-design`**: Thiết kế DB chuẩn 9 nguyên tắc Enterprise.
@@ -88,7 +88,7 @@ Bộ Aizen-Skills được tích hợp sẵn một **Rule Hệ thống** thông 
 - **`skill-creator`**: Tạo và cải thiện skill mới với chuẩn cấu trúc Aizen, test A/B qua Artifacts.
 
 ### Kỹ năng Chiến lược (Master Skill)
-- **`cecilia-coding-skills`**: Một Siêu kỹ năng (Super-Agent) tự động điều phối toàn bộ vòng đời phần mềm. Nó được trang bị sẵn 11 Sub-agents bên trong thư mục `agents/` của nó, bao gồm:
+- **`cecilia-coding-skills`**: Một Siêu kỹ năng (Super-Agent) tự động điều phối toàn bộ vòng đời phần mềm. Nó được trang bị sẵn 11 Sub-agents bên trong thư mục `agents/` của nó, chạy ở portable mode khi máy không có CLI `cecilia` (xem SKILL.md). Các sub-agent gồm:
   - Lập kế hoạch & Thiết kế (`cecilia-plan`, `cecilia-design`)
   - Lập trình (`cecilia-dev-be`, `cecilia-dev-fe`, `cecilia-ui`, `cecilia-db`)
   - Kiểm thử & Triển khai (`cecilia-test`, `cecilia-api-ux`, `cecilia-devops`)
@@ -103,6 +103,7 @@ Hệ thống hoạt động hoàn hảo 100% trên mọi HĐH:
 2. **Linux & macOS:** **Symbolic Links** tự động cấp quyền thực thi (`chmod 755`) cho các scripts.
 3. **Native Plugin:** Repo được định nghĩa là một Antigravity Plugin chuẩn.
 4. **Live-Sync:** Sửa file ở repo gốc ➔ Toàn bộ Agent trên máy tự động cập nhật ngay tức thì.
+5. **An toàn:** Installer không bao giờ ghi đè thư mục thật trùng tên (skill bạn tự viết) mà chỉ cảnh báo; link tới skill đã xóa/đổi tên được dọn tự động khi `sync`.
 
 ---
 
@@ -111,6 +112,7 @@ Hệ thống hoạt động hoàn hảo 100% trên mọi HĐH:
 ```bash
 aizen status          # Kiểm tra trạng thái liên kết của các Agent
 aizen sync            # Đồng bộ đệ quy toàn bộ skills, rules & plugins vào hệ thống
+aizen check           # Chỉ kiểm tra có bản mới hay không
 aizen update          # Kiểm tra và tải bản cập nhật mới nhất
 aizen auto-update     # Bật/tắt lịch cập nhật ngầm hàng ngày (Windows task / Linux cron)
 aizen help            # Xem hướng dẫn chi tiết
@@ -120,4 +122,4 @@ aizen help            # Xem hướng dẫn chi tiết
 
 ## 📄 Bản Quyền & Giấy Phép
 
-Phát hành dưới giấy phép [MIT](LICENSE).
+Phát hành dưới giấy phép [MIT](LICENSE). Riêng `skills/skill-creator` dựa trên skill của Anthropic và giữ giấy phép Apache 2.0 trong `skills/skill-creator/LICENSE.txt`.

@@ -1,10 +1,11 @@
 'use strict';
-// Lint cho skills/: tên frontmatter khớp thư mục, không có ký tự điều khiển, manifest không còn placeholder.
+// Lint cho skills/: đủ 8 thành phần, tên frontmatter khớp thư mục, không có ký tự điều khiển, manifest không còn placeholder.
 const fs = require('fs');
 const path = require('path');
 
 const skillsDir = path.join(__dirname, '..', 'skills');
 const errors = [];
+const REQUIRED = ['SKILL.md', 'manifest.json', 'rules', 'agents', 'references', 'tools', 'scripts', 'assets'];
 
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -19,6 +20,10 @@ for (const id of fs.readdirSync(skillsDir)) {
   const dir = path.join(skillsDir, id);
   const skillMd = path.join(dir, 'SKILL.md');
   if (!fs.existsSync(skillMd)) continue;
+
+  for (const part of REQUIRED) {
+    if (!fs.existsSync(path.join(dir, part))) errors.push(`${id}: thiếu ${part} (Aizen Universal Structure)`);
+  }
 
   const name = (fs.readFileSync(skillMd, 'utf8').match(/^name:\s*(.+?)\s*$/m) || [])[1];
   if (name !== id) errors.push(`${id}/SKILL.md: name "${name}" khác tên thư mục "${id}"`);

@@ -46,12 +46,11 @@ function checkGitUpdate() {
     const isGit = fs.existsSync(path.resolve(__dirname, '..', '.git'));
     if (!isGit) return null;
 
-    execSync('git fetch --dry-run', { stdio: 'ignore', timeout: 5000 });
-    const status = execSync('git status -uno', { encoding: 'utf8', timeout: 3000 });
-    if (status.includes('Your branch is behind')) {
-      return 'behind';
-    }
-    return 'up-to-date';
+    // Phải chạy trong thư mục repo; --dry-run không cập nhật ref nên trước đây không bao giờ thấy "behind".
+    const cwd = path.resolve(__dirname, '..');
+    execSync('git fetch --quiet', { cwd, stdio: 'ignore', timeout: 15000 });
+    const behind = execSync('git rev-list --count HEAD..@{u}', { cwd, encoding: 'utf8', timeout: 3000 });
+    return parseInt(behind, 10) > 0 ? 'behind' : 'up-to-date';
   } catch (e) {
     return null;
   }

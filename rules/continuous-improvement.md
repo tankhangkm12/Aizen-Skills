@@ -27,14 +27,14 @@ CHỈ THỰC HIỆN KHI ĐƯỢC NGƯỜI DÙNG CHẤP THUẬN:
    - Nếu là sửa/thêm Luật thép bắt buộc (Constraints): Thêm hoặc sửa file trong thư mục `rules/`.
    - Nếu là sửa/thêm Sub-agent phụ trợ: Thêm hoặc sửa file prompt trong thư mục `agents/`.
    Đảm bảo tuyệt đối không phá vỡ cấu trúc gốc (không được xóa các thư mục bắt buộc này dù nó rỗng).
-2. **Triển khai tự động:** Mở Terminal chạy chuỗi lệnh sau để hoàn tất vòng lặp:
+2. **Triển khai:** Chạy trong thư mục gốc của repo Aizen-Skills (thư mục chứa `bin/cli.js`; tìm qua đích của link skill, ví dụ `~/.claude/skills/<skill>`, hoặc hỏi người dùng nếu không chắc):
    ```bash
-   cd D:\aizen-skill\Aizen-Skills
-   # 1. Cập nhật symlink cục bộ
+   # 1. Kiểm tra cấu trúc và cập nhật link cục bộ
+   npm test
    node bin/cli.js sync
-   # 2. Commit và Push lên Github
-   git add .
-   git commit -m "feat/fix(skills): tự động cải tiến skill dựa trên feedback thực tế"
-   git push origin main
+   # 2. Commit đúng các file vừa sửa (không dùng `git add .`)
+   git add <các file đã sửa>
+   git commit -m "fix(<tên-skill>): <mô tả ngắn cải tiến>"
    ```
+   **Push:** chỉ chạy `git push` khi người dùng đồng ý rõ ràng cho lần push này; nếu không, in sẵn lệnh để họ tự chạy.
 3. **Báo cáo:** Thông báo hoàn tất quá trình cập nhật cho người dùng.

@@ -46,9 +46,9 @@ module.exports = {
     },
     {
       id: 'windsurf',
-      name: 'Windsurf (Global Memories)',
-      targetDir: path.join(home, '.codeium', 'windsurf', 'memories'),
-      type: 'rules-dir'
+      name: 'Windsurf (Global Skills)',
+      targetDir: path.join(home, '.codeium', 'windsurf', 'skills'),
+      type: 'skill-dir'
     }
   ],
 
