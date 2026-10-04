@@ -73,6 +73,7 @@ Sau khi cài, khởi động lại agent (hoặc mở session mới) để nó n
 | Skill | Dùng khi |
 |---|---|
 | [`cecilia-coding-skills`](skills/cecilia-coding-skills) | Làm tính năng/bug fix production: lập kế hoạch, code song song, test, review, PR. Xem [bên dưới](#cecilia--trợ-lý-production-coding). |
+| `cecilia-*` (6 knowledge pack) | Kiến thức theo chủ đề cho các role của Cecilia — không gọi trực tiếp, Cecilia tự nạp. |
 | [`adversarial-code-reviewer`](skills/adversarial-code-reviewer) | Review PR/diff/code do AI viết theo góc nhìn đối kháng: blast radius, lỗi logic, bảo mật. |
 | [`database-table-design`](skills/database-table-design) | Thiết kế schema quan hệ / bảng MySQL theo 9 nguyên tắc, viết DDL, review kiến trúc DB. |
 | [`devsecops-pipeline-flow`](skills/devsecops-pipeline-flow) | Dựng CI/CD bảo mật (GitHub Actions, GitLab CI, Jenkins, ArgoCD), quét Gitleaks/Trivy/Semgrep, có các bước xác nhận. |
@@ -86,7 +87,7 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 
 ## Cecilia — trợ lý production coding
 
-`cecilia-coding-skills` (v21) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
+`cecilia-coding-skills` (v22) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
 `git push`; cuối task bạn nhận khối lệnh push/PR để tự chạy.
 
 **Chế độ**
@@ -94,8 +95,8 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 | Mode | Khi nào | Luồng | Số sub-agent |
 |---|---|---|---|
 | FAST | sửa nhỏ, rõ ràng | main session tự sửa và chạy test | 0 |
-| STANDARD | mặc định | planner → 1 decision card → `dev` song song (mỗi unit một worktree) → tích hợp `int/<TASK>` → tester → reviewer → fix ≤ 2 vòng | ~4–6 |
-| CONTROLLED | auth, tiền, migration, concurrency, contract public, infra, prod | như STANDARD + duyệt plan rõ ràng + reviewer thứ hai (`LENS=redteam`) + `devops` khi đụng hạ tầng | ~6–8 |
+| STANDARD | mặc định | planner → 1 decision card → `dev` song song (mỗi unit một worktree) → tích hợp `int/<TASK>` → tester → reviewer → fix ≤ 2 vòng | ~4–6 (+3 mỗi vòng fix) |
+| CONTROLLED | auth, tiền, migration, concurrency, contract public, infra, prod | như STANDARD + duyệt plan rõ ràng + reviewer thứ hai (`LENS=redteam`) + `devops` khi đụng hạ tầng | ~6–8 (+3 mỗi vòng fix) |
 
 **5 role** (`agents/`)
 
@@ -107,20 +108,33 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 | `reviewer` | review độc lập trên SHA đã tích hợp, read-only | không |
 | `devops` | CI/CD, Docker, IaC, deploy/rollback, sự cố | file hạ tầng |
 
-**Kiến thức chia theo chủ đề** trong `references/<topic>/` — mỗi thư mục có `method.md` làm điểm vào, agent chỉ
-nạp file cần cho việc đang làm: `flow`, `discover`, `design`, `plan`, `backend`, `frontend`, `ui`, `db`, `api-ux`,
-`test`, `review`, `infra`, `common`.
+**Kiến thức chia theo chủ đề** thành skill chính + 6 knowledge pack cài cạnh nhau; mỗi chủ đề có `method.md` làm
+điểm vào, agent chỉ nạp file cần cho việc đang làm. Brief của mỗi role in bảng đường dẫn tuyệt đối tới các pack.
+
+| Skill | `references/` |
+|---|---|
+| `cecilia-coding-skills` | `flow`, `plan`, `dev`, `common` + toàn bộ `agents/`, `rules/`, `assets/`, `scripts/` |
+| `cecilia-discover-design` | `discover`, `design` |
+| `cecilia-backend` | `backend`, `api-ux` |
+| `cecilia-frontend` | `frontend`, `ui` |
+| `cecilia-db` | `db` |
+| `cecilia-quality` | `test`, `review` |
+| `cecilia-infra` | `infra` |
 
 **Quy tắc chính** (`rules/core.md`): mức quyền A0–A4 (việc rủi ro phải hỏi), không tự quyết thay người dùng, mọi kết
 luận gắn nhãn `[verified]/[inferred]/[unverified]/[projected]`, kiểm diff/test/SHA thay vì tin báo cáo "DONE".
 
-**Scripts** (`scripts/`, Python 3):
+**Scripts** (`scripts/`, Python 3, chạy từ thư mục project bằng đường dẫn tuyệt đối tới skill):
 
 ```bash
-python scripts/state.py init --task T-12 --goal "..." --mode standard   # trạng thái task để resume
-python scripts/check.py --task T-12        # lint, typecheck, build, test, secrets, deps → evidence.json
-python scripts/capacity.py --help          # ước lượng tải/dung lượng
+S=~/.claude/skills/cecilia-coding-skills/scripts
+python $S/state.py init --task T-12 --goal "..." --mode standard   # trạng thái task để resume
+python $S/check.py --task T-12 --unit api  # lint, typecheck, build, test, secrets, deps → evidence-api.json
+python $S/capacity.py --help               # ước lượng tải/dung lượng
 ```
+
+`check.py` chỉ báo PASS khi có bước thật sự chạy và đạt; thiếu test hoặc không quét được secrets → `UNVERIFIED`
+(exit 3), không bao giờ là PASS.
 
 Trạng thái và báo cáo ghi vào `tensura/` ở gốc project (local-only, nên thêm vào `.git/info/exclude`).
 
@@ -142,13 +156,15 @@ Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`
 │   └── assets/                #   template, file tĩnh
 ├── rules/                     # rule toàn cục (continuous-improvement.md)
 ├── bin/                       # cli.js, install.js, updater.js, agents-config.js
-├── tests/                     # check-skills.js (lint cấu trúc), test-installer.js
+├── tests/                     # check-skills.js (lint cấu trúc), check-scripts.js (smoke test Python), test-installer.js
 ├── plugin.json                # manifest plugin Antigravity
 └── package.json
 ```
 
-Thư mục rỗng giữ bằng `.gitkeep`. `tests/check-skills.js` bắt buộc đủ 8 phần và kiểm mọi đường dẫn
-`` `references/….md` `` được nhắc trong skill đều tồn tại.
+Thư mục rỗng giữ bằng `.gitkeep`. Knowledge pack (`manifest.json` có `partOf`) chỉ cần `SKILL.md`, `manifest.json`,
+`references/`. `tests/check-skills.js` kiểm: đủ thành phần, tên khớp thư mục, `description` ≤ 1024 ký tự, mọi
+đường dẫn `` `references|assets|scripts|agents|rules/…` `` và link markdown tương đối tồn tại (xuyên pack), `(vNN)`
+khớp `manifest.version`, không còn tên role cũ.
 
 ## CLI
 
@@ -171,7 +187,7 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 4. Kiểm tra rồi đồng bộ:
 
 ```bash
-npm test               # check-skills.js + test-installer.js
+npm test               # check-skills.js + check-scripts.js + test-installer.js
 node bin/cli.js sync
 ```
 
