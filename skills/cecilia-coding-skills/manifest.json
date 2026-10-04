@@ -1,17 +1,6 @@
 {
-  "name": "cecilia-orchestrator",
-  "agent_type": "{{agent_type}}",
-  "kind": "{{kind}}",
-  "description": "{{description}}",
-  "default_on": "{{default_on}}",
-  "model": "{{model}}",
-  "consumes": "{{consumes}}",
-  "produces": "{{produces}}",
-  "lane": "{{lane}}",
-  "report": "tensura/reports/<TASK>/orchestrator.md",
-  "review_guide": "{{review_guide}}",
-  "rules_slot": "rules/roles/orchestrator.md",
-  "lenses": "{{lenses}}",
-  "overrides": {"claude": {"tools": null, "disallowedTools": null}, "antigravity": {"tools": null}}
+  "name": "cecilia-coding-skills",
+  "version": "20.2.0",
+  "description": "Cecilia orchestrator: coordinates specialist sub-agents from idea to local PR",
+  "framework": "Aizen Universal Structure"
 }
-

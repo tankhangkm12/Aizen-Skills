@@ -19,7 +19,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Run Tests
-        run: node tests/test-installer.js
+        run: npm test --ignore-scripts
 
       - name: Publish to NPM
         run: npm publish --access public

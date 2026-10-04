@@ -65,21 +65,13 @@ Show the user the new folder tree and a short summary of what the skill does and
 ### 7. Publishing (only if the user asks, only after approval)
 If the user wants it in a git repository, follow `references/git-publish.md`: prepare a preview of every file to be added or changed (including `AGENT.md`), show it, and wait for an explicit yes before any commit or push.
 
-
 ## Mandatory Global Rules & Tools
-- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
-ules/ directory, if it exists.
-
-
-
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the `rules/` directory, if it exists.
 
 ## Mandatory Aizen Architecture
-This skill follows the strict Aizen Universal Structure. You MUST check and utilize the following components:
-- 
-ules/: Strict rules you must obey (e.g., read 
-ules/mcp.md for mandatory tools).
-- gents/: Sub-agent prompts. Use define_subagent to load them if delegation is needed.
-- 
-eferences/: Domain knowledge and guidelines.
-- 	ools/ & scripts/: Executable scripts and utilities.
-- ssets/: Static files and templates.
+This skill follows the Aizen Universal Structure. Check and use these components when present:
+- `rules/`: Strict rules you must obey (e.g., read `rules/mcp.md` for mandatory tools).
+- `agents/`: Sub-agent prompts. Load them as sub-agents if delegation is needed.
+- `references/`: Domain knowledge and guidelines.
+- `tools/` & `scripts/`: Executable scripts and utilities.
+- `assets/`: Static files and templates.

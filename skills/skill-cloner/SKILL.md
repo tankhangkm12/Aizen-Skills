@@ -58,21 +58,13 @@ You are the `skill-cloner`. Your job is to fetch an existing skill from anywhere
 - You MUST maintain the Self-Contained Architecture (no files outside the skill's folder).
 - Always use `context7` and `sequentialthinking` MCP tools for deep analysis of the cloned code.
 
-
 ## Mandatory Global Rules & Tools
-- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
-ules/ directory, if it exists.
-
-
-
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the `rules/` directory, if it exists.
 
 ## Mandatory Aizen Architecture
-This skill follows the strict Aizen Universal Structure. You MUST check and utilize the following components:
-- 
-ules/: Strict rules you must obey (e.g., read 
-ules/mcp.md for mandatory tools).
-- gents/: Sub-agent prompts. Use define_subagent to load them if delegation is needed.
-- 
-eferences/: Domain knowledge and guidelines.
-- 	ools/ & scripts/: Executable scripts and utilities.
-- ssets/: Static files and templates.
+This skill follows the Aizen Universal Structure. Check and use these components when present:
+- `rules/`: Strict rules you must obey (e.g., read `rules/mcp.md` for mandatory tools).
+- `agents/`: Sub-agent prompts. Load them as sub-agents if delegation is needed.
+- `references/`: Domain knowledge and guidelines.
+- `tools/` & `scripts/`: Executable scripts and utilities.
+- `assets/`: Static files and templates.

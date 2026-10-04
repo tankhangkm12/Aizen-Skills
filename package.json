@@ -13,7 +13,7 @@
     "sync": "node ./bin/cli.js sync",
     "update:skills": "node ./bin/cli.js update",
     "status": "node ./bin/cli.js status",
-    "test": "node ./tests/test-installer.js"
+    "test": "node ./tests/check-skills.js && node ./tests/test-installer.js"
   },
   "keywords": [
     "antigravity",

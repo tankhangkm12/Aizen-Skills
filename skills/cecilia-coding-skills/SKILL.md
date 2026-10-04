@@ -1,5 +1,5 @@
 ---
-name: cecilia-orchestrator
+name: cecilia-coding-skills
 description: Cecilia's coordinator in her main session (v20). Never does specialist work; dispatches only enabled roles. From one short prompt - discovery scopes it, 3 planners vote, Cecilia answers ONE decision card (options, models, questions), then parallel waves, integration, lens tests, voted review and a 3-round fix loop; local-only. Use for điều phối, vibe code, chạy nhiều agent, từ ý tưởng tới PR, tiếp tục run, status.
 ---
 
@@ -51,31 +51,20 @@ card) · `assets/decision-card.md` · `references/presets.md` + `assets/options-
     `workflow.py inbox list --status new`, take queued prompts.
 16. **API-UX loop** (`cecilia-api-ux` on) — after the contract draft and dev-be API changes; ≤ 2 rounds.
 17. **Local-only** — never push; finish with one copy-paste block of push/PR commands.
-
-
-18. **Sub-agents Dispatch** — All specialist roles (backend, frontend, testing, etc.) are stored in the gents/ directory (e.g., gents/cecilia-dev-be.md). To invoke them, you must FIRST read their .md file, use the define_subagent tool to register them dynamically, and then use invoke_subagent to dispatch tasks to them.
+18. **Sub-agents Dispatch** — All specialist roles (backend, frontend, testing, etc.) are stored in the `agents/` directory (e.g., `agents/cecilia-dev-be.md`). To invoke one, FIRST read its .md file, then dispatch it with your platform's sub-agent mechanism (Antigravity: `define_subagent` then `invoke_subagent`; Claude Code: the Agent tool with the file's content as the prompt).
 
 ## Workflow (summary)
 
 O0 intake (discovery) · O1 voted plan → options · O2 ONE card 🛑 (CONTROLLED: `cecilia approve` 🛑) ·
 O3 build waves ‖ → integrate → test wave ‖ · O4 voted review → fix loop (≤ 3) · O5 A3 relay, push/PR 🛑 · O6 finish.
 
-
-
 ## Mandatory Global Rules & Tools
-- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the 
-ules/ directory, if it exists.
-
-
-
+- **Rules Compliance:** You MUST strictly obey any system-wide or domain-specific rules defined in the `rules/` directory, if it exists.
 
 ## Mandatory Aizen Architecture
-This skill follows the strict Aizen Universal Structure. You MUST check and utilize the following components:
-- 
-ules/: Strict rules you must obey (e.g., read 
-ules/mcp.md for mandatory tools).
-- gents/: Sub-agent prompts. Use define_subagent to load them if delegation is needed.
-- 
-eferences/: Domain knowledge and guidelines.
-- 	ools/ & scripts/: Executable scripts and utilities.
-- ssets/: Static files and templates.
+This skill follows the Aizen Universal Structure. Check and use these components when present:
+- `rules/`: Strict rules you must obey (e.g., read `rules/mcp.md` for mandatory tools).
+- `agents/`: Sub-agent prompts. Load them as sub-agents if delegation is needed.
+- `references/`: Domain knowledge and guidelines.
+- `tools/` & `scripts/`: Executable scripts and utilities.
+- `assets/`: Static files and templates.
