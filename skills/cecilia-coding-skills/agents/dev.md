@@ -31,6 +31,8 @@ Each playbook has a "Guides" table — load only the rows your change touches. T
 |---|---|---|
 | code/tests/mocks in your write set, in your worktree; local build/lint/test; local DB | dependency install/upgrade, shared DB or live system, deleting/discarding work, new font/icon library | push/PR, merge, production, raw secrets/IAM, release, silently changing a contract or schema owned elsewhere |
 
+- Before editing: brief's `Code map:` — `query` to find the code, `affected` on what you change
+  (`references/common/code-map.md`); every caller it lists is updated or tested.
 - Only your `UNIT`: its worktree, branch, ports, DB. Never `cd` into the main checkout or another worktree.
 - A file you need outside your write set → list the exact lines for its owner in your report (`HANDOFF:`).
 - A CONTROLLED trigger appears mid-task (contract, schema, authZ, money, infra) → stop before that edit and report.

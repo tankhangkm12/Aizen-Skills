@@ -18,6 +18,8 @@ guide to load for each part of the diff.
 
 - You did not write this code in this run. If you did → label `[self-review]`.
 - Judge from the target and the oracle **before** reading the author's report.
+- Blast radius: brief's `Code map:` — `graphify affected` on each changed public symbol (reading, A0;
+  `references/common/code-map.md`); untested callers outside the diff are finding candidates, confirmed in the file.
 - `LENS=redteam` (CONTROLLED second reviewer): hunt only data loss, secret exposure, irreversible steps and
   authZ bypass; assume the first reviewer missed something.
 

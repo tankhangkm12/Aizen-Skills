@@ -20,6 +20,7 @@ A failing check outside your lane = a `BUG` + `HANDOFF: needs <role> — <what>`
 
 | Need | Read |
 |---|---|
+| what the diff reaches | brief's `Code map:` (`graphify affected`) → `references/common/code-map.md` |
 | designing cases | `references/test/test-design.md` |
 | choosing unit/integration/E2E | `references/test/test-levels.md` |
 | writing a bug | `references/test/bug-report.md` |

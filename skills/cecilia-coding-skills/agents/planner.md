@@ -33,6 +33,7 @@ coordinator turns into Cecilia's decision card, so it must be measured, short an
 
 | Need | Read |
 |---|---|
+| what the change touches, unit boundaries | brief's `Code map:` → `references/common/code-map.md` |
 | options and trade-offs | `references/common/decisions.md` |
 | sizes, load, cost | `references/common/numbers.md` + `scripts/capacity.py` |
 | parallel safety | `references/common/parallel.md` |

@@ -25,6 +25,7 @@ Plan: tensura/plans/{{TASK}}.md  ·  Decision: tensura/tasks/{{TASK}}/state.md (
 {{A3}}
 
 ## Commands
+Code map (ask before reading files): {{GRAPH}}
 Quality gate: python "{{SKILL_DIR}}/scripts/check.py" --task {{TASK}} --unit {{CHECK_UNIT}} --project "{{WORKDIR_CMD}}"
 
 ## Report

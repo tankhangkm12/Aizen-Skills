@@ -8,14 +8,17 @@ specialist work. Target: **4–6 dispatches** per task. State lives in `tensura/
 1. `python "<SKILL_DIR>/scripts/state.py" init --task <TASK> --mode standard --goal "<her prompt>"` (resuming →
    `state.py status --task <TASK>` and read `state.md`; never re-ask what is already answered there). Below,
    `state.py` means that same absolute path.
-2. Read `CLAUDE.md`/`AGENTS.md`, `tensura/{conventions,lessons}.md`, then skim only the code the prompt names.
-3. A CONTROLLED trigger (see SKILL.md) → switch to `references/flow/controlled.md` as well. FAST work that grew →
+2. Code map: `python "<SKILL_DIR>/scripts/graph.py" --project <ROOT>` (`references/common/code-map.md`). Exit 3 =
+   graphify missing → its install command goes on the card as an A3 item; continue with grep meanwhile.
+3. Read `CLAUDE.md`/`AGENTS.md`, `tensura/{conventions,lessons}.md`, then ask the map (`graphify query`) or skim
+   only the code the prompt names.
+4. A CONTROLLED trigger (see SKILL.md) → switch to `references/flow/controlled.md` as well. FAST work that grew →
    `state.py status --task <TASK> --mode standard`, then continue at S1.
 
 ## S1 — Plan (1 × planner)
 
 Dispatch `planner` with `state.py brief --task <TASK> --role planner [--stage discover|design]`. It measures the facts itself (no questions to
-Cecilia), writes `tensura/plans/<TASK>.md`: goal, 2–5 steps, **units** (disjoint write sets), checks,
+Cecilia; `graphify affected` sizes the change), writes `tensura/plans/<TASK>.md`: goal, 2–5 steps, **units** (disjoint write sets), checks,
 rollback, and 2–3 option shapes plus the preference/risk questions it could not settle.
 
 Needs requirements or a design first (new product area, unclear behaviour, new public API) → the brief says
@@ -25,7 +28,8 @@ Needs requirements or a design first (new product area, unclear behaviour, new p
 
 Show the plan's options and questions **once** (Claude Code: AskUserQuestion, recommended option first;
 Antigravity: `ask_question`; otherwise one numbered message). Record her answer:
-`state.py answer --task <TASK> --text "<answer>"`. No writer starts before this answer.
+`state.py answer --task <TASK> --text "<answer>"`. No writer starts before this answer. Graphify install approved →
+`graph.py --project <ROOT> --install` before S3, so the briefs carry the map.
 
 ## S3 — Build (N × dev, one message)
 

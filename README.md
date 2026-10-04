@@ -130,8 +130,13 @@ luận gắn nhãn `[verified]/[inferred]/[unverified]/[projected]`, kiểm diff
 S=~/.claude/skills/cecilia-coding-skills/scripts
 python $S/state.py init --task T-12 --goal "..." --mode standard   # trạng thái task để resume
 python $S/check.py --task T-12 --unit api  # lint, typecheck, build, test, secrets, deps → evidence-api.json
+python $S/graph.py --project .             # code map graphify (AST, offline) → graphify-out/
 python $S/capacity.py --help               # ước lượng tải/dung lượng
 ```
+
+`graph.py` dựng/cập nhật knowledge graph của project bằng [graphify](https://github.com/Graphify-Labs/graphify)
+để các role hỏi `graphify query/affected/path` thay vì đọc mò; chưa cài graphify → exit 3 kèm lệnh cài (A3, cần
+bạn duyệt; sau đó `--install`). `graphify-out/` được thêm vào `.git/info/exclude`.
 
 `check.py` chỉ báo PASS khi có bước thật sự chạy và đạt; thiếu test hoặc không quét được secrets → `UNVERIFIED`
 (exit 3), không bao giờ là PASS.

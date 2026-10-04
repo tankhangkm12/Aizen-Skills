@@ -21,8 +21,9 @@ const run = (args, expect = 0) => {
 const S = name => path.join(scripts, name);
 const cases = [
   ['state.py self-check', [S('state.py'), '--selfcheck']],
-  ...['state.py', 'check.py', 'capacity.py', 'uikit.py', 'apikit.py'].map(n => [`${n} --help`, [S(n), '--help']]),
+  ...['state.py', 'check.py', 'graph.py', 'capacity.py', 'uikit.py', 'apikit.py'].map(n => [`${n} --help`, [S(n), '--help']]),
   ['check.py --plan', [S('check.py'), '--task', 'T-1', '--plan']],
+  ['graph.py outside git → exit 2', [S('graph.py'), '--project', '.', '--check'], 2],
   ['capacity contention', [S('capacity.py'), 'contention', '--rps-per-key', '0.1,5,200', '--window-ms', '50', '--retries', '2']],
   ['capacity forecast short horizon', [S('capacity.py'), 'forecast', '--users', '10,20,30', '--monthly-growth', '0.01,0.02,0.03',
     '--rows-per-user-month', '1,2,3', '--row-bytes', '100', '--index-bytes-per-row', '50', '--months', '3']],

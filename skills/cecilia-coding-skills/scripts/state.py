@@ -131,6 +131,14 @@ def pack_table() -> str:
     return "\n".join(rows)
 
 
+def code_map(root: Path) -> str:
+    g = root / "graphify-out" / "graph.json"
+    if not g.is_file():
+        return "none — search with grep/glob (the coordinator builds it with scripts/graph.py)"
+    return (f'graphify query "<question>" --graph "{g.as_posix()}"  · also `affected "<symbol>"`, '
+            '`path "A" "B"`, `explain "X"` (references/common/code-map.md)')
+
+
 def cmd_brief(ws: Path, a) -> str:
     run = load(ws, a.task)
     if a.role in ("dev", "tester", "devops") and run["mode"] != "fast" and not run.get("decision"):
@@ -170,6 +178,7 @@ def cmd_brief(ws: Path, a) -> str:
         "DB": re.sub(r"[^a-z0-9]+", "_", f"{a.task}_{unit}".lower()).strip("_"),
         "CHECK_UNIT": a.unit or a.role,
         "INPUTS": inputs, "A3": a.a3 or "none", "REPORT": report, "PACKS": pack_table(),
+        "GRAPH": code_map(root),
     }
     text = (SKILL_DIR / "assets" / "agent-brief-template.md").read_text(encoding="utf-8")
     for k, v in fields.items():
@@ -271,6 +280,10 @@ def _selfcheck() -> None:
         assert "feature/T-1-u1" in d1 and ".worktrees/u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
         r2 = brief("--role", "reviewer", "--lens", "redteam")
         assert "review-redteam.md" in r2 and "READ-ONLY" in r2
+        assert "Code map (ask before reading files): none" in r2
+        Path(tmp, "graphify-out").mkdir()
+        Path(tmp, "graphify-out", "graph.json").write_text("{}", encoding="utf-8")
+        assert "graphify-out/graph.json\"" in brief("--role", "reviewer"), "brief must point at the code map"
         for _ in range(2):
             with contextlib.redirect_stdout(io.StringIO()):
                 main(["round", *w])

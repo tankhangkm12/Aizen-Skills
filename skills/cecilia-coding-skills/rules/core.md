@@ -58,4 +58,4 @@ back up what git cannot restore into `tensura/backups/<TASK>/`. Every report say
   `HANDOFF:` if any · `Deviations: none` or each difference from the brief and why.
 - Resuming → read `tensura/tasks/<TASK>/state.md` first; update it at every stop. Read
   `tensura/{conventions,lessons}.md` before the first edit when present; add `L-nn` lessons at the end.
-- Search before reading; quiet test/build output, paste ≤ 20 error lines; web: one narrow question, cite source + date.
+- Search before reading (brief's `Code map:` first, then grep); quiet test/build output, paste ≤ 20 error lines; web: one narrow question, cite source + date.
