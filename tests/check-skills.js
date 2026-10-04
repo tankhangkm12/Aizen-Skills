@@ -58,6 +58,8 @@ for (const id of ids) {
   const desc = (skillText.match(/^description:\s*(.+?)\s*$/m) || [])[1] || '';
   if (!desc) errors.push(`${id}/SKILL.md: thiếu description`);
   if (desc.length > 1024) errors.push(`${id}/SKILL.md: description ${desc.length} ký tự (> 1024)`);
+  // YAML thuần không cho ": " hay " #" trong scalar không nháy → `npx skills add` bỏ qua skill vì không parse được.
+  if (desc && !/^["'>|]/.test(desc) && /: | #/.test(desc)) errors.push(`${id}/SKILL.md: description chứa ": " hoặc " #" nhưng không đặt trong nháy (YAML lỗi, skills CLI sẽ bỏ qua skill)`);
 
   if (manifest.name !== id) errors.push(`${id}/manifest.json: name "${manifest.name}" khác tên thư mục`);
   if (!/^\d+\.\d+\.\d+$/.test(manifest.version || '')) errors.push(`${id}/manifest.json: version "${manifest.version}" không phải semver`);

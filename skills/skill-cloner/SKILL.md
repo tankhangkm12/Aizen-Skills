@@ -1,6 +1,6 @@
 ---
 name: skill-cloner
-description: Copy an existing skill from a GitHub folder or a local path into the Aizen-Skills repo, bring it to the Aizen Universal Structure (8 parts, manifest with source and licence), interview the user to customize its process, rules and scripts, prove the custom version beats the original in an A/B test, register it in README and docs, then npm test, sync and commit. Use when the user gives a skill link or folder to clone, import, fork or adapt (clone skill, chép skill, lấy skill từ GitHub, tuỳ biến skill có sẵn). Not for: writing a new skill from scratch or improving a skill already in the repo (skill-creator), or only evaluating a skill (agent-skill-tester).
+description: "Copy an existing skill from a GitHub folder or a local path into the Aizen-Skills repo, bring it to the Aizen Universal Structure (8 parts, manifest with source and licence), interview the user to customize its process, rules and scripts, prove the custom version beats the original in an A/B test, register it in README and docs, then npm test, sync and commit. Use when the user gives a skill link or folder to clone, import, fork or adapt (clone skill, chép skill, lấy skill từ GitHub, tuỳ biến skill có sẵn). Not for: writing a new skill from scratch or improving a skill already in the repo (skill-creator), or only evaluating a skill (agent-skill-tester)."
 ---
 
 # skill-cloner — import a skill and make it the user's (v2)

@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Create a new skill for the Aizen-Skills repo, or improve an existing one, following the Aizen Universal Structure - interview, scaffold all 8 parts, write SKILL.md/rules/references/scripts, register it in README and docs (usage guide + prompt template), evaluate it against a baseline, then npm test, sync and commit. Use when the user wants to create, write, edit, improve, benchmark or evaluate a skill for Aizen-Skills (tạo skill, viết skill, sửa skill, cải thiện skill, đánh giá skill). Not for: copying a skill from GitHub or another folder (skill-cloner), testing a skill without changing it (agent-skill-tester), or using an existing skill.
+description: "Create a new skill for the Aizen-Skills repo, or improve an existing one, following the Aizen Universal Structure - interview, scaffold all 8 parts, write SKILL.md/rules/references/scripts, register it in README and docs (usage guide + prompt template), evaluate it against a baseline, then npm test, sync and commit. Use when the user wants to create, write, edit, improve, benchmark or evaluate a skill for Aizen-Skills (tạo skill, viết skill, sửa skill, cải thiện skill, đánh giá skill). Not for: copying a skill from GitHub or another folder (skill-cloner), testing a skill without changing it (agent-skill-tester), or using an existing skill."
 ---
 
 # skill-creator — build Aizen skills that pass the standard (v2.1)
