@@ -202,6 +202,14 @@ def pack_table() -> tuple[str, Path]:
     return "\n".join(rows), owners["core"]
 
 
+def optional_tools() -> str:
+    """Community skills this skill may use (manifest `optional`), found next to it or not — never installed from here."""
+    names = json.loads((SKILL_DIR / "manifest.json").read_text(encoding="utf-8")).get("optional", [])
+    found = [f"{n} → {(SKILL_DIR.parent / n).resolve().as_posix()}" if (SKILL_DIR.parent / n / "SKILL.md").is_file()
+             else f"{n}: not installed (owner: `aizen external install {n}`)" for n in names]
+    return " · ".join(found) or "none"
+
+
 def code_map(root: Path) -> str:
     g = root / "graphify-out" / "graph.json"
     if not g.is_file():
@@ -251,7 +259,7 @@ def cmd_brief(ws: Path, a) -> str:
         "DB": re.sub(r"[^a-z0-9]+", "_", f"{a.task}_{unit}".lower()).strip("_"),
         "CHECK_UNIT": a.unit or a.role,
         "INPUTS": inputs, "A3": a.a3 or "none", "REPORT": report, "PACKS": packs, "CORE_DIR": core_dir.as_posix(),
-        "GRAPH": code_map(root),
+        "GRAPH": code_map(root), "OPTIONAL": optional_tools(),
     }
     text = (SKILL_DIR / "assets" / "flow" / "agent-brief-template.md").read_text(encoding="utf-8")
     for k, v in fields.items():
@@ -367,6 +375,7 @@ def _selfcheck() -> None:
         for line in rows:  # every pack folder printed in the brief exists
             assert Path(line.split("→")[1].strip()).is_dir(), line
         assert "/scripts/core/check.py" in d1 and "aizen-core" in d1, "quality gate must come from aizen-core"
+        assert "Optional tools: archify" in d1, "brief names the optional community skills"
         assert "{eval}" not in d1 and "{authoring}" not in d1, "brief lists only the packs aizen-build requires"
         assert "feature/T-1-u1" in d1 and ".worktrees/u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
         r2 = brief("--role", "reviewer", "--lens", "redteam")

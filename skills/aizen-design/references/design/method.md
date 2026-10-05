@@ -14,7 +14,7 @@ Used by `planner` when `STAGE=design`. Output: docs in `.aizen/docs/`, never cod
 5. **Rules enforced only in code are not enforced.** "Exactly one", "never duplicate" → UNIQUE, CHECK, PK or atomic
    update — or documented as a race.
 6. **The contract is a promise.** Changing an approved one = decision + impact table + new version.
-7. **Contradictions stop the work** — conflict table, ask. Diagrams are ASCII.
+7. **Contradictions stop the work** — conflict table, ask. Diagrams are ASCII; render the important ones with archify when it is installed (`diagrams.md`).
 
 ## Stages
 
@@ -26,6 +26,7 @@ Used by `planner` when `STAGE=design`. Output: docs in `.aizen/docs/`, never cod
 | API | `<unit>-api.md` + `.yaml` | `stage-api.md` | `assets/design/api.md` |
 | Frontend | `<app>-frontend.md` | `frontend-design.md` | `assets/design/frontend.md` |
 | Security | `security.md` | `threat-model.md`, `authz-matrix.md` | `assets/design/security.md` |
+| Rendered diagrams (optional) | `diagrams/<slug>/<slug>.html` next to the doc | `diagrams.md` (archify, when installed) | — |
 
 All guides are in `references/design/`. Pick only the stages the task needs; small changes edit the existing doc.
 

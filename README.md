@@ -143,6 +143,26 @@ node bin/vendor.js sync            # chép lại đúng các commit đã ghim
 node bin/vendor.js update redis    # kéo bản mới của một nguồn — xem git diff trước khi commit
 ```
 
+### Skill cộng đồng dùng trực tiếp — không chép, luôn theo bản mới
+
+Có những skill nên dùng **nguyên bản từ cộng đồng** thay vì chép về: chúng có công cụ chạy được, có cơ chế cập nhật
+riêng, và giá trị nằm ở việc theo kịp upstream. Aizen khai báo chúng trong [`externals.json`](externals.json),
+pack nào dùng thì ghi trong `manifest.json` → `optional`, và luôn có đường lui khi chưa cài.
+
+| Skill | Dùng ở | Để làm gì | Khi chưa cài |
+|---|---|---|---|
+| [archify](https://github.com/tt-a1i/archify) (MIT) | `aizen-design`, route design của `aizen-build` | render sơ đồ architecture / workflow / sequence / dataflow / lifecycle thành HTML tương tác, có kiểm tra tự động | sơ đồ ASCII trong tài liệu (vẫn là bản gốc) |
+
+```bash
+node bin/cli.js external list               # đã cài chưa, đang ở commit nào
+node bin/cli.js external install archify    # clone vào ~/.aizen/external/archify, chạy setup khai báo (npm ci)
+node bin/cli.js sync                        # liên kết nó vào thư mục skill của các agent, cạnh skill Aizen
+node bin/cli.js external update archify     # liệt kê commit mới của upstream rồi cập nhật
+```
+
+Không lệnh nào tự chạy khi `npm install`, `sync` hay auto-update: cài hoặc cập nhật code bên thứ ba luôn là việc
+bạn chủ động gõ. Nếu đã cài archify bằng `npx skills add tt-a1i/archify -g`, Aizen dùng luôn bản đó.
+
 ## aizen-build — điều phối production
 
 `aizen-build` (v24) điều phối một task từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ `git push`; cuối
@@ -214,7 +234,8 @@ Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`
 ├── rules/                     # rule toàn cục (continuous-improvement.md)
 ├── bin/                       # cli.js, install.js, updater.js, agents-config.js, vendor.js
 ├── tests/                     # check-skills.js (lint + sổ topic), check-scripts.js (smoke test Python), test-installer.js
-├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored
+├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored (chép, ghim commit)
+├── externals.json             # skill cộng đồng dùng trực tiếp (không chép, theo bản mới)
 ├── plugin.json                # manifest plugin Antigravity
 └── package.json
 ```
@@ -251,7 +272,8 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 | `sync` / `install` | liên kết skills, chép rules, đăng ký plugin; `--project` để cài vào project hiện tại |
 | `check` | kiểm tra có bản mới không |
 | `update` | kéo bản mới (git) rồi sync |
-| `auto-update enable\|disable` | bật/tắt cập nhật ngầm hằng ngày (Task Scheduler / cron) |
+| `auto-update enable\|disable` | bật/tắt cập nhật ngầm hằng ngày (Task Scheduler / cron) — chỉ repo Aizen, không đụng skill cộng đồng |
+| `external list\|install\|update\|remove <tên>` | skill cộng đồng trong `externals.json` |
 | `help` | trợ giúp |
 
 ## Phát triển skill

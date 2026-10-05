@@ -16,6 +16,9 @@ Backward: later decisions breaking earlier docs (e.g. presigned upload vs NOT NU
 unstable sort column; idempotency without unique key storage). LLD "exactly one / never duplicate" rules → named
 UNIQUE/CHECK. Every error code → test case. Decisions log entries → where implemented; agent-chosen entries
 still unconfirmed. Screens ↔ endpoints both ways. Permission column complete with ownership conditions.
+Rendered diagrams (`references/design/diagrams.md`): every node and arrow matches the ASCII diagram and the
+communication/interaction tables, and the archify `finalize` receipt passed — a diagram that disagrees with its doc is a
+SHOULD-FIX, a hand-over with failed gates presented as finished is a BLOCKER.
 Print a conflict table: `doc · section · says · conflicts with · proposed fix`.
 
 ## 3. Architecture & data soundness

@@ -1,0 +1,16 @@
+{
+  "$comment": "Community skills Aizen USES BUT DOES NOT COPY: they stay installed from upstream and follow its updates. `node bin/cli.js external install <name>` fetches one; `node bin/cli.js external update <name>` shows the new upstream commits, then fast-forwards. Nothing here runs on npm install, sync or auto-update. Aizen packs list them under `optional` in manifest.json and fall back when they are missing.",
+  "externals": [
+    {
+      "name": "archify",
+      "repo": "https://github.com/tt-a1i/archify",
+      "ref": "main",
+      "skill_path": "archify",
+      "license": "MIT",
+      "setup": ["npm", "ci", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"],
+      "needs": "Node.js >= 18; Chrome or Chromium for its browser-check gate",
+      "used_by": ["aizen-design", "aizen-build"],
+      "why": "Interactive, validated architecture / workflow / sequence / dataflow / lifecycle diagrams as standalone HTML. Used as an optional companion to the ASCII diagrams in Aizen design docs (references/design/diagrams.md)."
+    }
+  ]
+}

@@ -56,6 +56,8 @@ filters, empty/loading states, admin screens.
 
 ## Step 4 — ASCII architecture diagram (mandatory) + main data flow diagram
 
+Rendered companions (archify `architecture` + `dataflow`, when installed): `diagrams.md`.
+
 ## Step 5 — Write from template. Record decisions.
 
 ## Exit gate

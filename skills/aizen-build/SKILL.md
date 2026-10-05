@@ -14,7 +14,7 @@ Everyone follows `references/core/rules.md` (read it first) and `references/core
 |---|---|---|
 | a feature, bug fix, refactor, idea → PR | **build** | the whole flow below |
 | a review of a PR, diff, branch or AI-written code | **review** | S0 → reviewer (+ `redteam` when the diff touches a risk area) at the pinned SHA → verdict; no plan, nothing written but the report |
-| a schema, API contract, architecture or other design, no code yet | **design** | S0 → planner `STAGE=design` → S2 confirm the docs part by part → done (offer the build route) |
+| a schema, API contract, architecture or other design, no code yet | **design** | S0 → planner `STAGE=design` → S2 confirm the docs part by part → done (offer the build route); diagrams also rendered with archify when installed (`references/design/diagrams.md`) |
 | a CI/CD pipeline, Dockerfile, compose, Kubernetes or Terraform change | **build** with infra units | the planner writes `infra` modules for `devops`; security gates from `references/infra/pipeline-design.md` |
 
 Review route: the oracle is what the owner says the change should do, plus the PR description and linked issue;

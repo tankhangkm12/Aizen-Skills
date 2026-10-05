@@ -14,6 +14,9 @@ npm test                    # (tuỳ chọn) kiểm tra bộ skill
 Mở **session mới** của agent sau khi sync. Kiểm tra: gõ `/aizen-build` trong Claude Code, hoặc hỏi
 "liệt kê các skill bạn có". Cập nhật sau này: `git pull && node bin/cli.js sync`.
 
+Skill cộng đồng dùng kèm (không chép, luôn theo bản mới): `node bin/cli.js external install archify && node bin/cli.js sync`
+để tài liệu thiết kế có thêm sơ đồ HTML tương tác (cần Node ≥ 18 và Chrome). Cập nhật: `node bin/cli.js external update archify`.
+
 Python 3 cần cho script của `aizen-build` và `aizen-core` (`state.py`, `check.py`, `graph.py`, …). Graphify (code map)
 được đề nghị cài khi cần — bạn duyệt một lần. Cài cả bộ: mọi entry dùng luật chung ở `aizen-core` và kiến thức ở các pack.
 
