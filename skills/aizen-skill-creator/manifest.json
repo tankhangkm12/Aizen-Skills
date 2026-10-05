@@ -1,0 +1,14 @@
+{
+  "name": "aizen-skill-creator",
+  "version": "3.0.0",
+  "description": "Create or improve Aizen skills to the Aizen standard, with docs, evals and npm test",
+  "framework": "Aizen",
+  "kind": "entry",
+  "topics": [
+    "authoring"
+  ],
+  "requires": [
+    "aizen-core",
+    "aizen-skill-eval"
+  ]
+}

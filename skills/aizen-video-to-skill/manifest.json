@@ -1,0 +1,10 @@
+{
+  "name": "aizen-video-to-skill",
+  "version": "2.0.0",
+  "description": "Turn a YouTube or local video into an Aizen skill (subtitles, or ffmpeg + speech-to-text)",
+  "framework": "Aizen",
+  "kind": "entry",
+  "requires": [
+    "aizen-core"
+  ]
+}

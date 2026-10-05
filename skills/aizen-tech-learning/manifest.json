@@ -1,0 +1,10 @@
+{
+  "name": "aizen-tech-learning",
+  "version": "3.0.0",
+  "description": "Deep, layer-by-layer technology research with architecture diagrams and architecture-based comparison, published to Notion",
+  "framework": "Aizen",
+  "kind": "entry",
+  "requires": [
+    "aizen-core"
+  ]
+}

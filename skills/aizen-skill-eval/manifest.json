@@ -1,0 +1,13 @@
+{
+  "name": "aizen-skill-eval",
+  "version": "2.0.0",
+  "description": "Evaluate a skill against a baseline: trigger tests, with/without runs, grader, A/B comparator and benchmark aggregation",
+  "framework": "Aizen",
+  "kind": "entry",
+  "topics": [
+    "eval"
+  ],
+  "requires": [
+    "aizen-core"
+  ]
+}

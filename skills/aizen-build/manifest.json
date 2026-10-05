@@ -1,0 +1,21 @@
+{
+  "name": "aizen-build",
+  "version": "24.0.0",
+  "description": "Production engineering coordinator: plan module by module with the owner, then planner/dev/tester/reviewer/devops roles build, test, review and fix to a local branch with push/PR commands; also review-only, design-only and pipeline-only work",
+  "framework": "Aizen",
+  "kind": "entry",
+  "topics": [
+    "flow",
+    "plan",
+    "dev"
+  ],
+  "requires": [
+    "aizen-core",
+    "aizen-design",
+    "aizen-backend",
+    "aizen-frontend",
+    "aizen-database",
+    "aizen-quality",
+    "aizen-infra"
+  ]
+}

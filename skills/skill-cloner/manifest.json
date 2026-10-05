@@ -1,6 +1,0 @@
-{
-  "name": "skill-cloner",
-  "version": "2.0.0",
-  "description": "Clone a skill from GitHub or a local folder into Aizen-Skills, customize it with the user and prove it in an A/B test",
-  "framework": "Aizen Universal Structure"
-}
