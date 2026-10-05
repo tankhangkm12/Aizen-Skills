@@ -13,6 +13,7 @@ bộ (hoặc ít nhất skill cần dùng cùng các skill trong `requires` củ
 - [Cài đặt](#cài-đặt)
 - [Hướng dẫn sử dụng và prompt mẫu](docs/huong-dan-su-dung.md)
 - [Danh sách skill](#danh-sách-skill)
+- [Nguyên tắc làm việc của agent](#nguyên-tắc-làm-việc-của-agent)
 - [Kiến trúc bộ skill (SOLID)](#kiến-trúc-bộ-skill-solid)
 - [aizen-build — điều phối production](#aizen-build--điều-phối-production)
 - [Nâng cấp từ bản trước](#nâng-cấp-từ-bản-trước-đổi-tên)
@@ -95,7 +96,7 @@ Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
 
 | Pack | Topic | Nội dung |
 |---|---|---|
-| `aizen-core` | `core` | Luật chung cho mọi skill: quyền A0–A4, evidence, quyết định, git local-only, code-quality (thang tái sử dụng + `ponytail:`), code-style; `check.py`, `graph.py`, `capacity.py` |
+| `aizen-core` | `core` | Luật chung cho mọi skill: quyền A0–A4, evidence, quyết định, git local-only, code-quality (4 nguyên tắc Karpathy, thang tái sử dụng, `ponytail:`), code-style; `check.py`, `graph.py`, `capacity.py` |
 | `aizen-design` | `discover`, `design` | phạm vi, onboard code cũ, SRS, HLD/LLD, API contract, threat model |
 | `aizen-backend` | `backend`, `api-ux` | nguyên tắc backend, kiến trúc, messaging (Kafka, RabbitMQ), S3, microservices, stack Spring Boot / FastAPI / NestJS |
 | `aizen-frontend` | `frontend`, `ui` | nguyên tắc frontend, React/Next (luật của Vercel), accessibility, kiểm tra bằng trình duyệt, UI design |
@@ -104,6 +105,22 @@ Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
 | `aizen-infra` | `infra` | pipeline + security gate, deploy/rollback, secrets, observability, sự cố; Docker, Podman, Kubernetes/Helm, Terraform, Cloudflare |
 
 Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có thể gọi trực tiếp (Claude Code: `/<tên-skill>`).
+
+## Nguyên tắc làm việc của agent
+
+Bốn nguyên tắc của [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) áp cho mọi việc
+code, ở hai mức:
+
+- **Mọi session agent trên máy** — `rules/working-principles.md` được `sync` cài vào `~/.claude/rules/`,
+  `~/.gemini/config/rules/` (và `.mdc` cho Cursor khi `sync --project`).
+- **Trong các skill Aizen** — mỗi nguyên tắc có chỗ thực thi và chỗ kiểm (bảng trong `skills/aizen-core/SKILL.md`):
+
+| Nguyên tắc | Aizen thực thi bằng |
+|---|---|
+| Nghĩ trước khi code | câu hỏi chỉ ở pha plan, có phương án + mặc định; dòng "Simpler option"; `approve` chặn module chưa xác nhận |
+| Đơn giản trước | thang tái sử dụng, không trừu tượng cho code dùng một lần, không phòng thủ trạng thái không thể xảy ra, câu hỏi "200 → 50" |
+| Sửa như phẫu thuật | mọi dòng đổi phải truy về yêu cầu; chỉ dọn rác của chính mình, code chết có sẵn thì ghi vào `## Proposals` |
+| Thực thi theo mục tiêu | Done của module thành check chạy được trước khi code, test fail trước, `step → verify` |
 
 ## Kiến trúc bộ skill (SOLID)
 
@@ -122,6 +139,7 @@ Best practice của chính đội làm ra công cụ được chép nguyên văn
 
 | Nguồn | Vào pack | Giấy phép |
 |---|---|---|
+| andrej-karpathy-skills — 4 nguyên tắc làm việc + ví dụ (bảng ánh xạ trong `aizen-core`) | `aizen-core` | MIT |
 | Vercel — React & Next.js best practices (52/70 luật tác động cao nhất) | `aizen-frontend` | MIT |
 | Supabase — Postgres best practices | `aizen-database` | MIT |
 | PlanetScale — MySQL; Postgres MVCC/VACUUM, index audit | `aizen-database` | MIT |
@@ -231,7 +249,7 @@ Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`
 │   ├── references/<topic>/    #   kiến thức nạp theo nhu cầu; vendor/<nguồn>/ = kiến thức upstream ghim commit
 │   ├── assets/<topic>/        #   template
 │   └── scripts/<topic>/       #   mã chạy được (Python stdlib)
-├── rules/                     # rule toàn cục (continuous-improvement.md)
+├── rules/                     # rule toàn cục cho mọi session agent (working-principles.md, continuous-improvement.md)
 ├── bin/                       # cli.js, install.js, updater.js, agents-config.js, vendor.js
 ├── tests/                     # check-skills.js (lint + sổ topic), check-scripts.js (smoke test Python), test-installer.js
 ├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored (chép, ghim commit)
@@ -306,7 +324,7 @@ Cursor (`sync --project`) nhận rule dưới dạng `.mdc` `alwaysApply`; Winds
 ## Gỡ cài đặt
 
 Xóa các liên kết (không xóa repo): các mục trùng tên skill trong những thư mục ở bảng [Cài đặt](#cài-đặt),
-`~/.gemini/config/plugins/aizen-skills`, `~/.gemini/config/rules/continuous-improvement.md` và `~/.claude/rules/continuous-improvement.md`. Trên Windows dùng
+`~/.gemini/config/plugins/aizen-skills`, các file `working-principles.md`, `continuous-improvement.md` trong `~/.gemini/config/rules/` và `~/.claude/rules/`. Trên Windows dùng
 `rmdir <link>` (xóa junction, không đụng thư mục gốc). Tắt cập nhật ngầm: `node bin/cli.js auto-update disable`.
 
 ## Giấy phép

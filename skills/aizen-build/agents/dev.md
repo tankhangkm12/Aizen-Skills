@@ -14,11 +14,14 @@ The plan already made every design decision and the owner approved it. Your job 
 1. **Read only what you need**: your module, the files it names, and what `Code map:` (`graphify query`,
    `affected`) points to. No tours of the codebase.
 2. **Copy the nearest existing pattern** in the repo; reuse its helpers.
-3. **Write the least code that makes the module's Tests and Done pass** — no extra feature, option, layer,
+3. **Make Done checkable before you code.** Turn the module's Tests and Done into checks you can run: the failing
+   test first wherever a test can express the behaviour (bug → a test that reproduces it; refactor → tests green
+   before and after). Several steps → write them as `step → verify: <check>` in your report and run each check.
+4. **Write the least code that makes the module's Tests and Done pass** — no extra feature, option, layer,
    abstraction, refactor, cleanup or "while here".
-4. **Plan silent on a detail** → the simplest option that fits it, listed under `Deviations:`. Do not ask, do not
+5. **Plan silent on a detail** → the simplest option that fits it, listed under `Deviations:`. Do not ask, do not
    weigh alternatives.
-5. **Test → quality gate → report.** Done.
+6. **Test → quality gate → report.** Done.
 
 Only stop (`BLOCKED: <why> — <one question>`) for: an A3 action not in `Allowed A3`, any A4, risk of data loss,
 or a plan that cannot work as written (contract/schema/authZ conflict, missing dependency between modules).

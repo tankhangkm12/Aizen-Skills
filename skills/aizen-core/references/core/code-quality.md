@@ -15,10 +15,17 @@ formatter and conventions win on style; these rules win on substance unless the 
    5. Does a dependency the repo **already has** do it?
    6. Only then write the least custom code. A new dependency is never a rung: it is a decision (item 6).
    Say in one line which rung you stopped at when it is not obvious.
-3. **No dead code**: no commented-out blocks, unused imports/params/exports, unreachable branches, TODO
-   without an issue ID. Remove what your change made unused.
+3. **Clean up only your own mess.** Your diff adds no dead code (commented-out blocks, unused
+   imports/params/exports, unreachable branches, TODO without an issue ID) and removes what *your change* made
+   unused. Dead code that was there before is **mentioned, not deleted** — one row under `## Proposals`
+   (`references/dev/out-of-scope.md`), unless the plan asks for the cleanup.
 4. **No duplication**: the second copy of logic becomes one function; the third is a finding.
-5. **No speculative generality**: no option, abstraction, layer or config key nobody asked for.
+5. **No speculative generality**: no feature, option, abstraction, layer or config key nobody asked for, and
+   no abstraction for code used once.
+5b. **No defence against the impossible.** Validate where data enters (requests, messages, files, env, partner
+   responses — item 8); inside, trust what types and callers already guarantee. A null check on a value the type
+   system makes non-null, a `try` around code that cannot throw, a fallback for a state no caller can produce, is
+   noise that hides the real error paths.
 6. **Dependencies are a decision** (A3 to install; `decisions.md` §6 for options): prefer the standard
    library and what the repo already has.
 7. **Mark a deliberate shortcut.** When the simple version is chosen knowingly over a sturdier one (a global
@@ -27,6 +34,13 @@ formatter and conventions win on style; these rules win on substance unless the 
    It is debt with an exit condition, not an apology; `grep -rn "ponytail:"` lists the debt.
 8. **Never simplified away**: input validation at boundaries, error handling that prevents data loss,
    authorization, secrets handling, accessibility. Least code means least *unnecessary* code.
+
+### Before you hand it over — two questions
+
+- **Does every changed line trace to the request?** (a plan id, a finding id, or the owner's words). A line that
+  does not — a drive-by rename, reformat, "improvement" of adjacent code or comments — comes out of the diff.
+- **Would a senior engineer call this overcomplicated?** If 200 lines could be 50 without losing a requirement,
+  a validation or an error path, rewrite it as 50.
 
 ## 2. Write clearly
 
@@ -52,6 +66,7 @@ formatter and conventions win on style; these rules win on substance unless the 
 
 ```
 [ ] diff contains only the task          [ ] no dead / duplicated code
+[ ] every changed line traces to the task [ ] no pre-existing code "improved" in passing
 [ ] lowest ladder rung, or said why not  [ ] names and sizes within the signals
 [ ] errors handled, nothing swallowed    [ ] no scale trap on a hot path
 [ ] lint + format + type-check clean     [ ] tests for the behaviour changed

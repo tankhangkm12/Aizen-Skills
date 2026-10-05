@@ -28,6 +28,22 @@ and knowledge packs point here instead of restating them.
 | capacity, growth, contention projections | `scripts/core/capacity.py` |
 | templates | `assets/core/pr-draft-template.md`, `assets/core/evidence-record.json` |
 
+## Working principles — Karpathy's four, and where Aizen enforces each
+
+The behavioural guidelines from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+(MIT, vendored with worked examples in `references/core/vendor/karpathy-guidelines/`). Aizen states each one in its
+own rules so it is checked, not just recommended:
+
+| Principle | In Aizen | Checked by |
+|---|---|---|
+| **Think before coding** — state assumptions, show interpretations, push back with a simpler option, stop when unclear | plan time only: every question in the plan with options and a default (`references/core/rules.md` Questions, `references/core/decisions.md`); the plan's "Simpler option" line; facts are measured, labelled `[verified]/[inferred]/[unverified]` | the owner confirms part by part; `state.py approve` refuses unconfirmed modules |
+| **Simplicity first** — minimum code, nothing speculative, no single-use abstractions, no handling of impossible cases | `references/core/code-quality.md` §1: reuse ladder, items 5–5b, the "senior engineer / 200 → 50" question | reviewer simplicity check (`references/review/code.md` axis 7) |
+| **Surgical changes** — touch only what you must, match the style, clean up only your own orphans, mention other dead code | `references/core/code-quality.md` §1 items 1, 3 and "every changed line traces to the request"; `references/dev/out-of-scope.md` | reviewer: lines tracing to no id, churn, deleted or "improved" pre-existing code |
+| **Goal-driven execution** — turn the task into checks, test first, `step → verify` | each plan module carries its Tests and Done; `dev` makes them runnable before coding (aizen-build, dev role, step 3); `check.py` evidence | tester and reviewer judge against the plan at a pinned SHA |
+
+Trade-off, as upstream says: the rigor is for non-trivial work. A typo fix or an obvious one-liner still gets a
+smallest diff and a check, not a ceremony — size changes the plan, not the principles.
+
 ## Paths
 
 Every Aizen path `references/<topic>/…`, `assets/<topic>/…` or `scripts/<topic>/…` belongs to the skill whose
