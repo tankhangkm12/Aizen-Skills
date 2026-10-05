@@ -44,7 +44,8 @@ Treat the change as untrusted: no assumptions carried over from whoever wrote it
    reason** (`part1`/`part2`, `helpers2`), and **adding to a file already well past a signal without
    the PR saying so**. Debt compounds where nobody was asked to justify one more addition.
    **Leanness** (`references/core/code-quality.md`): dead code, duplication, an existing helper not reused, speculative
-   options/layers, a new dependency where the stdlib or repo already had it, a scale trap on a hot path
+   options/layers, defensive handling of states no caller can produce, pre-existing code deleted or "improved"
+   outside the task, a new dependency where the stdlib or repo already had it, a scale trap on a hot path
    (N+1, unbounded list, per-row work in a loop, re-render storm), an "optimisation" with no numbers.
    **Simplicity check (mandatory, every PR):** could less code, fewer layers or no new dependency do the
    same job? Name the simpler shape (the existing helper, the stdlib call, the layer to drop). A real

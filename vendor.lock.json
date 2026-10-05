@@ -2,6 +2,26 @@
   "$comment": "Upstream knowledge vendored into Aizen packs. `node bin/vendor.js sync` re-copies exactly these commits; `node bin/vendor.js update <name>` moves one entry to the upstream branch head (review the diff before committing). Files are copied verbatim; core rules still win (skills/aizen-core/references/core/workspace.md §3).",
   "vendors": [
     {
+      "name": "karpathy-guidelines",
+      "repo": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "ref": "main",
+      "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "license": "MIT",
+      "license_holder": "forrestchang and the andrej-karpathy-skills contributors",
+      "dest": "skills/aizen-core/references/core/vendor/karpathy-guidelines",
+      "copy": [
+        {
+          "from": "skills/karpathy-guidelines/SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "EXAMPLES.md",
+          "to": "examples.md"
+        }
+      ],
+      "notes": "The four behavioural principles (think before coding, simplicity first, surgical changes, goal-driven execution) and their worked examples. Aizen's operative wording lives in references/core/code-quality.md and references/core/rules.md; the mapping is in aizen-core SKILL.md. The upstream README states MIT without a LICENSE file — the MIT text here names the plugin author."
+    },
+    {
       "name": "vercel-react-best-practices",
       "repo": "https://github.com/vercel-labs/agent-skills",
       "ref": "main",
