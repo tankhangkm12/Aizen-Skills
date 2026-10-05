@@ -32,6 +32,7 @@ const ids = fs.readdirSync(skillsDir).filter(id => fs.existsSync(path.join(skill
 for (const id of fs.readdirSync(skillsDir)) {
   if (!ids.includes(id)) errors.push(`skills/${id}: không có SKILL.md (mọi thư mục trong skills/ đều bị cài như một skill)`);
 }
+const externals = ((readJson(path.join(root, 'externals.json')) || {}).externals || []).map(e => e.name);
 const manifests = Object.fromEntries(ids.map(id => [id, readJson(path.join(skillsDir, id, 'manifest.json'))]));
 
 // Sổ topic: topic → skill sở hữu (Open/Closed: thêm pack mới chỉ cần khai báo topics trong manifest).
@@ -56,6 +57,7 @@ for (const id of ids) {
   if (!/^\d+\.\d+\.\d+$/.test(m.version || '')) errors.push(`${id}/manifest.json: version "${m.version}" không phải semver`);
   if (!['entry', 'pack'].includes(m.kind)) errors.push(`${id}/manifest.json: kind phải là "entry" hoặc "pack"`);
   for (const r of m.requires || []) if (!ids.includes(r)) errors.push(`${id}/manifest.json: requires "${r}" không tồn tại`);
+  for (const o of m.optional || []) if (!externals.includes(o)) errors.push(`${id}/manifest.json: optional "${o}" chưa khai báo trong externals.json`);
   for (const t of m.topics || []) {
     if (!['references', 'assets', 'scripts'].some(k => fs.existsSync(path.join(dir, k, t)))) {
       errors.push(`${id}/manifest.json: topic "${t}" không có references/${t}/, assets/${t}/ hay scripts/${t}/`);
@@ -121,6 +123,10 @@ for (const id of ids) {
 }
 
 // vendor.lock.json khớp các thư mục vendor/ đang có.
+for (const e of (readJson(path.join(root, 'externals.json')) || {}).externals || []) {
+  for (const k of ['name', 'repo', 'ref', 'license', 'used_by']) if (!e[k]) errors.push(`externals.json: ${e.name || '?'} thiếu ${k}`);
+  if (ids.includes(e.name)) errors.push(`externals.json: ${e.name} trùng tên một skill trong skills/`);
+}
 const lock = readJson(path.join(root, 'vendor.lock.json')) || { vendors: [] };
 for (const v of lock.vendors || []) {
   if (!fs.existsSync(path.join(root, v.dest))) errors.push(`vendor.lock.json: ${v.name} trỏ tới ${v.dest} không tồn tại`);

@@ -22,7 +22,7 @@ Every row is mechanical. Anything against a running system is A3 — quote it an
 
 ## 2. The system map — the deliverable of this step
 
-An ASCII diagram plus three tables. The third one is the reason this step exists.
+An ASCII diagram plus three tables (archify `architecture` with `--repo-root` when installed: `references/design/diagrams.md`). The third one is the reason this step exists.
 
 ```
 [client] → [api-gateway] → ┬→ [order-svc] ──→ (orders db)

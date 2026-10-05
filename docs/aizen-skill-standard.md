@@ -104,6 +104,16 @@ Best practice của đội làm ra công cụ được chép **nguyên văn** v�
 4. Thứ tự ưu tiên: luật core > guide của pack > vendored (`references/core/workspace.md` §3 trong `aizen-core`).
 5. Cập nhật có chủ đích: `node bin/vendor.js update <name>`, đọc `git diff`, rồi commit.
 
+### 6b. Chép hay dùng trực tiếp?
+
+| Chọn | Khi | Cách |
+|---|---|---|
+| **Vendor** (chép, ghim commit) | tài liệu/luật thuần, ít thay đổi, cần ổn định và đọc offline | `vendor.lock.json` + `bin/vendor.js` |
+| **External** (dùng trực tiếp, theo bản mới) | skill có công cụ chạy được, có cơ chế cập nhật riêng, giá trị nằm ở việc theo kịp cộng đồng | `externals.json` + `bin/external.js`; pack khai báo `"optional": ["<tên>"]` |
+
+External: không bao giờ tự cài/cập nhật (người dùng gõ `aizen external install|update`); pack dùng nó phải có
+đường lui khi chưa cài và ghi rõ trong guide; brief in dòng `Optional tools:` cho biết đã cài hay chưa.
+
 ## 7. `scripts/`
 
 - Python 3 thư viện chuẩn (hoặc Node không cần cài thêm). Phụ thuộc ngoài → kiểm tra có chưa, in lệnh cài, hỏi trước.

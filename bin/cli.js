@@ -6,6 +6,7 @@ const path = require('path');
 const { runInstall, discoverSkills } = require('./install');
 const { updateSkills, setupScheduler } = require('./updater');
 const agentsConfig = require('./agents-config');
+const external = require('./external');
 
 const args = process.argv.slice(2);
 const command = args[0] ? args[0].toLowerCase() : 'status';
@@ -24,6 +25,8 @@ CÁC LỆNH CHÍNH:
   auto-update         Cấu hình tác vụ tự động cập nhật ngầm hàng ngày
                       Ví dụ: aizen auto-update enable  (hoặc disable)
   status              Hiển thị danh sách skills và trạng thái liên kết với các Agent
+  external            Skill cộng đồng dùng trực tiếp, không chép (externals.json):
+                      aizen external list | install <tên> | update <tên> | remove <tên>
   help, -h            Hiển thị trợ giúp này
 `);
 }
@@ -53,6 +56,9 @@ function showStatus() {
     console.log(`  ${statusIcon} [${agent.name}]: ${linkedCount}/${skills.length} skills (${agent.targetDir})`);
   });
 
+  console.log('\n[3] Skill cộng đồng (externals.json — dùng trực tiếp, không chép):');
+  external.list();
+
   console.log('\n==================================================\n');
 }
 
@@ -78,6 +84,10 @@ async function main() {
 
     case 'status':
       showStatus();
+      break;
+
+    case 'external':
+      process.exitCode = external.main(args.slice(1));
       break;
 
     case 'help':

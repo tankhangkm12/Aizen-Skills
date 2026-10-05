@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const agentsConfig = require('./agents-config');
+const { installedExternals, externalRoot } = require('./external');
 
 const isWindows = process.platform === 'win32';
 const rootDir = path.resolve(__dirname, '..');
@@ -197,7 +198,10 @@ function pruneStaleLinks(targetDir, skills) {
       }
       const raw = fs.readlinkSync(p).replace(/^\\\\\?\\/, ''); // junction trên Windows có tiền tố \\?\
       const target = path.resolve(targetDir, raw) + path.sep;
+      const extRoot = path.resolve(externalRoot()) + path.sep;
+      // Links into this repo, or to a community skill that was removed with `aizen external remove`.
       if (target.toLowerCase().startsWith(skillsRoot.toLowerCase())) safeRemoveLink(p);
+      else if (target.toLowerCase().startsWith(extRoot.toLowerCase()) && !fs.existsSync(target)) safeRemoveLink(p);
     } catch (e) {}
   }
 }
@@ -365,9 +369,11 @@ function runInstall(options = {}) {
   console.log(`  OS: ${process.platform} (${isWindows ? 'NTFS Junction' : 'Symlink'})`);
   console.log('==================================================\n');
 
-  const skills = discoverSkills();
-  console.log(`[1] Phát hiện ${skills.length} skills trong thư mục 'skills/':`);
-  skills.forEach(s => console.log(`    - ${s.id}: ${s.description.slice(0, 75)}...`));
+  const own = discoverSkills();
+  const ext = installedExternals();
+  const skills = own.concat(ext.filter(e => !own.some(s => s.id === e.id)));
+  console.log(`[1] Phát hiện ${own.length} skills trong thư mục 'skills/' + ${ext.length} skill cộng đồng đã cài (aizen external):`);
+  skills.forEach(s => console.log(`    - ${s.id}${s.external ? ' [cộng đồng]' : ''}: ${s.description.slice(0, 75)}...`));
   console.log('');
 
   if (isGlobal) {

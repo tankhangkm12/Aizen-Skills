@@ -43,7 +43,7 @@ indexes); request/response schemas → stage 5 doc (LLD writes `METHOD /path` ne
 **CORE:** one section each, all eight parts:
 1. Purpose & trigger (FR/BR IDs)
 2. Chosen option — what the owner chose, what was rejected, why (D-nn)
-3. Main flow — ASCII sequence diagram
+3. Main flow — ASCII sequence diagram (+ archify `sequence` / `lifecycle` render when installed: `diagrams.md`)
 4. State machine — `state · event · new state · who may trigger`
 5. Errors & edge cases — `situation · system does · user sees`, must cover: out of stock/limit ·
    external timeout · double click · two users on one record · orphan data after mid-flow failure

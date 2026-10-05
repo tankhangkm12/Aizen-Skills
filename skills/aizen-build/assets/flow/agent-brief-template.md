@@ -31,6 +31,7 @@ Runtime (yours alone): ports {{PORTS}} · compose project {{TASK}}-{{UNIT}} · D
 
 ## Commands
 Code map (ask before reading files): {{GRAPH}}
+Optional tools: {{OPTIONAL}}
 Quality gate: python "{{CORE_DIR}}/scripts/core/check.py" --task {{TASK}} --unit {{CHECK_UNIT}} --project "{{WORKDIR_CMD}}"
 
 ## Report
