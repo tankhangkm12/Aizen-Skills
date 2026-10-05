@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const scripts = path.join(__dirname, '..', 'skills', 'cecilia-coding-skills', 'scripts');
+const skill = (...p) => path.join(__dirname, '..', 'skills', ...p);
 const python = ['python3', 'python'].find(p => spawnSync(p, ['--version']).status === 0);
 if (!python) {
   // Máy dev không có Python thì bỏ qua; CI thì bắt buộc.
@@ -13,30 +13,39 @@ if (!python) {
   process.exit(process.env.CI ? 1 : 0);
 }
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'cecilia-'));
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'aizen-'));
 const run = (args, expect = 0) => {
   const r = spawnSync(python, args, { cwd: tmp, encoding: 'utf8', env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
   return { ok: r.status === expect, status: r.status, out: (r.stdout || '') + (r.stderr || '') };
 };
-const S = name => path.join(scripts, name);
+const S = {
+  'state.py': skill('aizen-build', 'scripts', 'flow', 'state.py'),
+  'check.py': skill('aizen-core', 'scripts', 'core', 'check.py'),
+  'graph.py': skill('aizen-core', 'scripts', 'core', 'graph.py'),
+  'capacity.py': skill('aizen-core', 'scripts', 'core', 'capacity.py'),
+  'uikit.py': skill('aizen-frontend', 'scripts', 'frontend', 'uikit.py'),
+  'apikit.py': skill('aizen-backend', 'scripts', 'api-ux', 'apikit.py'),
+};
 const cases = [
-  ['state.py self-check', [S('state.py'), '--selfcheck']],
-  ['skill-creator feedback.py self-check', [path.join(__dirname, '..', 'skills', 'skill-creator', 'scripts', 'feedback.py'), '--selfcheck']],
-  ['skill-creator new_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-creator', 'scripts', 'new_skill.py'), '--selfcheck']],
-  ['tech-learning-tree check_tree.py self-check', [path.join(__dirname, '..', 'skills', 'tech-learning-tree', 'scripts', 'check_tree.py'), '--selfcheck']],
-  ['tech-learning-tree to_notion.py self-check', [path.join(__dirname, '..', 'skills', 'tech-learning-tree', 'scripts', 'to_notion.py'), '--selfcheck']],
-  ['skill-cloner fetch_skill.py self-check', [path.join(__dirname, '..', 'skills', 'skill-cloner', 'scripts', 'fetch_skill.py'), '--selfcheck']],
-  ...['gate.py', 'check_inputs.py'].map(n => [`thanhtan-backend-coding-init ${n} self-check`,
-    [path.join(__dirname, '..', 'skills', 'thanhtan-backend-coding-init', 'scripts', n), '--selfcheck']]),
-  ...['state.py', 'check.py', 'graph.py', 'capacity.py', 'uikit.py', 'apikit.py'].map(n => [`${n} --help`, [S(n), '--help']]),
-  ['check.py --plan', [S('check.py'), '--task', 'T-1', '--plan']],
-  ['graph.py outside git → exit 2', [S('graph.py'), '--project', '.', '--check'], 2],
-  ['capacity contention', [S('capacity.py'), 'contention', '--rps-per-key', '0.1,5,200', '--window-ms', '50', '--retries', '2']],
-  ['capacity forecast short horizon', [S('capacity.py'), 'forecast', '--users', '10,20,30', '--monthly-growth', '0.01,0.02,0.03',
+  ['state.py self-check', [S['state.py'], '--selfcheck']],
+  ['feedback.py self-check', [skill('aizen-skill-creator', 'scripts', 'authoring', 'feedback.py'), '--selfcheck']],
+  ['new_skill.py self-check', [skill('aizen-skill-creator', 'scripts', 'authoring', 'new_skill.py'), '--selfcheck']],
+  ['fetch_skill.py self-check', [skill('aizen-skill-importer', 'scripts', 'fetch_skill.py'), '--selfcheck']],
+  ['check_tree.py self-check', [skill('aizen-tech-learning', 'scripts', 'check_tree.py'), '--selfcheck']],
+  ['to_notion.py self-check', [skill('aizen-tech-learning', 'scripts', 'to_notion.py'), '--selfcheck']],
+  ...['gate.py', 'check_inputs.py'].map(n => [`aizen-init ${n} self-check`, [skill('aizen-init', 'scripts', n), '--selfcheck']]),
+  ['pipeline_scaffold.py self-check', [skill('aizen-infra', 'scripts', 'infra', 'pipeline_scaffold.py'), '--selfcheck']],
+  ...['connectivity.py', 'secrets_checklist.py'].map(n => [`${n} --help`, [skill('aizen-infra', 'scripts', 'infra', n), '--help']]),
+  ['aggregate_benchmark.py --help', [skill('aizen-skill-eval', 'scripts', 'eval', 'aggregate_benchmark.py'), '--help']],
+  ...Object.keys(S).map(n => [`${n} --help`, [S[n], '--help']]),
+  ['check.py --plan', [S['check.py'], '--task', 'T-1', '--plan']],
+  ['graph.py outside git → exit 2', [S['graph.py'], '--project', '.', '--check'], 2],
+  ['capacity contention', [S['capacity.py'], 'contention', '--rps-per-key', '0.1,5,200', '--window-ms', '50', '--retries', '2']],
+  ['capacity forecast short horizon', [S['capacity.py'], 'forecast', '--users', '10,20,30', '--monthly-growth', '0.01,0.02,0.03',
     '--rows-per-user-month', '1,2,3', '--row-bytes', '100', '--index-bytes-per-row', '50', '--months', '3']],
-  ['uikit contrast', [S('uikit.py'), 'contrast', '#1a1a1a', '#ffffff']],
-  ['apikit journey', [S('apikit.py'), 'journey', '--calls', 'GET /cart > GET /products/{id} x3', '--latency-ms', '80']],
-  ['apikit bad latency → exit 2', [S('apikit.py'), 'journey', '--calls', 'GET /a', '--latency-ms', '1,2'], 2],
+  ['uikit contrast', [S['uikit.py'], 'contrast', '#1a1a1a', '#ffffff']],
+  ['apikit journey', [S['apikit.py'], 'journey', '--calls', 'GET /cart > GET /products/{id} x3', '--latency-ms', '80']],
+  ['apikit bad latency → exit 2', [S['apikit.py'], 'journey', '--calls', 'GET /a', '--latency-ms', '1,2'], 2],
 ];
 let failed = 0;
 for (const [label, args, expect] of cases) {

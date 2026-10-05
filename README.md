@@ -4,15 +4,18 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Bộ skill cho AI coding agent: **Claude Code**, **Antigravity / Gemini CLI**, **Cursor**, **Windsurf** và mọi agent đọc
-thư mục chuẩn `~/.agents/skills`. Mỗi skill là một thư mục tự chứa (`SKILL.md` + tài nguyên), cài bằng liên kết
-(junction/symlink) nên sửa trong repo là agent thấy ngay.
+thư mục chuẩn `~/.agents/skills`. Mỗi skill là một thư mục (`SKILL.md` + tài nguyên) cài cạnh nhau bằng liên kết
+(junction/symlink) nên sửa trong repo là agent thấy ngay. Luật chung nằm một chỗ ở `aizen-core`; vì vậy hãy cài cả
+bộ (hoặc ít nhất skill cần dùng cùng các skill trong `requires` của `manifest.json`).
 
 ## Mục lục
 
 - [Cài đặt](#cài-đặt)
 - [Hướng dẫn sử dụng và prompt mẫu](docs/huong-dan-su-dung.md)
 - [Danh sách skill](#danh-sách-skill)
-- [Cecilia — trợ lý production coding](#cecilia--trợ-lý-production-coding)
+- [Kiến trúc bộ skill (SOLID)](#kiến-trúc-bộ-skill-solid)
+- [aizen-build — điều phối production](#aizen-build--điều-phối-production)
+- [Nâng cấp từ bản trước](#nâng-cấp-từ-bản-trước-đổi-tên)
 - [Cấu trúc repo](#cấu-trúc-repo)
 - [CLI](#cli)
 - [Phát triển skill](#phát-triển-skill)
@@ -75,34 +78,92 @@ quyền cho trước) giúp agent không phải đoán và không hỏi lại.
 
 ## Danh sách skill
 
+Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
+
+- **entry** — skill bạn gọi (agent tự chọn theo `description`, hoặc `/<tên>`).
+- **pack** — kho kiến thức theo topic; không gọi trực tiếp, các entry tự nạp đúng file cần.
+
 | Skill | Dùng khi |
 |---|---|
-| [`cecilia-coding-skills`](skills/cecilia-coding-skills) | Làm tính năng/bug fix production: lập kế hoạch, code song song, test, review, PR. Xem [bên dưới](#cecilia--trợ-lý-production-coding). |
-| `cecilia-*` (6 knowledge pack) | Kiến thức theo chủ đề cho các role của Cecilia — không gọi trực tiếp, Cecilia tự nạp. |
-| [`adversarial-code-reviewer`](skills/adversarial-code-reviewer) | Review PR/diff/code do AI viết theo góc nhìn đối kháng: blast radius, lỗi logic, bảo mật. |
-| [`database-table-design`](skills/database-table-design) | Thiết kế schema quan hệ / bảng MySQL theo 9 nguyên tắc, viết DDL, review kiến trúc DB. |
-| [`devsecops-pipeline-flow`](skills/devsecops-pipeline-flow) | Dựng CI/CD bảo mật (GitHub Actions, GitLab CI, Jenkins, ArgoCD), quét Gitleaks/Trivy/Semgrep, có các bước xác nhận. |
-| [`thanhtan-backend-coding-init`](skills/thanhtan-backend-coding-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.thanhtan/`, khung code + health check, Docker/compose kèm infra, env + config tập trung, kết nối infra fail-fast, adapter qua interface, AOP + request-id + auth, README, rà lại bằng graphify. |
-| [`agent-skill-tester`](skills/agent-skill-tester) | Đánh giá một skill so với baseline (Outcome, Process, Style, Efficiency), LLM-as-a-judge. |
-| [`skill-creator`](skills/skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn cho Aizen-Skills: phỏng vấn, dựng đủ 8 phần, viết docs + prompt mẫu, đánh giá so với baseline, `npm test` rồi commit. |
-| [`skill-cloner`](skills/skill-cloner) | Chép skill từ GitHub/thư mục local về Aizen-Skills, chuẩn hoá cấu trúc + ghi nguồn/giấy phép, phỏng vấn để tuỳ biến, chứng minh bằng A/B test, viết docs rồi commit. |
-| [`tech-learning-tree`](skills/tech-learning-tree) | Nghiên cứu sâu một công nghệ theo một workload cụ thể: đi từ tầng ứng dụng xuống runtime, kernel, network để giải thích vì sao nó hiệu quả, có sơ đồ kiến trúc Mermaid, so sánh đối thủ bằng kiến trúc; ghi file md đã kiểm tra rồi đăng lên Notion. |
-| [`video-to-skill`](skills/video-to-skill) | Biến video YouTube/file local thành skill (phụ đề → hoặc ffmpeg + speech-to-text). |
+| [`aizen-build`](skills/aizen-build) | Mọi việc kỹ thuật trên dự án đang có: tính năng, sửa bug, refactor, từ ý tưởng tới PR; **review** PR/diff; **chỉ thiết kế** (schema, API, kiến trúc); **chỉ dựng** CI/CD, Docker, Kubernetes. Xem [bên dưới](#aizen-build--điều-phối-production). |
+| [`aizen-init`](skills/aizen-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.aizen/init/`, khung code + health check, Docker/compose kèm infra, config tập trung, kết nối infra fail-fast, adapter, AOP + request-id + auth, README, rà lại bằng graphify. |
+| [`aizen-skill-creator`](skills/aizen-skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn theo chuẩn Aizen, đặt đúng chỗ (entry hay topic của pack), viết docs, đánh giá, `npm test`, commit. |
+| [`aizen-skill-importer`](skills/aizen-skill-importer) | Đưa tri thức bên ngoài vào Aizen: chép cả skill (ghi nguồn/giấy phép, tuỳ biến, A/B test) hoặc **vendor** best practice của upstream vào một pack, ghim commit. |
+| [`aizen-skill-eval`](skills/aizen-skill-eval) | Đánh giá một skill so với baseline: bộ eval (gồm negative control), chạy độc lập, chấm điểm, A/B, tổng hợp benchmark. |
+| [`aizen-tech-learning`](skills/aizen-tech-learning) | Nghiên cứu sâu một công nghệ theo một workload: từ tầng ứng dụng xuống runtime, kernel, network; sơ đồ Mermaid; so sánh bằng kiến trúc; đăng lên Notion. |
+| [`aizen-video-to-skill`](skills/aizen-video-to-skill) | Biến video YouTube/file local thành skill (phụ đề → hoặc ffmpeg + speech-to-text). |
+
+| Pack | Topic | Nội dung |
+|---|---|---|
+| `aizen-core` | `core` | Luật chung cho mọi skill: quyền A0–A4, evidence, quyết định, git local-only, code-quality (thang tái sử dụng + `ponytail:`), code-style; `check.py`, `graph.py`, `capacity.py` |
+| `aizen-design` | `discover`, `design` | phạm vi, onboard code cũ, SRS, HLD/LLD, API contract, threat model |
+| `aizen-backend` | `backend`, `api-ux` | nguyên tắc backend, kiến trúc, messaging (Kafka, RabbitMQ), S3, microservices, stack Spring Boot / FastAPI / NestJS |
+| `aizen-frontend` | `frontend`, `ui` | nguyên tắc frontend, React/Next (luật của Vercel), accessibility, kiểm tra bằng trình duyệt, UI design |
+| `aizen-database` | `db` | schema, migration, concurrency, hiệu năng, HA/DR; PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch |
+| `aizen-quality` | `test`, `review` | chiến lược test, lens, review độc lập (blast radius, gating), verify báo cáo |
+| `aizen-infra` | `infra` | pipeline + security gate, deploy/rollback, secrets, observability, sự cố; Docker, Podman, Kubernetes/Helm, Terraform, Cloudflare |
 
 Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có thể gọi trực tiếp (Claude Code: `/<tên-skill>`).
 
-## Cecilia — trợ lý production coding
+## Kiến trúc bộ skill (SOLID)
 
-`cecilia-coding-skills` (v23) điều phối một task code từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ
-`git push`; cuối task bạn nhận khối lệnh push/PR để tự chạy. Hướng dẫn dùng và prompt mẫu:
+| Nguyên tắc | Áp vào Aizen |
+|---|---|
+| **S** — một lý do để thay đổi | mỗi pack sở hữu đúng các topic của nó: `references/<topic>/`, `assets/<topic>/`, `scripts/<topic>/` nằm cùng nhau. Luật chung chỉ có một bản ở `aizen-core` (trước đây 10 bản `rules/mcp.md`). |
+| **O** — mở để mở rộng, đóng để sửa | thêm pack/topic mới chỉ cần khai báo `topics` trong `manifest.json`; `state.py` và lint đọc manifest, không sửa code. Stack/engine/platform mới: một file trong `stacks/`, `engines/`, `platforms/`. |
+| **L** — thay thế được | mọi pack theo cùng một hợp đồng: `SKILL.md` + `manifest.json` (`kind`, `topics`, `requires`) + `method.md` làm điểm vào. |
+| **I** — interface nhỏ | role chỉ nạp topic nó cần; mỗi `method.md` có bảng "Guides" để nạp từng dòng. Review, thiết kế, pipeline là các *route* ngắn của cùng một luồng thay vì skill riêng tranh trigger. |
+| **D** — phụ thuộc vào trừu tượng | đường dẫn trỏ tới **topic**, không tới thư mục cụ thể; brief in bảng topic → thư mục tuyệt đối từ manifest. |
+
+### Đứng trên vai người khổng lồ — kiến thức vendored
+
+Best practice của chính đội làm ra công cụ được chép nguyên văn vào pack, **ghim commit**, kèm `UPSTREAM.md` và
+`LICENSE`. Danh sách nằm trong [`vendor.lock.json`](vendor.lock.json):
+
+| Nguồn | Vào pack | Giấy phép |
+|---|---|---|
+| Vercel — React & Next.js best practices (52/70 luật tác động cao nhất) | `aizen-frontend` | MIT |
+| Supabase — Postgres best practices | `aizen-database` | MIT |
+| PlanetScale — MySQL; Postgres MVCC/VACUUM, index audit | `aizen-database` | MIT |
+| Redis Inc. — core, connections, clustering, security, observability | `aizen-database` | MIT |
+| Elastic — index design, query optimization, reindex | `aizen-database` | Apache-2.0 |
+| Confluent — Kafka client Java/Python | `aizen-backend` | Apache-2.0 |
+| FastAPI (skill chính thức trong repo FastAPI) | `aizen-backend` | MIT |
+| Julien Dubois (JHipster) — Spring Boot 4 | `aizen-backend` | Apache-2.0 |
+| Docker Inc. — build, compose, destructive guardrails | `aizen-infra` | Apache-2.0 |
+| KubeShark — Kubernetes failure modes | `aizen-infra` | MIT |
+
+Thứ tự ưu tiên khi mâu thuẫn: **luật core > hướng dẫn của pack > kiến thức vendored** — upstream dạy *làm đúng thế
+nào trong công cụ đó*, core quyết định *làm bao nhiêu và ai quyết*. RabbitMQ, S3, Podman, NestJS chưa có nguồn chính
+thức đủ tốt (hoặc không có giấy phép) nên Aizen tự viết guide, dẫn docs chính thức.
+
+```bash
+node bin/vendor.js list            # nguồn, commit, giấy phép
+node bin/vendor.js sync            # chép lại đúng các commit đã ghim
+node bin/vendor.js update redis    # kéo bản mới của một nguồn — xem git diff trước khi commit
+```
+
+## aizen-build — điều phối production
+
+`aizen-build` (v24) điều phối một task từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ `git push`; cuối
+task bạn nhận khối lệnh push/PR để tự chạy. Hướng dẫn dùng và prompt mẫu:
 [docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md) · [docs/prompt-mau.md](docs/prompt-mau.md).
 
-**Một luồng, hai pha** (không còn chế độ FAST/STANDARD/CONTROLLED)
+**Route** — chọn ở bước đầu:
+
+| Bạn cần | Route |
+|---|---|
+| tính năng, bug, refactor, ý tưởng → PR | **build** — đủ hai pha bên dưới |
+| review PR / diff / branch | **review** — reviewer (+ redteam nếu chạm vùng rủi ro) ở SHA đã ghim |
+| chỉ thiết kế (schema, API, kiến trúc) | **design** — planner `STAGE=design`, bạn duyệt từng phần |
+| CI/CD, Docker, Kubernetes, Terraform | **build** với module `infra` cho `devops`, có security gate |
+
+**Hai pha của route build**
 
 | Pha | Làm gì | Bạn |
 |---|---|---|
-| **Thống nhất** | planner khảo sát + thiết kế, viết plan chia theo module (chốt sẵn tên, interface, dữ liệu, file, test) → Cecilia xác nhận **từng phần**: phạm vi → từng module → cách triển khai (các việc A3 duyệt trước) → `approve` | được hỏi chi tiết từng phần |
-| **Thực thi** | `dev` song song (mỗi module một worktree, viết code tối thiểu) → tích hợp `int/<TASK>` → tester → reviewer (+ `redteam` nếu có module rủi ro) → fix ≤ 2 vòng → tổng kết + lệnh push/PR | **không bị hỏi thêm**; chỉ khi `BLOCKED` (việc A3 chưa duyệt, A4, mất dữ liệu, plan không làm được) |
+| **Thống nhất** | planner khảo sát + thiết kế, viết plan chia theo module (chốt sẵn tên, interface, dữ liệu, file, test) → bạn xác nhận **từng phần**: phạm vi → từng module → cách triển khai (các việc A3 duyệt trước) → `approve` (script **từ chối** nếu còn module chưa xác nhận) | được hỏi chi tiết từng phần |
+| **Thực thi** | `dev` song song (mỗi module một worktree, code tối thiểu) → tích hợp `int/<TASK>` → tester → reviewer (+ `redteam` nếu có module rủi ro) → fix ≤ 2 vòng → tổng kết + lệnh push/PR | **không bị hỏi thêm**; chỉ khi `BLOCKED` (việc A3 chưa duyệt, A4, mất dữ liệu, plan không làm được) |
 
 **5 role** (`agents/`)
 
@@ -114,71 +175,71 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 | `reviewer` | review độc lập trên SHA đã tích hợp, read-only | không |
 | `devops` | CI/CD, Docker, IaC, deploy/rollback, sự cố | file hạ tầng |
 
-**Kiến thức chia theo chủ đề** thành skill chính + 6 knowledge pack cài cạnh nhau; mỗi chủ đề có `method.md` làm
-điểm vào, agent chỉ nạp file cần cho việc đang làm. Brief của mỗi role in bảng đường dẫn tuyệt đối tới các pack.
+**Quy tắc chính** (`aizen-core/references/core/rules.md`): mức quyền A0–A4 (việc A3 duyệt sẵn trong plan, A4 chỉ
+bạn làm), chỉ hỏi ở pha thống nhất, không tự quyết thay bạn, mọi kết luận gắn nhãn
+`[verified]/[inferred]/[unverified]/[projected]`, kiểm diff/test/SHA thay vì tin báo cáo "DONE". Code: thang tái sử
+dụng (YAGNI → có sẵn trong repo → stdlib → tính năng native → dependency đã có → mới viết), đánh dấu đường tắt bằng
+`ponytail: <đơn giản hoá gì> — nâng cấp khi <ngưỡng đo được>`, không bao giờ cắt validation, xử lý lỗi, bảo mật, a11y.
 
-| Skill | `references/` |
-|---|---|
-| `cecilia-coding-skills` | `flow`, `plan`, `dev`, `common` + toàn bộ `agents/`, `rules/`, `assets/`, `scripts/` |
-| `cecilia-discover-design` | `discover`, `design` |
-| `cecilia-backend` | `backend`, `api-ux` |
-| `cecilia-frontend` | `frontend`, `ui` |
-| `cecilia-db` | `db` |
-| `cecilia-quality` | `test`, `review` |
-| `cecilia-infra` | `infra` |
-
-**Quy tắc chính** (`rules/core.md`): mức quyền A0–A4 (việc A3 duyệt sẵn trong plan, A4 chỉ bạn làm), chỉ hỏi ở pha thống nhất, không tự quyết thay người dùng, mọi kết
-luận gắn nhãn `[verified]/[inferred]/[unverified]/[projected]`, kiểm diff/test/SHA thay vì tin báo cáo "DONE".
-
-**Scripts** (`scripts/`, Python 3, chạy từ thư mục project bằng đường dẫn tuyệt đối tới skill):
+**Scripts** (Python 3, chạy từ thư mục project bằng đường dẫn tuyệt đối):
 
 ```bash
-S=~/.claude/skills/cecilia-coding-skills/scripts
-python $S/state.py init --task T-12 --goal "..."     # trạng thái task để resume
-python $S/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng module
-python $S/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
-python $S/check.py --task T-12 --unit api  # lint, typecheck, build, test, secrets, deps → evidence-api.json
-python $S/graph.py --project .             # code map graphify (AST, offline) → graphify-out/
-python $S/capacity.py --help               # ước lượng tải/dung lượng
+B=~/.claude/skills/aizen-build/scripts/flow; C=~/.claude/skills/aizen-core/scripts/core
+python $B/state.py init --task T-12 --goal "..."     # trạng thái task để resume; tự thêm .aizen/ vào .git/info/exclude
+python $B/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng phần
+python $B/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
+python $C/check.py --task T-12 --unit api             # lint, typecheck, build, test, secrets, deps → evidence-api.json
+python $C/graph.py --project .                        # code map graphify (AST, offline) → graphify-out/
+python $C/capacity.py --help                          # dự phóng tải/dung lượng
 ```
 
-`graph.py` dựng/cập nhật knowledge graph của project bằng [graphify](https://github.com/Graphify-Labs/graphify)
-để các role hỏi `graphify query/affected/path` thay vì đọc mò; chưa cài graphify → exit 3 kèm lệnh cài (A3, cần
-bạn duyệt; sau đó `--install`). `graphify-out/` được thêm vào `.git/info/exclude`.
-
 `check.py` chỉ báo PASS khi có bước thật sự chạy và đạt; thiếu test hoặc không quét được secrets → `UNVERIFIED`
-(exit 3), không bao giờ là PASS.
-
-Trạng thái và báo cáo ghi vào `tensura/` ở gốc project (local-only, nên thêm vào `.git/info/exclude`).
+(exit 3), không bao giờ là PASS. Trạng thái và báo cáo ghi vào `.aizen/` ở gốc project (local-only).
 
 Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
-`references/flow/platform-*.md`.
+`skills/aizen-build/references/flow/platform-*.md`.
 
 ## Cấu trúc repo
 
 ```text
 .
 ├── docs/                      # hướng dẫn sử dụng, prompt mẫu, chuẩn viết skill
-├── skills/<skill>/            # mỗi skill tự chứa, đủ 8 phần:
+├── skills/<skill>/            # chỉ SKILL.md + manifest.json là bắt buộc; thư mục khác có khi có nội dung
 │   ├── SKILL.md               #   điểm vào: front-matter name/description + hướng dẫn
-│   ├── manifest.json          #   metadata, version
-│   ├── rules/                 #   luật bắt buộc
-│   ├── agents/                #   prompt sub-agent
-│   ├── references/            #   kiến thức nạp theo nhu cầu
-│   ├── tools/                 #   định nghĩa tool
-│   ├── scripts/               #   mã chạy được (Python/JS)
-│   └── assets/                #   template, file tĩnh
+│   ├── manifest.json          #   name, version, kind (entry|pack), topics, requires
+│   ├── rules/ agents/         #   luật riêng, prompt sub-agent (entry)
+│   ├── references/<topic>/    #   kiến thức nạp theo nhu cầu; vendor/<nguồn>/ = kiến thức upstream ghim commit
+│   ├── assets/<topic>/        #   template
+│   └── scripts/<topic>/       #   mã chạy được (Python stdlib)
 ├── rules/                     # rule toàn cục (continuous-improvement.md)
-├── bin/                       # cli.js, install.js, updater.js, agents-config.js
-├── tests/                     # check-skills.js (lint cấu trúc), check-scripts.js (smoke test Python), test-installer.js
+├── bin/                       # cli.js, install.js, updater.js, agents-config.js, vendor.js
+├── tests/                     # check-skills.js (lint + sổ topic), check-scripts.js (smoke test Python), test-installer.js
+├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored
 ├── plugin.json                # manifest plugin Antigravity
 └── package.json
 ```
 
-Thư mục rỗng giữ bằng `.gitkeep`. Knowledge pack (`manifest.json` có `partOf`) chỉ cần `SKILL.md`, `manifest.json`,
-`references/`. `tests/check-skills.js` kiểm: đủ thành phần, tên khớp thư mục, `description` ≤ 1024 ký tự, mọi
-đường dẫn `` `references|assets|scripts|agents|rules/…` `` và link markdown tương đối tồn tại (xuyên pack), `(vNN)`
-khớp `manifest.version`, không còn tên role cũ.
+`tests/check-skills.js` kiểm: manifest (`kind`, `topics` không trùng, `requires` tồn tại), tên khớp thư mục,
+`description` ≤ 1024 ký tự và có "Not for:" (entry), mọi đường dẫn `` `references|assets|scripts/<topic>/…` `` resolve
+qua sổ topic, link markdown tương đối tồn tại, `(vNN)` khớp `manifest.version`, mỗi `vendor/<nguồn>/` có
+`UPSTREAM.md` + `LICENSE`, không còn tên cũ.
+
+## Nâng cấp từ bản trước (đổi tên)
+
+| Cũ | Mới |
+|---|---|
+| `cecilia-coding-skills` | `aizen-build` |
+| `cecilia-discover-design` / `-backend` / `-frontend` / `-db` / `-quality` / `-infra` | `aizen-design` / `aizen-backend` / `aizen-frontend` / `aizen-database` / `aizen-quality` / `aizen-infra` |
+| `adversarial-code-reviewer` | route **review** của `aizen-build` (+ `aizen-quality` §0 blast radius) |
+| `database-table-design` | `aizen-database` (`schema-design.md` — quy ước team chọn một lần) |
+| `devsecops-pipeline-flow` | `aizen-infra` (security gates, Cloudflare, Docker Hub, `pipeline_scaffold.py`) |
+| `thanhtan-backend-coding-init` | `aizen-init` |
+| `skill-creator` / `skill-cloner` / `agent-skill-tester` | `aizen-skill-creator` / `aizen-skill-importer` / `aizen-skill-eval` |
+| `tech-learning-tree` / `video-to-skill` | `aizen-tech-learning` / `aizen-video-to-skill` |
+| workspace `tensura/`, `.thanhtan/` | `.aizen/`, `.aizen/init/` |
+
+`git pull && node bin/cli.js sync` dọn link tên cũ và tạo link tên mới. Task đang dở trong `tensura/`: đổi tên thư
+mục thành `.aizen/` rồi `state.py status --task <TASK>`.
 
 ## CLI
 
@@ -195,13 +256,14 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 
 ## Phát triển skill
 
-Chuẩn đầy đủ: [docs/aizen-skill-standard.md](docs/aizen-skill-standard.md) (cấu trúc 8 phần, `description`,
-`manifest.json`, scripts, tài liệu bắt buộc, git).
+Chuẩn đầy đủ: [docs/aizen-skill-standard.md](docs/aizen-skill-standard.md) (entry/pack, topic, `description`,
+`manifest.json`, vendored knowledge, scripts, tài liệu bắt buộc, git).
 
-1. Tạo skill mới: `/skill-creator` · chép và tuỳ biến skill có sẵn: `/skill-cloner` (prompt mẫu trong
-   [docs/prompt-mau.md](docs/prompt-mau.md)). Cả hai dựng đủ 8 phần, viết docs, đánh giá rồi commit.
-2. Mỗi skill dùng trực tiếp phải có: một dòng trong bảng [Danh sách skill](#danh-sách-skill), dòng trong
-   `docs/huong-dan-su-dung.md` (§2, §4) và một prompt `/<tên>` trong `docs/prompt-mau.md` — `npm test` kiểm.
+1. Tạo skill mới: `/aizen-skill-creator` · đưa skill hoặc kiến thức bên ngoài vào: `/aizen-skill-importer` (prompt
+   mẫu trong [docs/prompt-mau.md](docs/prompt-mau.md)). Trước khi tạo skill mới, hỏi: đây là **entry** mới hay chỉ là
+   một **topic** cho pack đã có?
+2. Mỗi entry phải có: một dòng trong bảng [Danh sách skill](#danh-sách-skill), dòng trong `docs/huong-dan-su-dung.md`
+   (§2, §4) và một prompt `/<tên>` trong `docs/prompt-mau.md` — `npm test` kiểm.
 3. `description` quyết định khi nào agent chọn skill: làm gì · "Use when …" · "Not for: …".
 4. Thư mục tạm (baseline, kết quả eval) ở `.aizen-work/` — không bao giờ trong `skills/`.
 5. Kiểm tra rồi đồng bộ:
@@ -213,9 +275,10 @@ node bin/cli.js sync
 
 **Skill tự cải thiện** (`rules/continuous-improvement.md`): khi một skill làm chưa tốt (bạn phàn nàn, script lỗi,
 hướng dẫn sai, phải làm tay), agent ghi một dòng vào sổ `.aizen-work/feedback/<skill>.jsonl` bằng
-`skill-creator/scripts/feedback.py` — không hỏi, không chen task. Chỉ khi bạn phàn nàn trực tiếp, vấn đề lặp ≥ 2
-lần, hoặc skill ra kết quả sai, agent mới đề xuất sửa; sửa đi qua quy trình improve của `skill-creator` (baseline,
-eval case mới từ prompt đã ghi, bump version, `npm test`, commit). Xem sổ: `python skills/skill-creator/scripts/feedback.py list --open`.
+`aizen-skill-creator/scripts/authoring/feedback.py` — không hỏi, không chen task. Chỉ khi bạn phàn nàn trực tiếp, vấn
+đề lặp ≥ 2 lần, hoặc skill ra kết quả sai, agent mới đề xuất sửa; sửa đi qua quy trình improve của
+`aizen-skill-creator` (baseline, eval case mới, bump version, `npm test`, commit). Xem sổ:
+`python skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
 Cursor (`sync --project`) nhận rule dưới dạng `.mdc` `alwaysApply`; Windsurf/Gemini CLI chưa được cài rule tự động.
 
 ## Gỡ cài đặt
@@ -226,5 +289,6 @@ Xóa các liên kết (không xóa repo): các mục trùng tên skill trong nh�
 
 ## Giấy phép
 
-[MIT](LICENSE). Riêng `skills/skill-creator` dựa trên skill của Anthropic, giữ giấy phép Apache 2.0 trong
-`skills/skill-creator/LICENSE.txt`.
+[MIT](LICENSE). Riêng `skills/aizen-skill-creator` và phần grader/benchmark của `skills/aizen-skill-eval` dựa trên
+skill của Anthropic, giữ giấy phép Apache 2.0 (`LICENSE.txt` trong mỗi thư mục). Kiến thức vendored giữ giấy phép
+gốc trong `LICENSE` của từng thư mục `vendor/<nguồn>/` (xem `vendor.lock.json`).

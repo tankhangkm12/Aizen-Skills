@@ -3,10 +3,10 @@
 Copy, thay phần `<…>`, xoá dòng không cần. Dòng nào bạn chưa biết thì bỏ trống — agent tự đo những gì đo được,
 chỉ hỏi bạn về lựa chọn và rủi ro. Cách dùng chung: [huong-dan-su-dung.md](huong-dan-su-dung.md).
 
-## Cecilia — tính năng mới
+## aizen-build — tính năng mới
 
 ```text
-/cecilia-coding-skills
+/aizen-build
 Task: <MÃ-TASK, vd SHOP-42>
 Mục tiêu: <một câu kiểm chứng được>
 Tiêu chí xong:
@@ -21,10 +21,10 @@ Cho phép sẵn (A3): <cài graphify · chạy Postgres local bằng docker comp
 Hỏi tôi xác nhận từng module trước khi code; sau khi tôi approve thì làm hết không hỏi thêm.
 ```
 
-## Cecilia — sửa bug
+## aizen-build — sửa bug
 
 ```text
-/cecilia-coding-skills
+/aizen-build
 Task: <BUG-123>
 Lỗi: mong đợi <…>, thực tế <…>
 Tái hiện: <các bước / request mẫu / dữ liệu>  · Môi trường: <local/staging, trình duyệt, version>
@@ -34,20 +34,20 @@ Phạm vi: chỉ sửa nguyên nhân gốc, kèm test hồi quy; không refactor
 Cho phép sẵn (A3): <…>
 ```
 
-## Cecilia — refactor
+## aizen-build — refactor
 
 ```text
-/cecilia-coding-skills
+/aizen-build
 Task: <REF-7>
 Mục tiêu: <tách / đổi tên / gom … để …>  · Hành vi bên ngoài: KHÔNG đổi
 Phạm vi: <thư mục / module>  · Ngoài phạm vi: <…>
 Chốt hành vi bằng: <test hiện có / thêm test trước khi chuyển code>
 ```
 
-## Cecilia — từ ý tưởng tới PR
+## aizen-build — từ ý tưởng tới PR
 
 ```text
-/cecilia-coding-skills
+/aizen-build
 Task: <NEW-1>
 Ý tưởng: <2–5 câu: ai dùng, vấn đề gì, kết quả mong muốn>
 Người dùng và quy mô: <ai, bao nhiêu, thiết bị>
@@ -56,14 +56,14 @@ Công nghệ: <stack bắt buộc, hoặc "đề xuất giúp tôi">
 Đi qua yêu cầu và thiết kế trước (STAGE discover/design), hỏi tôi từng phần, rồi mới lập plan.
 ```
 
-## Cecilia — tiếp tục / kiểm tra
+## aizen-build — tiếp tục / kiểm tra
 
 ```text
-Cecilia, tiếp tục task <MÃ-TASK>.
-Cecilia, trạng thái task <MÃ-TASK>?
+/aizen-build tiếp tục task <MÃ-TASK>.
+/aizen-build trạng thái task <MÃ-TASK>?
 ```
 
-## Trả lời khi Cecilia xác nhận
+## Trả lời khi agent xác nhận từng phần
 
 ```text
 theo đề xuất
@@ -72,30 +72,31 @@ phạm vi: thêm AC-3 <…>
 approve plan <MÃ-TASK>
 ```
 
-## Review code
+## aizen-build — review code
 
 ```text
-/adversarial-code-reviewer
+/aizen-build review
 Review: <PR #45 | branch feature/x so với develop | git diff main...HEAD>
 Thay đổi này để: <mục tiêu>
 Phần lõi / rủi ro cao: <auth, migration, …>
 Trả về: findings theo mức độ, mỗi cái có file:line và kịch bản lỗi.
 ```
 
-## Thiết kế bảng
+## aizen-build — chỉ thiết kế bảng
 
 ```text
-/database-table-design
+/aizen-build thiết kế (chưa code)
 Engine: <MySQL 8.0>
 Thực thể: <Order(…), OrderItem(…)> · Quan hệ: <1 Order – n OrderItem>
 Quy mô: <rows/tháng, giữ bao lâu>  · Truy vấn chính: <lọc theo user + thời gian, …>
-Trả về: DDL có COMMENT, index và lý do.
+Quy ước team (nếu có): <audit columns, soft delete, …>
+Trả về: tài liệu database + DDL có COMMENT, index và lý do.
 ```
 
-## CI/CD
+## aizen-build — CI/CD
 
 ```text
-/devsecops-pipeline-flow
+/aizen-build dựng pipeline
 Repo: <đường dẫn / URL>  · CI: <GitHub Actions>  · Deploy tới: <VPS / k8s / …>
 Registry: <Docker Hub user/repo>  · Branch → môi trường: <main → prod, develop → staging>
 Secret đã có (chỉ tên): <DOCKERHUB_TOKEN, SSH_KEY>
@@ -104,7 +105,7 @@ Secret đã có (chỉ tên): <DOCKERHUB_TOKEN, SSH_KEY>
 ## Khởi tạo dự án backend
 
 ```text
-/thanhtan-backend-coding-init
+/aizen-init
 Repo: <https://github.com/team/project.git | git@gitlab.com:team/project.git>
 Tài liệu dự án: <./docs/SRS.md, ./docs/architecture.md | link Notion>
 Stack / infra (nếu tài liệu chưa ghi): <NestJS + PostgreSQL + Redis>
@@ -115,7 +116,7 @@ Push lên remote: <hỏi tôi mỗi lần>
 ## Skill
 
 ```text
-/skill-creator
+/aizen-skill-creator
 Skill mới: <tên-gạch-ngang> — giúp agent <làm gì, cho ai>
 Phải kích hoạt khi: 1) "<prompt thật>" 2) "<…>" 3) "<…>"
 Không kích hoạt khi: "<…>" (để cho skill <tên skill có sẵn>)
@@ -127,13 +128,13 @@ Tài liệu tham khảo: <link, file>
 ```
 
 ```text
-/skill-creator
+/aizen-skill-creator
 Cải thiện skill <tên>: <vấn đề gặp phải, kèm prompt đã dùng và kết quả sai>
 Mong muốn: <hành vi đúng>  · Giữ nguyên: <…>
 ```
 
 ```text
-/skill-cloner
+/aizen-skill-importer
 Nguồn: https://github.com/<owner>/<repo>/tree/<branch>/<đường-dẫn-tới-thư-mục-skill>   (hoặc đường dẫn thư mục skill trên máy)
 Tên đích: <tên-gạch-ngang>
 Muốn đổi: <quy trình / luật / công cụ / định dạng đầu ra / ngôn ngữ trigger>
@@ -141,7 +142,14 @@ Task mẫu cho A/B test: <một yêu cầu thật, vd "đọc file X.pdf và tó
 ```
 
 ```text
-/agent-skill-tester
+/aizen-skill-importer vendor
+Nguồn: https://github.com/<owner>/<repo>  (thư mục skill: <đường-dẫn>)
+Đưa vào pack: <aizen-database / aizen-backend / …>  · Topic: <db / backend / …>
+Chỉ giữ: <các phần giá trị cao>  · Bỏ: <phần quảng cáo / không thuộc stack>
+```
+
+```text
+/aizen-skill-eval
 Skill: <tên>  · Đạt khi: <…>
 Nên kích hoạt: <2–3 prompt>  · Không nên kích hoạt: <2–3 prompt>
 ```
@@ -149,7 +157,7 @@ Nên kích hoạt: <2–3 prompt>  · Không nên kích hoạt: <2–3 prompt>
 ## Học công nghệ / video
 
 ```text
-/tech-learning-tree
+/aizen-tech-learning
 Công nghệ: <tên + version>
 Workload tham chiếu: <một thao tác cụ thể, vd. "cache 100k GET/s, value 1KB, 1 node">
 Muốn hiểu: vì sao nó hiệu quả trong workload này, đi xuống tới kernel/network; khi nào nó hết hiệu quả
@@ -158,7 +166,7 @@ Ghi vào Notion dưới trang: <trang cha>  · File md: ./tech-tree/<tên>.md
 ```
 
 ```text
-/video-to-skill
+/aizen-video-to-skill
 Video: <link YouTube hoặc đường dẫn file>
 Skill mới giúp agent: <…>  · Tên skill: <…>  · Ngôn ngữ: <vi/en>
 ```

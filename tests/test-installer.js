@@ -11,22 +11,22 @@ console.log('[TEST] Bắt đầu kiểm tra hệ thống Aizen Skills Installer.
 // 1. Test discoverSkills
 const skills = discoverSkills();
 console.log(`[TEST 1] Kiểm tra phát hiện skills: tìm thấy ${skills.length} skills.`);
-assert(skills.length >= 2, 'Phải tìm thấy ít nhất 2 skills (database-table-design & video-to-skill)');
+assert(skills.length >= 2, 'Phải tìm thấy ít nhất 2 skills (aizen-database & aizen-video-to-skill)');
 
-const dbSkill = skills.find(s => s.id === 'database-table-design');
-assert(dbSkill, 'Phải tìm thấy database-table-design');
-assert(dbSkill.description.length > 20, 'database-table-design phải có description hợp lệ');
-console.log('  ✓ database-table-design: OK');
+const dbSkill = skills.find(s => s.id === 'aizen-database');
+assert(dbSkill, 'Phải tìm thấy aizen-database');
+assert(dbSkill.description.length > 20, 'aizen-database phải có description hợp lệ');
+console.log('  ✓ aizen-database: OK');
 
-const videoSkill = skills.find(s => s.id === 'video-to-skill');
-assert(videoSkill, 'Phải tìm thấy video-to-skill');
-assert(videoSkill.description.length > 20, 'video-to-skill phải có description hợp lệ');
-console.log('  ✓ video-to-skill: OK');
+const videoSkill = skills.find(s => s.id === 'aizen-video-to-skill');
+assert(videoSkill, 'Phải tìm thấy aizen-video-to-skill');
+assert(videoSkill.description.length > 20, 'aizen-video-to-skill phải có description hợp lệ');
+console.log('  ✓ aizen-video-to-skill: OK');
 
 // 2. Test createLink (Junction trên Windows / Symlink trên Unix)
 console.log('\n[TEST 2] Kiểm tra cơ chế Directory Junction / Symlink...');
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aizen-test-'));
-const testTarget = path.join(tempDir, 'database-table-design');
+const testTarget = path.join(tempDir, 'aizen-database');
 
 try {
   const linkRes = createLink(dbSkill.path, testTarget);
@@ -65,20 +65,20 @@ try {
   fs.mkdirSync(ghost);
   const linkType = process.platform === 'win32' ? 'junction' : 'dir';
   fs.symlinkSync(ghost, path.join(pruneDir, '__ghost_skill__'), linkType);
-  fs.symlinkSync(dbSkill.path, path.join(pruneDir, 'database-table-design'), linkType);
+  fs.symlinkSync(dbSkill.path, path.join(pruneDir, 'aizen-database'), linkType);
   fs.mkdirSync(path.join(pruneDir, 'my-own-skill'));
   fs.writeFileSync(path.join(pruneDir, 'my-own-skill', 'SKILL.md'), 'x');
-  fs.mkdirSync(path.join(pruneDir, 'video-to-skill'));
-  fs.writeFileSync(path.join(pruneDir, 'video-to-skill', 'SKILL.md'), 'user edit');
+  fs.mkdirSync(path.join(pruneDir, 'aizen-video-to-skill'));
+  fs.writeFileSync(path.join(pruneDir, 'aizen-video-to-skill', 'SKILL.md'), 'user edit');
 
   pruneStaleLinks(pruneDir, skills);
   assert(!fs.existsSync(path.join(pruneDir, '__ghost_skill__')), 'Link tới skill đã xóa phải bị dọn');
-  assert(fs.existsSync(path.join(pruneDir, 'database-table-design', 'SKILL.md')), 'Link hợp lệ phải được giữ');
+  assert(fs.existsSync(path.join(pruneDir, 'aizen-database', 'SKILL.md')), 'Link hợp lệ phải được giữ');
   assert(fs.existsSync(path.join(pruneDir, 'my-own-skill', 'SKILL.md')), 'Thư mục người dùng phải được giữ');
 
-  const res = createLink(videoSkill.path, path.join(pruneDir, 'video-to-skill'));
+  const res = createLink(videoSkill.path, path.join(pruneDir, 'aizen-video-to-skill'));
   assert.strictEqual(res.status, 'directory-exists');
-  assert.strictEqual(fs.readFileSync(path.join(pruneDir, 'video-to-skill', 'SKILL.md'), 'utf8'), 'user edit',
+  assert.strictEqual(fs.readFileSync(path.join(pruneDir, 'aizen-video-to-skill', 'SKILL.md'), 'utf8'), 'user edit',
     'createLink không được ghi đè thư mục thật trùng tên');
   console.log('  ✓ Dọn link cũ / giữ thư mục thật: OK');
 } finally {
@@ -103,7 +103,7 @@ try {
   updateAgentsMd(skills, fakeHome, false);
   const md = fs.readFileSync(path.join(fakeHome, 'AGENTS.md'), 'utf8');
   assert.strictEqual(md.split('## Available Skills').length, 2, 'Sync lại không được nhân đôi mục skill');
-  assert(md.includes('video-to-skill/SKILL.md'), 'Sync lại phải cập nhật danh sách skill');
+  assert(md.includes('aizen-video-to-skill/SKILL.md'), 'Sync lại phải cập nhật danh sách skill');
   assert(md.includes('keep me') && md.includes('continuous-improvement.md'), 'AGENTS.md phải giữ nội dung cũ và trỏ tới rule');
   console.log('  ✓ Rules toàn cục + AGENTS.md: OK');
 } finally {

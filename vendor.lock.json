@@ -1,0 +1,347 @@
+{
+  "$comment": "Upstream knowledge vendored into Aizen packs. `node bin/vendor.js sync` re-copies exactly these commits; `node bin/vendor.js update <name>` moves one entry to the upstream branch head (review the diff before committing). Files are copied verbatim; core rules still win (skills/aizen-core/references/core/workspace.md §3).",
+  "vendors": [
+    {
+      "name": "vercel-react-best-practices",
+      "repo": "https://github.com/vercel-labs/agent-skills",
+      "ref": "main",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "license": "MIT",
+      "license_holder": "Vercel, Inc.",
+      "dest": "skills/aizen-frontend/references/frontend/vendor/vercel-react-best-practices",
+      "copy": [
+        {
+          "from": "skills/react-best-practices/SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "skills/react-best-practices/rules",
+          "to": "rules",
+          "exclude": [
+            "js-*",
+            "advanced-*",
+            "_template.md"
+          ]
+        }
+      ],
+      "notes": "Kept the six highest-impact categories (waterfalls, bundle, server, client fetching, re-render, rendering). Dropped js-* micro-optimisations and advanced-* patterns: Aizen optimises only measured hot paths (core/code-quality.md §3)."
+    },
+    {
+      "name": "supabase-postgres-best-practices",
+      "repo": "https://github.com/supabase/agent-skills",
+      "ref": "main",
+      "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-database/references/db/vendor/supabase-postgres",
+      "copy": [
+        {
+          "from": "skills/supabase-postgres-best-practices/SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "skills/supabase-postgres-best-practices/references",
+          "to": "references",
+          "exclude": [
+            "_contributing.md",
+            "_template.md"
+          ]
+        }
+      ],
+      "notes": "Generic Postgres rules by impact (query, connections, RLS, schema, locking, data access, monitoring). Supabase-specific notes inside rules apply only on Supabase."
+    },
+    {
+      "name": "planetscale-mysql",
+      "repo": "https://github.com/planetscale/database-skills",
+      "ref": "main",
+      "commit": "73b20b7eb64716d8c7100c054f0677c0c6e77e30",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-database/references/db/vendor/planetscale-mysql",
+      "copy": [
+        {
+          "from": "skills/mysql/SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "skills/mysql/references",
+          "to": "references"
+        }
+      ],
+      "notes": "MySQL/InnoDB schema, indexing, locking and online DDL. The guide's hosting recommendation is the vendor's marketing, not an Aizen decision — hosting is an option for the owner."
+    },
+    {
+      "name": "planetscale-postgres-internals",
+      "repo": "https://github.com/planetscale/database-skills",
+      "ref": "main",
+      "commit": "73b20b7eb64716d8c7100c054f0677c0c6e77e30",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-database/references/db/vendor/planetscale-postgres",
+      "copy": [
+        {
+          "from": "skills/postgres/references/mvcc-vacuum.md",
+          "to": "references/mvcc-vacuum.md"
+        },
+        {
+          "from": "skills/postgres/references/mvcc-transactions.md",
+          "to": "references/mvcc-transactions.md"
+        },
+        {
+          "from": "skills/postgres/references/index-optimization.md",
+          "to": "references/index-optimization.md"
+        },
+        {
+          "from": "skills/postgres/references/optimization-checklist.md",
+          "to": "references/optimization-checklist.md"
+        }
+      ],
+      "notes": "Only the vendor-neutral internals (MVCC, VACUUM, index audit, optimisation checklist). PlanetScale CLI, pooling and hosting pages dropped."
+    },
+    {
+      "name": "redis",
+      "repo": "https://github.com/redis/agent-skills",
+      "ref": "main",
+      "commit": "a84871d065f398fed55e1633f66b66f731eb4e2b",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-database/references/db/vendor/redis",
+      "copy": [
+        {
+          "from": "skills/redis-core/SKILL.md",
+          "to": "core/guide.md"
+        },
+        {
+          "from": "skills/redis-core/references",
+          "to": "core/references"
+        },
+        {
+          "from": "skills/redis-connections/SKILL.md",
+          "to": "connections/guide.md"
+        },
+        {
+          "from": "skills/redis-connections/references",
+          "to": "connections/references"
+        },
+        {
+          "from": "skills/redis-clustering/SKILL.md",
+          "to": "clustering/guide.md"
+        },
+        {
+          "from": "skills/redis-clustering/references",
+          "to": "clustering/references"
+        },
+        {
+          "from": "skills/redis-security/SKILL.md",
+          "to": "security/guide.md"
+        },
+        {
+          "from": "skills/redis-security/references",
+          "to": "security/references"
+        },
+        {
+          "from": "skills/redis-observability/SKILL.md",
+          "to": "observability/guide.md"
+        },
+        {
+          "from": "skills/redis-observability/references",
+          "to": "observability/references"
+        }
+      ],
+      "notes": "Official Redis guidance: data structures and key naming, connections/pipelining, cluster hash tags, ACL/TLS hardening, observability. Search, semantic cache and Iris dropped (not in the stack)."
+    },
+    {
+      "name": "elastic-elasticsearch",
+      "repo": "https://github.com/elastic/agent-skills",
+      "ref": "main",
+      "commit": "baa511126ba2dc37b52e273b52734f8e4e0d323c",
+      "license": "Apache-2.0",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-database/references/db/vendor/elastic",
+      "copy": [
+        {
+          "from": "skills/elasticsearch/elasticsearch-index-design/SKILL.md",
+          "to": "index-design/guide.md"
+        },
+        {
+          "from": "skills/elasticsearch/elasticsearch-index-design/references",
+          "to": "index-design/references"
+        },
+        {
+          "from": "skills/elasticsearch/elasticsearch-query-optimization/SKILL.md",
+          "to": "query-optimization/guide.md"
+        },
+        {
+          "from": "skills/elasticsearch/elasticsearch-query-optimization/references",
+          "to": "query-optimization/references"
+        },
+        {
+          "from": "skills/elasticsearch/elasticsearch-reindex/SKILL.md",
+          "to": "reindex/guide.md"
+        },
+        {
+          "from": "skills/elasticsearch/elasticsearch-reindex/references",
+          "to": "reindex/references"
+        }
+      ],
+      "notes": "Official Elastic guidance for mappings, query profiling and reindex-based mapping changes. Commands use the `elastic` CLI; any write to a shared cluster is A3."
+    },
+    {
+      "name": "confluent-kafka-clients",
+      "repo": "https://github.com/confluentinc/agent-skills",
+      "ref": "main",
+      "commit": "db79f9e411674839a12d7c01d3434c54cf137266",
+      "license": "Apache-2.0",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-backend/references/backend/vendor/confluent-kafka",
+      "copy": [
+        {
+          "from": "skills/developing-kafka-java-client/SKILL.md",
+          "to": "java/guide.md"
+        },
+        {
+          "from": "skills/developing-kafka-java-client/references",
+          "to": "java/references"
+        },
+        {
+          "from": "skills/developing-kafka-python-client/SKILL.md",
+          "to": "python/guide.md"
+        },
+        {
+          "from": "skills/developing-kafka-python-client/references",
+          "to": "python/references"
+        }
+      ],
+      "notes": "Official Confluent producer/consumer patterns and Schema Registry serializers for Java and Python, with sample code. Their HARD-GATE / announce steps are replaced by Aizen's plan questions (core/workspace.md §3)."
+    },
+    {
+      "name": "fastapi",
+      "repo": "https://github.com/fastapi/fastapi",
+      "ref": "master",
+      "commit": "52159d7e7018df55b57a0b8fdd6c1193e48b2b57",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-backend/references/backend/vendor/fastapi",
+      "copy": [
+        {
+          "from": "fastapi/.agents/skills/fastapi/SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "fastapi/.agents/skills/fastapi/references",
+          "to": "references"
+        }
+      ],
+      "notes": "The official FastAPI skill shipped inside the FastAPI repository: Annotated dependencies, response models, Pydantic v2, routing, streaming/SSE."
+    },
+    {
+      "name": "dr-jskill-spring-boot",
+      "repo": "https://github.com/jdubois/dr-jskill",
+      "ref": "main",
+      "commit": "5c0ef67e402f764783c7fa5d90c357b4260fc8d6",
+      "license": "Apache-2.0",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-backend/references/backend/vendor/spring-boot",
+      "copy": [
+        {
+          "from": "references/SPRING-BOOT-4.md",
+          "to": "spring-boot-4.md"
+        },
+        {
+          "from": "references/PROJECT-SETUP.md",
+          "to": "project-setup.md"
+        },
+        {
+          "from": "references/CONFIGURATION.md",
+          "to": "configuration.md"
+        },
+        {
+          "from": "references/DATABASE.md",
+          "to": "database.md"
+        },
+        {
+          "from": "references/SECURITY.md",
+          "to": "security.md"
+        },
+        {
+          "from": "references/TEST.md",
+          "to": "test.md"
+        },
+        {
+          "from": "references/LOGGING.md",
+          "to": "logging.md"
+        },
+        {
+          "from": "references/DOCKER.md",
+          "to": "docker.md"
+        }
+      ],
+      "notes": "Julien Dubois' (JHipster) Spring Boot 4 practices. Only the reference pages; the project generator scripts, front-end and cloud pages are not vendored."
+    },
+    {
+      "name": "docker",
+      "repo": "https://github.com/docker/skills",
+      "ref": "main",
+      "commit": "f79172733725e2fd236343ee7b963c446ed85d09",
+      "license": "Apache-2.0",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-infra/references/infra/vendor/docker",
+      "copy": [
+        {
+          "from": "skills/docker-build-strategies",
+          "to": "build-strategies",
+          "exclude": [
+            "agents",
+            "skill.yaml"
+          ],
+          "rename": {
+            "SKILL.md": "guide.md"
+          }
+        },
+        {
+          "from": "skills/docker-compose-patterns",
+          "to": "compose-patterns",
+          "exclude": [
+            "agents",
+            "skill.yaml"
+          ],
+          "rename": {
+            "SKILL.md": "guide.md"
+          }
+        },
+        {
+          "from": "skills/docker-destructive-guardrails",
+          "to": "destructive-guardrails",
+          "exclude": [
+            "agents",
+            "skill.yaml"
+          ],
+          "rename": {
+            "SKILL.md": "guide.md"
+          }
+        }
+      ],
+      "notes": "Official Docker guidance: multi-stage builds, layer caching, non-root images, Compose health/dependency patterns, and which commands destroy state. The guardrail tiers map onto Aizen A3."
+    },
+    {
+      "name": "kubeshark",
+      "repo": "https://github.com/LukasNiessen/kubernetes-skill",
+      "ref": "main",
+      "commit": "34f93c1e409156958cc7c410ab1aa88ab512f10f",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "dest": "skills/aizen-infra/references/infra/vendor/kubeshark",
+      "copy": [
+        {
+          "from": "SKILL.md",
+          "to": "guide.md"
+        },
+        {
+          "from": "references",
+          "to": "references"
+        }
+      ],
+      "notes": "Failure-mode workflow for Kubernetes manifests and Helm (insecure defaults, resource starvation, exposure, privilege sprawl, fragile rollouts, API drift)."
+    }
+  ]
+}

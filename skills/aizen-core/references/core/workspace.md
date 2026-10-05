@@ -1,0 +1,81 @@
+# Workspace — where things live (v24)
+
+Everything Aizen roles write lives under `.aizen/` at the workspace root (the project root unless
+`CLAUDE.md`/`AGENTS.md` names another). `.aizen/`, `.worktrees/` are local-only: add them to `.git/info/exclude`,
+never stage them.
+
+## 1. Layout
+
+```
+.aizen/
+├── docs/
+│   ├── README.md · DECISIONS.md          index + status of each doc · D-nn decision log
+│   ├── system/                           system-map, idea, requirements, architecture, security, test-plan, infrastructure
+│   ├── modules/<module>/                 <module>-design.md (LLD) · <module>-database.md · <module>-api.md + .yaml
+│   └── apps/<app>/                       <app>-frontend.md · <app>-ui.md · design-tokens.json · ui-exports/
+├── plans/<TASK>.md                       the plan (planner)
+├── conventions.md                        one page: naming, patterns, commands — read before the first edit
+├── lessons.md                            L-nn lessons from past tasks
+├── tasks/<TASK>/state.md · run.json      written by scripts/flow/state.py — read first when resuming
+├── reports/<TASK>/
+│   ├── plan.md · dev-<unit>.md · test[-<unit>].md · review[-redteam].md · devops[-<unit>].md
+│   │                                     (exact name in each brief)
+│   ├── pr-body[-<unit>].md               Draft PR text for `gh pr create --body-file` (one per unit; the
+│   │                                     coordinator merges them into pr-body.md for the final PR)
+│   └── evidence[-<unit>].json            written by scripts/core/check.py (always in the main checkout)
+└── backups/<TASK>/                       DB dumps and copies taken before a change (git.md §4)
+```
+
+Microservices: `docs/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api.md` + `.yaml`, `<svc>-database.md`,
+`<svc>-infrastructure.md` and `modules/<module>/<module>-design.md`. Names are lower-kebab-case.
+
+## 2. Logical names → paths (under `.aizen/docs/`)
+
+| Logical name | Monolith | Microservices |
+|---|---|---|
+| system map · idea · requirements · architecture · security · test plan | `system/<name>.md` | same |
+| module design (LLD) | `modules/<m>/<m>-design.md` | `services/<svc>/modules/<m>/<m>-design.md` |
+| database doc | `modules/<m>/<m>-database.md` | `services/<svc>/<svc>-database.md` |
+| API contract | `modules/<m>/<m>-api.md` + `.yaml` | `services/<svc>/<svc>-api.md` + `.yaml` |
+| frontend architecture · UI design | `apps/<app>/<app>-frontend.md` · `<app>-ui.md` | same |
+| infrastructure doc | `system/infrastructure.md` | `services/<svc>/<svc>-infrastructure.md` |
+
+An existing repo with its own docs folder keeps it; record the mapping in `.aizen/conventions.md`.
+
+## 3. Priority when sources conflict
+
+```
+The owner's direct instruction > docs > plan > repo conventions > these skills' defaults
+```
+
+Following the higher source is never silent: note the conflict in one line. A direct instruction that contradicts
+docs on business logic, schema or a public contract → confirm once before acting.
+
+Inside "these skills' defaults" there is a second order:
+
+```
+core rules (references/core/) > the pack's own method and guides > vendored upstream knowledge (…/vendor/…)
+```
+
+Vendored knowledge is best practice copied from the people who build the tool (React from Vercel, Redis from
+Redis, Kafka from Confluent, …), pinned to a commit and listed in `vendor.lock.json` of the Aizen repo. It says
+**how to do a thing right in that tool**; core rules decide **how much to build and who decides**. So a vendored
+rule never overrides the authority levels, the questions-only-before-approve rule, least code, local-only git or
+the owner's decisions: when a vendored guide says "ask the user first", "announce", "install X", "add an
+abstraction" or "deploy", the core rule wins and the vendored step becomes a plan question or an A3 item. A
+vendored rule that conflicts with a pack guide on substance → follow the pack guide, cite both in the report.
+
+## 4. Traceability IDs
+
+| Prefix | Meaning | Created by |
+|---|---|---|
+| `FR` `NFR` `BR` `AC` | requirements, rules, acceptance criteria | planner (discover) |
+| `SCR` `CMP` | screen, frontend component | planner (design) or dev (ui), whoever first |
+| `EP` · `THR` `CTL` | endpoint/event · threat, control | planner (design) |
+| `TC` `BUG` | test case, bug | tester |
+| `F` | review finding | reviewer |
+| `D` | decision | whoever records it in `DECISIONS.md` |
+| `U` `X` `R` | unknown, contradiction, risk in as-built docs | planner (discover) |
+| `L` | lesson | any role |
+
+IDs are never renumbered once published; retire with `~~FR-07~~ removed D-12`.

@@ -1,0 +1,12 @@
+{
+  "name": "aizen-skill-importer",
+  "version": "3.0.0",
+  "description": "Import a skill or upstream knowledge from GitHub or a local folder into Aizen, with source, licence and pinned commit, customize it and prove it in an A/B test",
+  "framework": "Aizen",
+  "kind": "entry",
+  "requires": [
+    "aizen-core",
+    "aizen-skill-creator",
+    "aizen-skill-eval"
+  ]
+}

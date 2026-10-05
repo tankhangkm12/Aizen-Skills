@@ -3,8 +3,8 @@
 **Mục tiêu:** mỗi lần một skill Aizen làm chưa tốt, vấn đề được ghi lại; vấn đề lặp lại hoặc nghiêm trọng được
 sửa có kiểm chứng (baseline + eval), không sửa vội theo một trường hợp.
 
-`FB` = `python "<skill-creator>/scripts/feedback.py"` (`<skill-creator>` = thư mục skill `skill-creator` đã cài,
-vd. `~/.claude/skills/skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen-work/feedback/<skill>.jsonl`.
+`FB` = `python "<aizen-skill-creator>/scripts/authoring/feedback.py"` (`<aizen-skill-creator>` = thư mục skill `aizen-skill-creator` đã cài,
+vd. `~/.claude/skills/aizen-skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen-work/feedback/<skill>.jsonl`.
 
 ## Khi nào kích hoạt — chỉ khi có tín hiệu
 
@@ -36,6 +36,6 @@ Không tìm thấy repo → bỏ qua và nói một dòng; không bao giờ ch�
 
 ## Bước C — Sửa (sau khi được duyệt)
 
-Theo "Workflow — improve an existing skill" của `skill-creator`: baseline → sửa → bump `manifest.json` → thêm
+Theo "Workflow — improve an existing skill" của `aizen-skill-creator`: baseline → sửa → bump `manifest.json` → thêm
 eval case từ `--prompt` đã ghi → eval với vs không → `npm test` → `node bin/cli.js sync` → commit đúng file đã sửa
 → `FB resolve --skill <id> --id <n> --commit <sha>`. Không `git push` trừ khi người dùng cho phép lần push đó.

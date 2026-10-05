@@ -1,0 +1,11 @@
+# agent workspace, agent tool files and local secrets (aizen-init)
+.aizen/
+.claude/
+.agents/
+.cursor/
+.windsurf/
+.gemini/
+.codex/
+.aizen-work/
+graphify-out/
+.env
