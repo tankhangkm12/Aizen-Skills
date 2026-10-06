@@ -5,7 +5,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { runInstall } = require('./install');
+const { refreshAfterUpdate } = require('./install');
 
 const isWindows = process.platform === 'win32';
 const packageJsonPath = path.resolve(__dirname, '..', 'package.json');
@@ -67,7 +67,7 @@ async function updateSkills(options = {}) {
     try {
       execSync('git pull --rebase', { stdio: 'inherit', cwd: path.resolve(__dirname, '..') });
       console.log('  ✓ Đã cập nhật mã nguồn thành công.');
-      runInstall();
+      refreshAfterUpdate();
       return;
     } catch (err) {
       console.error('  ! Lỗi khi git pull:', err.message);
@@ -83,7 +83,7 @@ async function updateSkills(options = {}) {
       try {
         execSync(`npm update -g ${pkg.name}`, { stdio: 'inherit' });
         console.log('  ✓ Đã cập nhật gói thành công.');
-        runInstall();
+        refreshAfterUpdate();
       } catch (e) {
         console.warn(`  ! Hãy chạy thủ công: npm update -g ${pkg.name}`);
       }

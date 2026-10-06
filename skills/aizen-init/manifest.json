@@ -16,7 +16,7 @@
       {
         "id": "init-gate",
         "type": "command",
-        "run": "python3 \"{skill_dir}/scripts/gate.py\" --project \"{ws}\" 11"
+        "run": "uv run \"{skill_dir}/scripts/gate.py\" --project \"{ws}\" 11"
       }
     ],
     "verifier": {

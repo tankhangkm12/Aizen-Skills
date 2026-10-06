@@ -11,14 +11,14 @@ description: "Bring outside knowledge into Aizen (v4) - either a whole skill fro
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-importer --run <skill-name> --goal "…"` (run id = the destination name); the confirmed change list goes to `.aizen/runs/<RUN>/work/change-summary.md`, then `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's ok>"`.
+`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-importer --run <skill-name> --goal "…"` (run id = the destination name); the confirmed change list goes to `.aizen/runs/<RUN>/work/change-summary.md`, then `uv run "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's ok>"`.
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
-  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  `references/core/verifier.md` + the output of `uv run "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
   itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
@@ -48,7 +48,7 @@ Stars measure a repo, not each skill in it: read the skill itself before choosin
 
 1. **Source and name.** A GitHub folder URL (`https://github.com/<owner>/<repo>/tree/<ref>/<path>`) or a local folder
    with `SKILL.md`, and a destination name (`aizen-<what>`). Existing `skills/<name>` → propose another name.
-2. **Fetch.** `python "<SKILL_DIR>/scripts/fetch_skill.py" <source> <name>` → the skill in `skills/<name>/`,
+2. **Fetch.** `uv run "<SKILL_DIR>/scripts/fetch_skill.py" <source> <name>` → the skill in `skills/<name>/`,
    the untouched original in `<REPO>/.aizen/cache/import/<name>/baseline/`. Report files, licence and what was changed.
 3. **Analyze, then interview (one round, then stop and wait).** Read the whole copy. Ask 3–4 questions from
    `references/interview-guide.md`, each with a proposal tied to what the skill does today, plus the **sample

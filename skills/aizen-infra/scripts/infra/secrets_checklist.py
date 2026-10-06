@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Secret names for a pipeline, and a scan for plaintext secrets in the workspace (aizen-infra, v24).
 
 Never takes a secret value as an argument: values are typed by the owner into the CI secret store

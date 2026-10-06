@@ -50,7 +50,7 @@ The MCP server is host configuration — the owner adds it themselves; you only 
 
 ## 3. The loop
 
-`UIKIT` below is `python "<FRONTEND_DIR>/scripts/frontend/uikit.py"` — `<FRONTEND_DIR>` is the `aizen-frontend` folder in your brief's path table
+`UIKIT` below is `uv run "<FRONTEND_DIR>/scripts/frontend/uikit.py"` — `<FRONTEND_DIR>` is the `aizen-frontend` folder in your brief's path table
 (`python3` / `py` where `python` is not on PATH).
 
 ```bash
@@ -75,11 +75,11 @@ playwright-cli -s=$S close                     # then stop the dev server you st
 4. **Compare with the design** when an export exists. Exports live in the main checkout at
    `.aizen/knowledge/apps/<app>/ui-exports/<SCR>-<slug>--<state>--<breakpoint>.png` (`dev` (ui) handoff);
    the breakpoint names map to widths in `<app>-ui.md`. Capture at the export's width and height, then
-   `python3 $UIKIT diff <export.png> <shot> --out <shot>-diff.png` — report the percentage and the
+   `uv run $UIKIT diff <export.png> <shot> --out <shot>-diff.png` — report the percentage and the
    difference box; look at the diff image before judging. PNG at 1x only: an SVG export or an @2x image
    is compared by eye (structure), not by pixels.
 5. **Measure contrast** of every text/background pair you introduced:
-   `python3 $UIKIT contrast "#6b7280" "#ffffff"` (AA: 4.5 text, 3 large text and UI parts).
+   `uv run $UIKIT contrast "#6b7280" "#ffffff"` (AA: 4.5 text, 3 large text and UI parts).
 6. **Guidelines.** Check the changed files against `references/frontend/web-interface-guidelines.md`.
 7. **dev (fe):** fix, re-capture, re-measure — at most 3 polish rounds per screen, then report what remains
    (a failing build or command still follows `references/flow/parallel.md` §6). **`tester`:** never fix — each defect

@@ -23,8 +23,8 @@ the **design system behind the picture** — tokens and components the repo can 
 ## 2. Tokens, measured
 
 ```bash
-python3 $UIKIT palette ref.png --tokens <path>/design-tokens.json   # colours → nearest token, ΔE
-python3 $UIKIT contrast "#1f2937" "#ffffff"                          # every text/background pair
+uv run $UIKIT palette ref.png --tokens <path>/design-tokens.json   # colours → nearest token, ΔE
+uv run $UIKIT contrast "#1f2937" "#ffffff"                          # every text/background pair
 ```
 
 (`$UIKIT` = this skill's `scripts/frontend/uikit.py`, see `visual-check.md` §3; Windows: `py`.)
@@ -54,7 +54,7 @@ Render at the picture's CSS viewport — its pixel size divided by its scale (a 
 screenshot is a 1390 px viewport): `playwright-cli resize <w> <h>`, screenshot, then (1x pictures):
 
 ```bash
-python3 $UIKIT diff ref.png shot.png --out shot-diff.png
+uv run $UIKIT diff ref.png shot.png --out shot-diff.png
 ```
 
 Spec: iterate until the remaining difference is explained (fonts, live data, anti-aliasing) — report the

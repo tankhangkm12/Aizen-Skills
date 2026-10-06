@@ -15,14 +15,14 @@ finds it, or ask the user for the path).
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-creator --run <skill-name> --goal "…"` (the run id is the new skill's name); the confirmed design note goes to `.aizen/runs/<RUN>/work/design-note.md`, then `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's ok>"`.
+`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-creator --run <skill-name> --goal "…"` (the run id is the new skill's name); the confirmed design note goes to `.aizen/runs/<RUN>/work/design-note.md`, then `uv run "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's ok>"`.
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
-  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  `references/core/verifier.md` + the output of `uv run "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
   itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
@@ -38,7 +38,7 @@ finds it, or ask the user for the path).
    Anything already in `aizen-core` (authority, evidence, git, code quality, MCP) is linked, never repeated.
 3. **Design note (confirm before writing).** ≤ 15 lines: name, kind, topics, requires, description, workflow
    steps, files, eval prompts. Wait for "ok".
-4. **Scaffold.** `python "<SKILL_DIR>/scripts/authoring/new_skill.py" <name> --description "<…>" --title "<…>"` —
+4. **Scaffold.** `uv run "<SKILL_DIR>/scripts/authoring/new_skill.py" <name> --description "<…>" --title "<…>"` —
    creates only `SKILL.md` + `manifest.json`; never overwrites an existing skill.
 5. **Write the skill** to the standard: `SKILL.md` lean (≤ ~150 lines) with imperative steps; long knowledge in
    `references/` with "when to read"; repeatable logic in `scripts/` (stdlib, `--help`, `--selfcheck`); hard limits
@@ -55,7 +55,7 @@ finds it, or ask the user for the path).
 ## Workflow — improve an existing skill
 
 1. Read the whole skill, the user's complaint or goal, and its open feedback
-   (`python "<SKILL_DIR>/scripts/authoring/feedback.py" list --skill <name> --open`); reproduce the weakness with one prompt.
+   (`uv run "<SKILL_DIR>/scripts/authoring/feedback.py" list --skill <name> --open`); reproduce the weakness with one prompt.
 2. Copy the current version to `<REPO>/.aizen/cache/import/<name>/baseline/` (never inside `skills/`).
 3. Propose the change as a short diff summary (files, what changes, why) → wait for "ok".
 4. Edit; bump `manifest.json` version (patch / minor / major) and any `(vN)` in headings to match; update the
@@ -80,5 +80,5 @@ finds it, or ask the user for the path).
 | structure, manifest, docs rows, git rules | `<REPO>/docs/aizen-skill-standard.md` |
 | rules for authoring and importing | `references/authoring/rules.md` |
 | eval set, runs, grading, benchmark | `references/eval/schemas.md`, `references/eval/grader.md` (aizen-skill-eval) |
-| skill feedback log (`log` / `list` / `resolve`) | `scripts/authoring/feedback.py`, `<REPO>/rules/continuous-improvement.md` |
+| skill feedback log (`log` / `list` / `resolve`) | `scripts/authoring/feedback.py`, `<CORE_DIR>/rules/continuous-improvement.md` (aizen-core) |
 | skeleton | `assets/authoring/skill-template.md` |

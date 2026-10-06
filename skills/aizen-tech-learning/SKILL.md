@@ -14,14 +14,14 @@ component map (IDs `C1…Cn`) → one branch per layer → core algorithm → co
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. Step 0 starts the run: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-tech-learning --goal "<technology> for <workload>" --output <note path>`; after the intake answers, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's answers>"`. Writing the note before `go` is refused.
+`<CORE_DIR>` = the aizen-core folder next to this skill. Step 0 starts the run: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-tech-learning --goal "<technology> for <workload>" --output <note path>`; after the intake answers, `uv run "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's answers>"`. Writing the note before `go` is refused.
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
-  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  `references/core/verifier.md` + the output of `uv run "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
   itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
@@ -54,9 +54,9 @@ component map (IDs `C1…Cn`) → one branch per layer → core algorithm → co
 7. **In practice (short).** Quick start, the production settings that tune the mechanisms above (say which
    C-ID/layer each one affects), SDKs; AI agent / MCP integration only when it exists.
 8. **Write and check.** Fill `references/tree-template.md` in the user's language into the markdown file, then
-   `python "<SKILL_DIR>/scripts/check_tree.py" <file>` (add `--min-alternatives 1` when the user named only one
+   `uv run "<SKILL_DIR>/scripts/check_tree.py" <file>` (add `--min-alternatives 1` when the user named only one
    alternative). Fix until PASS.
-9. **Publish to Notion.** `python "<SKILL_DIR>/scripts/to_notion.py" <file>` → `<file>.notion.md` + the title
+9. **Publish to Notion.** `uv run "<SKILL_DIR>/scripts/to_notion.py" <file>` → `<file>.notion.md` + the title
    (the `#` heading becomes the page title; tables become Notion `<table>`; URLs become links; markup
    characters are escaped; mermaid stays a `mermaid` code block, which Notion renders). Then `notion-search`
    for that title under the parent: found → `notion-update-page`, else `notion-create-pages` with the

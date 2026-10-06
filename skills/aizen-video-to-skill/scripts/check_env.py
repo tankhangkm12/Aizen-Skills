@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Check which tools aizen-video-to-skill needs and print install hints.
 
-Usage: python3 check_env.py [--json]
+Usage: uv run check_env.py [--json]
 Exit code 0 if everything required for the common paths is present, 1 otherwise.
 This script never installs anything; the agent must ask the user first.
 """
@@ -30,8 +34,8 @@ def install_hints():
     }.get(system, "see https://ffmpeg.org/download.html")
     return {
         "ffmpeg": ffmpeg,
-        "yt-dlp": f"{sys.executable} -m pip install -U yt-dlp",
-        "faster-whisper": f"{sys.executable} -m pip install -U faster-whisper",
+        "yt-dlp": "uv tool install yt-dlp",
+        "faster-whisper": "uv run --with faster-whisper --script scripts/extract_content.py ...  (no install; uv caches it)",
     }
 
 

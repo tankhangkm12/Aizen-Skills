@@ -6,16 +6,16 @@ const os = require('os');
 const path = require('path');
 
 const skill = (...p) => path.join(__dirname, '..', 'skills', ...p);
-const python = ['python3', 'python'].find(p => spawnSync(p, ['--version']).status === 0);
-if (!python) {
-  // Máy dev không có Python thì bỏ qua; CI thì bắt buộc.
-  console[process.env.CI ? 'error' : 'warn']('[SCRIPTS] không tìm thấy python3/python');
+// Script chạy đúng như người dùng chạy: `uv run --script` (header PEP 723, uv tự tải Python).
+if (spawnSync('uv', ['--version']).status !== 0) {
+  // Máy dev không có uv thì bỏ qua; CI thì bắt buộc.
+  console[process.env.CI ? 'error' : 'warn']('[SCRIPTS] không tìm thấy uv');
   process.exit(process.env.CI ? 1 : 0);
 }
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'aizen-'));
 const run = (args, expect = 0) => {
-  const r = spawnSync(python, args, { cwd: tmp, encoding: 'utf8', env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
+  const r = spawnSync('uv', ['run', '--quiet', '--script', ...args], { cwd: tmp, encoding: 'utf8', env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
   return { ok: r.status === expect, status: r.status, out: (r.stdout || '') + (r.stderr || '') };
 };
 const S = {
@@ -63,4 +63,4 @@ for (const [label, args, expect] of cases) {
 }
 fs.rmSync(tmp, { recursive: true, force: true });
 if (failed) process.exit(1);
-console.log(`[SCRIPTS] ${cases.length} kiểm tra script Python đều đạt (${python}).`);
+console.log(`[SCRIPTS] ${cases.length} kiểm tra script Python đều đạt (uv run --script).`);

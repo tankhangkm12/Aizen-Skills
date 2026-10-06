@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Validate a generated skill folder against the standard layout.
 
-Usage: python3 validate_skill.py <skill-folder>
+Usage: uv run validate_skill.py <skill-folder>
 Checks: SKILL.md exists, frontmatter has name+description, name is kebab-case
 and matches the folder, description is meaningful, body length is sane,
 referenced files exist, no leftover template placeholders.

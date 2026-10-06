@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """new_skill.py — scaffold a new Aizen entry skill (docs/aizen-skill-standard.md, v3).
 
-    python <SKILL_DIR>/scripts/authoring/new_skill.py <name> --description "<what. Use when … Not for …>" [--title "..."]
-    python <SKILL_DIR>/scripts/authoring/new_skill.py --selfcheck
+    uv run <SKILL_DIR>/scripts/authoring/new_skill.py <name> --description "<what. Use when … Not for …>" [--title "..."]
+    uv run <SKILL_DIR>/scripts/authoring/new_skill.py --selfcheck
 
 Creates <repo>/skills/<name>/ with SKILL.md (from assets/authoring/) and manifest.json only — add rules/,
 agents/, references/, scripts/, assets/ when the skill has something to put there (no empty folders)

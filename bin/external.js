@@ -114,4 +114,4 @@ function main(argv) {
 }
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));
-module.exports = { main, declared, installedExternals, externalRoot };
+module.exports = { main, list, declared, installedExternals, externalRoot };

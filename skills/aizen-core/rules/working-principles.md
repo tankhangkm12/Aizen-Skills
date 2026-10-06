@@ -1,6 +1,6 @@
 # Working principles for coding agents (Aizen, after Karpathy)
 
-Installed for every agent session by `aizen sync`. Inside an Aizen skill (aizen-build, aizen-init, …) the skill's
+Installed as a session rule by `guard.py install` (per project) or `aizen sync --global` (whole machine). Inside an Aizen skill (aizen-build, aizen-init, …) the skill's
 own rules decide **when** to ask and how much to build; these four say **how** to behave everywhere else too.
 Source: github.com/multica-ai/andrej-karpathy-skills (MIT); Aizen's checked version is in aizen-core.
 

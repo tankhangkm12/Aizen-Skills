@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Self-check for guard.py and project.py — `python guard.py --selfcheck` / `python project.py --selfcheck`.
 
 Builds throw-away git projects and walks a run of aizen-build and of a file-producing skill through the hooks.
@@ -8,6 +12,7 @@ import contextlib
 import io
 import subprocess
 import tempfile
+import sys
 from pathlib import Path
 
 import guard as G
@@ -282,12 +287,19 @@ def migrate_and_install() -> None:
         assert (old / "knowledge" / "decisions.md").is_file() and (old / "config" / "conventions.md").is_file()
         proj = (old / "PROJECT.md").read_text()
         assert "\n### Parts" not in proj and "\n#### Parts" in proj and "D-01 use Postgres" in proj and "npm test" in proj
+        (ws / ".agents" / "skills").mkdir(parents=True)
         for _ in range(2):
             quiet(G.cmd_install, ws)
         cs = G.read_json(ws / ".claude" / "settings.local.json", {})
-        assert len(cs["hooks"]["Stop"]) == 1 and "/aizen-core/scripts/core/guard.py" in cs["hooks"]["Stop"][0]["hooks"][0]["command"]
-        assert "aizen-guard" in G.read_json(ws / ".agents" / "hooks.json", {})
-        assert (ws / ".git" / "hooks" / "pre-push").is_file()
+        stop_cmd = cs["hooks"]["Stop"][0]["hooks"][0]["command"]
+        assert len(cs["hooks"]["Stop"]) == 1 and "/aizen-core/scripts/core/guard.py" in stop_cmd
+        # hooks run through uv — never a Python path baked in at install time
+        agy = G.read_json(ws / ".agents" / "hooks.json", {})["aizen-guard"]
+        assert stop_cmd.startswith("uv run --quiet --script ") and sys.executable not in stop_cmd
+        assert agy["PreToolUse"][0]["hooks"][0]["command"].startswith("uv run --quiet --script ")
+        assert "exec uv run --quiet --script " in (ws / ".git" / "hooks" / "pre-push").read_text()
+        rule = ws / ".agents" / "rules" / "aizen-working-principles.md"
+        assert rule.read_text(encoding="utf-8").startswith("---\ntrigger: always_on\n---\n")
         assert ".aizen/" in (ws / ".git" / "info" / "exclude").read_text()
 
 

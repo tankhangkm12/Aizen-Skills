@@ -13,12 +13,12 @@ and scripts for their eval / A/B steps; you can also run it alone on any skill.
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-eval --goal "evaluate <skill>"`; after the owner confirms the success criteria, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Graders follow `references/core/verifier.md` (aizen-core) — the same judge the guard uses.
+`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-eval --goal "evaluate <skill>"`; after the owner confirms the success criteria, `uv run "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Graders follow `references/core/verifier.md` (aizen-core) — the same judge the guard uses.
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
 
@@ -37,7 +37,7 @@ and scripts for their eval / A/B steps; you can also run it alone on any skill.
    result `[not independent]`.
 4. **Grade** each run with `references/eval/grader.md` → `grading.json`. Customization A/B (importer, improve):
    also `references/eval/comparator.md` with the agreed change list → PASS / FAIL per item.
-5. **Aggregate**: `python "<SKILL_DIR>/scripts/eval/aggregate_benchmark.py" <iteration dir> --skill-name <name>`
+5. **Aggregate**: `uv run "<SKILL_DIR>/scripts/eval/aggregate_benchmark.py" <iteration dir> --skill-name <name>`
    → `review.md`: pass rate with vs without, time and tokens, failing expectations.
 6. **Diagnose and report**: trigger misses → the `description`; process/style misses → concrete examples or
    fewer degrees of freedom in the skill; waste → say what not to do. Every new failure becomes an eval case,

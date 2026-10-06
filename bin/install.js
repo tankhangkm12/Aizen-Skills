@@ -290,21 +290,20 @@ ${fs.readFileSync(skillMd, 'utf8')}
 // guard.py của aizen-core: hợp đồng chung cho mọi skill — hook Claude Code + Antigravity + pre-push, chỉ trong dự án
 const coreScripts = path.join(skillsDir, 'aizen-core', 'scripts', 'core');
 const guardScript = path.join(coreScripts, 'guard.py');
-function findPython() {
+// Script Python của Aizen chạy bằng uv (PEP 723): uv tự tải Python, máy không cần cài Python.
+const UV_HINT = 'Cài uv: Windows `winget install astral-sh.uv` · macOS/Linux `curl -LsSf https://astral.sh/uv/install.sh | sh`, '
+  + 'mở terminal mới (khởi động lại agent) rồi chạy lại.';
+function hasUv() {
   const { spawnSync } = require('child_process');
-  return ['python3', 'python', 'py'].find(p => {
-    const r = spawnSync(p, ['--version'], { encoding: 'utf8' });
-    return r.status === 0 && /Python 3/.test((r.stdout || '') + (r.stderr || ''));
-  });
+  return spawnSync('uv', ['--version'], { encoding: 'utf8' }).status === 0;
 }
 function runGuard(args, options = {}, script = guardScript) {
   const { spawnSync } = require('child_process');
-  const python = findPython();
-  if (!python) {
-    console.warn('  ! [Aizen Guard] Không tìm thấy Python 3 — bỏ qua hook ép quy trình.');
-    return 1;
+  if (!hasUv()) {
+    console.warn(`  ! [Aizen] Không tìm thấy uv — ${UV_HINT}`);
+    return 3;
   }
-  const r = spawnSync(python, [script, ...args], { stdio: options.stdio || 'inherit', encoding: 'utf8' });
+  const r = spawnSync('uv', ['run', '--quiet', '--script', script, ...args], { stdio: options.stdio || 'inherit', encoding: 'utf8' });
   return r.status === null ? 1 : r.status;
 }
 function installGuard(projectDir = process.cwd(), verbose = true) {
@@ -342,9 +341,9 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
   }
 }
 
-// rules/*.md của repo (luật áp cho mọi skill, vd. continuous-improvement.md)
+// Luật phiên làm việc nằm trong aizen-core/rules/ để đi cùng skill khi cài bằng skills.sh
 function repoRules() {
-  const rulesDir = path.join(rootDir, 'rules');
+  const rulesDir = path.join(skillsDir, 'aizen-core', 'rules');
   return fs.existsSync(rulesDir) ? fs.readdirSync(rulesDir).filter(f => f.endsWith('.md')).map(f => path.join(rulesDir, f)) : [];
 }
 
@@ -352,14 +351,15 @@ function repoRules() {
 function installGlobalRules(verbose = true, homedir = os.homedir()) {
   const rules = repoRules();
   if (!rules.length) return;
+  // Antigravity bỏ qua file rule thiếu front-matter `trigger`
   const targets = [
-    ['Antigravity Rules', path.join(homedir, '.gemini', 'config', 'rules')],
-    ['Claude Code Rules', path.join(homedir, '.claude', 'rules')],
+    ['Antigravity Rules', path.join(homedir, '.gemini', 'config', 'rules'), '---\ntrigger: always_on\n---\n'],
+    ['Claude Code Rules', path.join(homedir, '.claude', 'rules'), ''],
   ];
-  for (const [name, dir] of targets) {
+  for (const [name, dir, head] of targets) {
     try {
       fs.mkdirSync(dir, { recursive: true });
-      for (const src of rules) fs.copyFileSync(src, path.join(dir, path.basename(src)));
+      for (const src of rules) fs.writeFileSync(path.join(dir, path.basename(src)), head + fs.readFileSync(src, 'utf8'), 'utf8');
       if (verbose) console.log(`  ✓ [${name}] Đã sao chép ${rules.length} system rules -> ${dir}`);
     } catch (err) {
       if (verbose) console.warn(`  ! [${name}] Lỗi: ${err.message}`);
@@ -385,9 +385,22 @@ function installAntigravityPlugin(verbose = true) {
 
 // Entrypoint chính
 function runInstall(options = {}) {
-  const isAuto = options.auto || process.argv.includes('--auto');
-  const isProject = options.project || process.argv.includes('--project');
-  const isGlobal = options.global || process.argv.includes('--global') || !isProject;
+  const argv = options.argv || process.argv;
+  if (options.postinstall || argv.includes('--postinstall')) {
+    // npm install không còn tự liên kết toàn máy: người dùng chọn rõ phạm vi.
+    console.log('\n[Aizen Skills] Đã tải mã nguồn. Chưa liên kết vào agent nào. Chọn một:');
+    console.log('  · Cho một dự án:  cd <dự án> && node ' + path.join(rootDir, 'bin', 'cli.js') + ' sync --project');
+    console.log('  · Cho toàn máy:   node ' + path.join(rootDir, 'bin', 'cli.js') + ' sync --global');
+    console.log('  · Không cần clone: npx skills add tankhangkm12/Aizen-Skills (xem README)\n');
+    return;
+  }
+  const isGlobal = options.global || argv.includes('--global');
+  const isProject = options.project || argv.includes('--project') || !isGlobal;
+  if (isProject && !isGlobal && path.resolve(process.cwd()) === path.resolve(rootDir)) {
+    console.error('[Aizen Skills] Đang đứng trong repo Aizen-Skills. Hãy `cd` vào dự án rồi `sync --project`, hoặc dùng `sync --global`.');
+    process.exitCode = 2;
+    return;
+  }
 
   // Cấp quyền thực thi nếu chạy trên Linux / macOS
   ensurePermissions(rootDir);
@@ -422,6 +435,14 @@ function runInstall(options = {}) {
   console.log('==================================================\n');
 }
 
+// Sau `aizen update`: junction đã tự thấy nội dung mới; chỉ cần liên kết lại toàn máy nếu trước đó đã cài toàn máy.
+function refreshAfterUpdate() {
+  const hadGlobal = agentsConfig.global.some(a => fs.existsSync(path.join(a.targetDir, 'aizen-core')));
+  if (hadGlobal) runInstall({ global: true });
+  console.log('  ℹ Dự án cài bằng `sync --project` tự thấy bản mới; skill mới thêm vào thì chạy lại `sync --project` trong dự án đó.');
+  console.log('  ℹ Dự án cài bằng skills.sh: chạy `npx skills update` trong dự án đó.');
+}
+
 if (require.main === module) {
   runInstall();
 }
@@ -438,5 +459,7 @@ module.exports = {
   createLink,
   safeRemoveLink,
   pruneStaleLinks,
-  runInstall
+  runInstall,
+  refreshAfterUpdate,
+  hasUv
 };

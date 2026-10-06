@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """apikit — look at an API the way its consumers meet it (Aizen reviewer, api-ux lens, v24).
 
     apikit.py summary  api.yaml               # consistency lint: naming, pagination, errors, formats, status codes

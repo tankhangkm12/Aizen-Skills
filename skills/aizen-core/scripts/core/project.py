@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """project.py — compile .aizen/PROJECT.md, the one file the owner reads to understand and steer the project (v25).
 
-    python <CORE_DIR>/scripts/core/project.py [--workspace .]     # rebuild now (the guard also does it on every change)
-    python <CORE_DIR>/scripts/core/project.py --selfcheck
+    uv run <CORE_DIR>/scripts/core/project.py [--workspace .]     # rebuild now (the guard also does it on every change)
+    uv run <CORE_DIR>/scripts/core/project.py --selfcheck
 
 PROJECT.md is compiled, never edited: the content comes from .aizen/knowledge/ (system, modules, decisions,
 lessons), .aizen/config/conventions.md, .aizen/backlog.md and .aizen/runs|archive/. Change the source, the map

@@ -3,7 +3,7 @@
 ## Dispatch
 
 - One role instance = one **Agent** tool call. Prompt = the full output of
-  `python "<SKILL_DIR>/scripts/flow/state.py" brief …` (header line first); it already names the absolute paths of
+  `uv run "<SKILL_DIR>/scripts/flow/state.py" brief …` (header line first); it already names the absolute paths of
   `agents/<role>.md` and `references/core/rules.md`.
 - `subagent_type`: `general-purpose` for every role — the planner writes its plan file, and the reviewer
   brief already says READ-ONLY. Never `Plan`/`Explore`: they cannot write their report.

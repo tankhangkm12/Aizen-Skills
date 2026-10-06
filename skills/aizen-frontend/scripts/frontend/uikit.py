@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """UI measurement helpers for Aizen frontend roles — numbers, not eyeballing (v24).
 
   uikit.py contrast "#1d4ed8" "#ffffff"                  WCAG 2.x contrast ratio and AA/AAA verdicts

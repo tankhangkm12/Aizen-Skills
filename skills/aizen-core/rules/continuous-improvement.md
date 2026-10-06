@@ -3,7 +3,7 @@
 **Mục tiêu:** mỗi lần một skill Aizen làm chưa tốt, vấn đề được ghi lại; vấn đề lặp lại hoặc nghiêm trọng được
 sửa có kiểm chứng (baseline + eval), không sửa vội theo một trường hợp.
 
-`FB` = `python "<aizen-skill-creator>/scripts/authoring/feedback.py"` (`<aizen-skill-creator>` = thư mục skill `aizen-skill-creator` đã cài,
+`FB` = `uv run "<aizen-skill-creator>/scripts/authoring/feedback.py"` (`<aizen-skill-creator>` = thư mục skill `aizen-skill-creator` đã cài,
 vd. `~/.claude/skills/aizen-skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen/knowledge/feedback/<skill>.jsonl`.
 
 ## Khi nào kích hoạt — chỉ khi có tín hiệu

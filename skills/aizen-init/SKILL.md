@@ -18,12 +18,12 @@ Spring Boot / FastAPI guides), `references/infra/platforms/docker.md`, `referenc
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. The run is `init`: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-init --run init --goal "<project>"` before `check_inputs.py`. At each checkpoint `python "<CORE_DIR>/scripts/core/guard.py" ask --run init --question "<what to approve>"`, stop; on the owner's ok `python "<CORE_DIR>/scripts/core/guard.py" go --run init --text "<their words>"` and set `Approved: yes`.
+`<CORE_DIR>` = the aizen-core folder next to this skill. The run is `init`: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-init --run init --goal "<project>"` before `check_inputs.py`. At each checkpoint `uv run "<CORE_DIR>/scripts/core/guard.py" ask --run init --question "<what to approve>"`, stop; on the owner's ok `uv run "<CORE_DIR>/scripts/core/guard.py" go --run init --text "<their words>"` and set `Approved: yes`.
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - The contract runs `gate.py 11`: every step report, checkpoint approval and artifact.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
@@ -33,7 +33,7 @@ Spring Boot / FastAPI guides), `references/infra/platforms/docker.md`, `referenc
 Run steps **in order**. Before each step run the gate; it must exit 0:
 
 ```bash
-python "<SKILL_DIR>/scripts/gate.py" --project <P> <step>
+uv run "<SKILL_DIR>/scripts/gate.py" --project <P> <step>
 ```
 
 After each step write `.aizen/runs/init/reports/step-<N>.md` (`assets/report-template.md`) with `Status: done` and the
@@ -43,7 +43,7 @@ stop, show the report, and wait for the user's "ok"; then set `Approved: yes`. D
 
 **Pre-step — inputs.** Need a GitHub/GitLab repo URL and the detailed project documents. Missing either → ask
 for it and stop. Then:
-`python "<SKILL_DIR>/scripts/check_inputs.py" --project <P> --repo <url> --docs <file|dir|url> [...]`
+`uv run "<SKILL_DIR>/scripts/check_inputs.py" --project <P> --repo <url> --docs <file|dir|url> [...]`
 — creates `.aizen/runs/init/{plans,reports,graphify}`, writes `.aizen/runs/init/inputs.md`, adds the agent entries of
 `assets/gitignore-agent.txt` to `<P>/.gitignore`.
 

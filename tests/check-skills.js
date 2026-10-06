@@ -97,6 +97,15 @@ for (const id of ids) {
     const text = fs.readFileSync(f, 'utf8');
     if (/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(text)) errors.push(`${rel}: chứa ký tự điều khiển`);
     if (!inVendor && STALE.test(text)) errors.push(`${rel}: còn tên cũ "${text.match(STALE)[0]}"`);
+    // Script của Aizen chạy bằng uv: phải có header PEP 723, và tài liệu/luật không được gọi `python <script>`.
+    if (/(^|[\\/])scripts[\\/].*\.py$/.test(rel) && !inVendor && !/^# \/\/\/ script$/m.test(text)) {
+      errors.push(`${rel}: thiếu header PEP 723 (# /// script … # ///) — script phải chạy được bằng \`uv run\``);
+    }
+    const RAW_PY = /\bpython3? (?=\\?["']|\$\{?[A-Za-z_]|<|\{|[A-Za-z0-9_./-]*\.py\b)/;
+    if (!inVendor && !/guard_selfcheck\.py$|grader\.md$/.test(rel) && RAW_PY.test(text)) {
+      const line = text.split('\n').find(l => RAW_PY.test(l)).trim().slice(0, 80);
+      errors.push(`${rel}: gọi script bằng python thay vì \`uv run\`: ${line}`);
+    }
     if (!f.endsWith('.md')) continue;
     if (!inVendor) {
       for (const [, ref] of text.matchAll(/`((?:references|assets|scripts|agents|rules)\/[A-Za-z0-9_./-]+\.(?:md|py|json|ya?ml|sh))`/g)) {

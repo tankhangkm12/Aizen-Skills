@@ -2,7 +2,7 @@
 
 You are the main session. You run this flow, dispatch roles, merge branches and talk to the owner. Roles do the
 specialist work. State lives in `.aizen/runs/<TASK>/`. Below, `state.py` means
-`python "<SKILL_DIR>/scripts/flow/state.py"` and `graph.py` means `python "<CORE_DIR>/scripts/core/graph.py"`
+`uv run "<SKILL_DIR>/scripts/flow/state.py"` and `graph.py` means `uv run "<CORE_DIR>/scripts/core/graph.py"`
 (`<SKILL_DIR>` = this skill's folder, `<CORE_DIR>` = the `aizen-core` folder next to it).
 
 **Two phases.** Plan and design are slow and talked through with the owner **module by module**. Once the owner

@@ -19,8 +19,8 @@ SỬ DỤNG:
   aizen [lệnh] [tùy chọn]
 
 CÁC LỆNH CHÍNH:
-  install, sync       Tự động nhận diện và liên kết toàn bộ skills vào các AI Agent
-                      Tùy chọn: --global (mặc định), --project
+  install, sync       Liên kết skills vào agent. Mặc định --project (dự án đang đứng);
+                      --global để cài cho mọi dự án trên máy. Script Python chạy bằng uv.
   update              Kiểm tra và cập nhật phiên bản mới nhất từ git / npm
   auto-update         Cấu hình tác vụ tự động cập nhật ngầm hàng ngày
                       Ví dụ: aizen auto-update enable  (hoặc disable)

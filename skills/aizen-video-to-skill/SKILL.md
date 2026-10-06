@@ -12,14 +12,14 @@ Why this is split into scripts + judgment: transcript extraction is deterministi
 
 ## Run contract (enforced by the guard)
 
-`<CORE_DIR>` = the aizen-core folder next to this skill. Step 1 starts the run: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-video-to-skill --goal "<what the skill should help with>" --output out/<name>/SKILL.md`; after the owner confirms the goal, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Publishing still needs the owner's yes (`python "<CORE_DIR>/scripts/core/guard.py" ask`).
+`<CORE_DIR>` = the aizen-core folder next to this skill. Step 1 starts the run: `uv run "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-video-to-skill --goal "<what the skill should help with>" --output out/<name>/SKILL.md`; after the owner confirms the goal, `uv run "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Publishing still needs the owner's yes (`uv run "<CORE_DIR>/scripts/core/guard.py" ask`).
 - Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
   `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
 - The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
-  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
-  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+  `uv run "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `uv run "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
 - When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
-  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  `references/core/verifier.md` + the output of `uv run "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
   itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
 - Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
   done and archives it.
@@ -38,13 +38,13 @@ Input is either a public YouTube URL or a path to a local video/audio file. Conf
 
 ### 2. Check the environment
 ```bash
-python3 scripts/check_env.py
+uv run scripts/check_env.py
 ```
-It reports whether `ffmpeg`, `yt-dlp` (URLs only) and `faster-whisper` (speech-to-text) are present, and prints install commands for the detected OS. **If a required tool is missing, tell the user which one and ask permission before installing** (e.g. `pip install -U yt-dlp faster-whisper`, `apt install ffmpeg` / `brew install ffmpeg` / `winget install ffmpeg`). If you cannot install (no permission, no network), ask the user how to proceed.
+It reports whether `ffmpeg`, `yt-dlp` (URLs only) and `faster-whisper` (speech-to-text) are present, and prints install commands for the detected OS. **If a required tool is missing, tell the user which one and ask permission before installing** (e.g. `uv tool install yt-dlp`; faster-whisper needs no install — run `extract_content.py` with `uv run --with faster-whisper --script`; `apt install ffmpeg` / `brew install ffmpeg` / `winget install ffmpeg`). If you cannot install (no permission, no network), ask the user how to proceed.
 
 ### 3. Extract the content
 ```bash
-python3 scripts/extract_content.py "<url-or-file>" --out ./out/work
+uv run scripts/extract_content.py "<url-or-file>" --out ./out/work
 ```
 The script tries, in order, and records which one worked in `manifest.json`:
 1. **Direct text**: human-written subtitles (YouTube manual captions, or a sidecar `.srt/.vtt`, or an embedded subtitle stream in a local file).
@@ -72,7 +72,7 @@ Follow `references/skill-output-template.md` for the exact folder layout, frontm
 - Include a source.md file inside the new skill's references folder with the video URL/title, extraction method and date, so the provenance is traceable. Keep the full transcript out of the skill unless the user asks for it.
 - Write the skill in English (shared standard for all agents) unless the user says otherwise; reply to the user in their own language.
 
-Then validate: `python3 scripts/validate_skill.py ./out/<new-skill-name>`.
+Then validate: `uv run scripts/validate_skill.py ./out/<new-skill-name>`.
 
 ### 6. Deliver and get review
 Show the user the new folder tree and a short summary of what the skill does and which video parts it came from. Wait for feedback and iterate. If the `aizen-skill-creator` skill is available, you may use it for test prompts and description tuning.

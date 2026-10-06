@@ -8,7 +8,7 @@ reading folders. It is a map, not evidence.
 ## Setup (coordinator, S0 of every task)
 
 ```bash
-python "<CORE_DIR>/scripts/core/graph.py" --project <ROOT>      # build or refresh <ROOT>/graphify-out/
+uv run "<CORE_DIR>/scripts/core/graph.py" --project <ROOT>      # build or refresh <ROOT>/graphify-out/
 ```
 
 - Exit 0 → the map is ready; every brief now prints the `Code map:` command with the absolute graph path.

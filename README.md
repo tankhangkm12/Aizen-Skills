@@ -26,19 +26,50 @@ bộ (hoặc ít nhất skill cần dùng cùng các skill trong `requires` củ
 
 ## Cài đặt
 
-Yêu cầu: Node.js ≥ 18, Git. Một số skill dùng thêm Python 3 (scripts) — không bắt buộc để cài.
+Yêu cầu: **Node.js ≥ 18** (cho `npx`) và **[uv](https://docs.astral.sh/uv/)**. Không cần cài Python: mọi script của
+Aizen có header [PEP 723](https://peps.python.org/pep-0723/) và chạy bằng `uv run`, uv tự tải Python phù hợp.
 
-### Cách 1 — Clone và liên kết (khuyến nghị)
+```bash
+winget install astral-sh.uv                        # Windows
+curl -LsSf https://astral.sh/uv/install.sh | sh    # macOS / Linux
+```
+
+Cài xong uv, mở terminal mới (và khởi động lại Antigravity / Claude Code) để PATH có `uv`.
+
+### Cách 1 — Dùng: cài cho một dự án qua skills.sh (khuyến nghị)
+
+Chạy trong thư mục gốc của dự án (đã `git init`):
+
+```bash
+npx skills add tankhangkm12/Aizen-Skills -a antigravity -s '*' -y      # chép 14 skill vào ./.agents/skills
+uv run .agents/skills/aizen-core/scripts/core/guard.py install         # hook, git pre-push, session rules, .aizen/
+```
+
+- `-a antigravity` → `./.agents/skills/`; thêm agent khác bằng `-a antigravity claude-code` (Claude Code →
+  `./.claude/skills/`). Không có `-g` nên **chỉ dự án này** thấy Aizen.
+- Bước `guard.py install` ghi hook dạng `uv run --script "<dự án>/.agents/skills/aizen-core/…/guard.py" hook …` vào
+  `.agents/hooks.json` (Antigravity), `.claude/settings.local.json` (Claude Code) và `.git/hooks/pre-push`; chép luật
+  phiên làm việc vào `.agents/rules/` (front-matter `trigger: always_on`) và `.claude/rules/`. Quên bước này cũng
+  không sao: skill entry tự chạy nó ở bước đầu (`aizen-core/references/core/rules.md` → Setup).
+- Cập nhật: `npx skills update` rồi chạy lại `guard.py install`. Chuyển thư mục dự án đi chỗ khác → chạy lại
+  `guard.py install` (hook dùng đường dẫn tuyệt đối tới bản trong dự án).
+- Skill cộng đồng dùng kèm, ví dụ archify: `npx skills add tt-a1i/archify -a antigravity -y`.
+
+### Cách 2 — Phát triển Aizen: clone và liên kết (live-sync)
+
+Dùng khi bạn sửa chính bộ skill: dự án liên kết (junction/symlink) vào repo nên sửa trong repo là agent thấy ngay.
 
 ```bash
 git clone https://github.com/tankhangkm12/Aizen-Skills.git
 cd Aizen-Skills
-npm install          # postinstall tự chạy bộ cài (global)
-# hoặc chạy tay:
-node bin/cli.js sync
+npm install                                        # chỉ tải; không tự liên kết vào agent nào
+cd /path/to/du-an && node /path/to/Aizen-Skills/bin/cli.js sync --project
 ```
 
-Bộ cài liên kết từng thư mục trong `skills/` vào:
+`sync --project` (mặc định của `sync`) liên kết vào `./.agents/skills`, `./.claude/skills`, tạo `./.cursor/rules/*.mdc`,
+cập nhật `AGENTS.md`, rồi chạy `guard.py install` như Cách 1.
+
+Muốn cài cho **mọi dự án trên máy** thì phải gõ rõ `node bin/cli.js sync --global`. Lệnh này liên kết vào:
 
 | Agent | Thư mục |
 |---|---|
@@ -50,27 +81,13 @@ Bộ cài liên kết từng thư mục trong `skills/` vào:
 | Cursor | `~/.cursor/skills` |
 | Windsurf | `~/.codeium/windsurf/skills` |
 
-Ngoài ra nó chép `rules/*.md` vào `~/.gemini/config/rules/` (Antigravity) và `~/.claude/rules/` (Claude Code), và đăng ký cả repo làm plugin Antigravity tại
+và chép luật phiên làm việc (`skills/aizen-core/rules/*.md`) vào `~/.gemini/config/rules/` (có front-matter
+`trigger: always_on`, thiếu nó Antigravity bỏ qua file) và `~/.claude/rules/`, đăng ký repo làm plugin Antigravity tại
 `~/.gemini/config/plugins/aizen-skills`.
 
 - **Windows** dùng NTFS junction (không cần quyền Admin); **Linux/macOS** dùng symlink và `chmod 755` cho scripts.
 - Thư mục thật trùng tên (skill bạn tự viết) **không bị ghi đè** — bộ cài chỉ cảnh báo.
 - Liên kết trỏ tới skill đã xóa/đổi tên được dọn khi chạy `sync`.
-
-Cài cho riêng một project (`./.agents/skills`, `./.claude/skills`, `./.cursor/rules/*.mdc`):
-
-```bash
-node /path/to/Aizen-Skills/bin/cli.js sync --project
-```
-
-### Cách 2 — Qua skills.sh
-
-```bash
-npx skills add tankhangkm12/Aizen-Skills --list   # xem danh sách
-npx skills add tankhangkm12/Aizen-Skills          # cài tất cả
-```
-
-Cách này chép skill (không live-sync, không cài rules/plugin).
 
 Sau khi cài, khởi động lại agent (hoặc mở session mới) để nó nạp danh sách skill.
 
@@ -112,8 +129,8 @@ Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có th�
 Bốn nguyên tắc của [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) áp cho mọi việc
 code, ở hai mức:
 
-- **Mọi session agent trên máy** — `rules/working-principles.md` được `sync` cài vào `~/.claude/rules/`,
-  `~/.gemini/config/rules/` (và `.mdc` cho Cursor khi `sync --project`).
+- **Mọi session agent trong dự án** — `skills/aizen-core/rules/working-principles.md` được `guard.py install` chép vào
+  `.agents/rules/` (Antigravity) và `.claude/rules/` (Claude Code) của dự án; `sync --global` chép cho cả máy; `.mdc` cho Cursor khi `sync --project`.
 - **Trong các skill Aizen** — mỗi nguyên tắc có chỗ thực thi và chỗ kiểm (bảng trong `skills/aizen-core/SKILL.md`):
 
 | Nguyên tắc | Aizen thực thi bằng |
@@ -220,16 +237,16 @@ bạn làm), chỉ hỏi ở pha thống nhất, không tự quyết thay bạn,
 dụng (YAGNI → có sẵn trong repo → stdlib → tính năng native → dependency đã có → mới viết), đánh dấu đường tắt bằng
 `ponytail: <đơn giản hoá gì> — nâng cấp khi <ngưỡng đo được>`, không bao giờ cắt validation, xử lý lỗi, bảo mật, a11y.
 
-**Scripts** (Python 3, chạy từ thư mục project bằng đường dẫn tuyệt đối):
+**Scripts** (chạy bằng `uv run`, từ thư mục project, đường dẫn tuyệt đối):
 
 ```bash
 B=~/.claude/skills/aizen-build/scripts/flow; C=~/.claude/skills/aizen-core/scripts/core
-python $B/state.py init --task T-12 --goal "..."     # trạng thái task để resume; tự thêm .aizen/ vào .git/info/exclude
-python $B/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng phần
-python $B/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
-python $C/check.py --task T-12 --unit api             # lint, typecheck, build, test, secrets, deps → evidence-api.json
-python $C/graph.py --project .                        # code map graphify (AST, offline) → graphify-out/
-python $C/capacity.py --help                          # dự phóng tải/dung lượng
+uv run $B/state.py init --task T-12 --goal "..."     # trạng thái task để resume; tự thêm .aizen/ vào .git/info/exclude
+uv run $B/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng phần
+uv run $B/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
+uv run $C/check.py --task T-12 --unit api             # lint, typecheck, build, test, secrets, deps → evidence-api.json
+uv run $C/graph.py --project .                        # code map graphify (AST, offline) → graphify-out/
+uv run $C/capacity.py --help                          # dự phóng tải/dung lượng
 ```
 
 `check.py` chỉ báo PASS khi có bước thật sự chạy và đạt; thiếu test hoặc không quét được secrets → `UNVERIFIED`
@@ -298,7 +315,6 @@ Kiểm `path:line` chứng minh dòng có thật, không chứng minh nhận xé
 │   ├── references/<topic>/    #   kiến thức nạp theo nhu cầu; vendor/<nguồn>/ = kiến thức upstream ghim commit
 │   ├── assets/<topic>/        #   template
 │   └── scripts/<topic>/       #   mã chạy được (Python stdlib)
-├── rules/                     # rule toàn cục cho mọi session agent (working-principles.md, continuous-improvement.md)
 ├── bin/                       # cli.js, install.js, updater.js, agents-config.js, vendor.js
 ├── tests/                     # check-skills.js (lint + sổ topic), check-scripts.js (smoke test Python), test-installer.js
 ├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored (chép, ghim commit)
@@ -365,17 +381,20 @@ npm test               # check-skills.js + check-scripts.js + test-installer.js
 node bin/cli.js sync
 ```
 
-**Skill tự cải thiện** (`rules/continuous-improvement.md`): khi một skill làm chưa tốt (bạn phàn nàn, script lỗi,
+**Skill tự cải thiện** (`skills/aizen-core/rules/continuous-improvement.md`): khi một skill làm chưa tốt (bạn phàn nàn, script lỗi,
 hướng dẫn sai, phải làm tay), agent ghi một dòng vào sổ `.aizen/knowledge/feedback/<skill>.jsonl` bằng
 `aizen-skill-creator/scripts/authoring/feedback.py` — không hỏi, không chen task. Chỉ khi bạn phàn nàn trực tiếp, vấn
 đề lặp ≥ 2 lần, hoặc skill ra kết quả sai, agent mới đề xuất sửa; sửa đi qua quy trình improve của
 `aizen-skill-creator` (baseline, eval case mới, bump version, `npm test`, commit). Xem sổ:
-`python skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
+`uv run skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
 Cursor (`sync --project`) nhận rule dưới dạng `.mdc` `alwaysApply`; Windsurf/Gemini CLI chưa được cài rule tự động.
 
 ## Gỡ cài đặt
 
-Xóa các liên kết (không xóa repo): các mục trùng tên skill trong những thư mục ở bảng [Cài đặt](#cài-đặt),
+Một dự án cài bằng skills.sh: `npx skills remove` trong dự án, xoá khối `aizen-guard` trong `.agents/hooks.json`,
+hook có `guard.py` trong `.claude/settings.local.json`, file `.git/hooks/pre-push` của Aizen và `.agents/rules/aizen-*.md`.
+
+Bản `sync --global`: xóa các liên kết (không xóa repo): các mục trùng tên skill trong những thư mục ở bảng [Cài đặt](#cài-đặt),
 `~/.gemini/config/plugins/aizen-skills`, các file `working-principles.md`, `continuous-improvement.md` trong `~/.gemini/config/rules/` và `~/.claude/rules/`. Trên Windows dùng
 `rmdir <link>` (xóa junction, không đụng thư mục gốc). Tắt cập nhật ngầm: `node bin/cli.js auto-update disable`.
 

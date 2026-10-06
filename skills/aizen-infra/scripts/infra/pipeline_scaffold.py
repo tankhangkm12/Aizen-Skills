@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Scaffold production-grade DevSecOps CI/CD pipelines and multi-stage Dockerfiles.
 
 Supported Engines:

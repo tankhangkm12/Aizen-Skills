@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """check — run the repository's own quality checks and record what really happened (v25).
 
-    python <CORE_DIR>/scripts/core/check.py --task SHOP-42 --unit api   # detect, run, write evidence
-    python <CORE_DIR>/scripts/core/check.py --task SHOP-42 --plan       # print the commands only
-    python <CORE_DIR>/scripts/core/check.py --task SHOP-42 --steps test,secrets --base origin/develop
+    uv run <CORE_DIR>/scripts/core/check.py --task SHOP-42 --unit api   # detect, run, write evidence
+    uv run <CORE_DIR>/scripts/core/check.py --task SHOP-42 --plan       # print the commands only
+    uv run <CORE_DIR>/scripts/core/check.py --task SHOP-42 --steps test,secrets --base origin/develop
 
 Steps (each skipped when the repository has nothing for it):
   lint · typecheck · build · test   the repo's own scripts and tools (package.json scripts, ruff/pytest/mypy,

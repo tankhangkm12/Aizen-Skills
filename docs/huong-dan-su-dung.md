@@ -5,20 +5,22 @@ Tài liệu này hướng dẫn cách dùng bộ skill hiệu quả nhất: agen
 
 ## 1. Cài và kiểm tra
 
+Cần Node.js ≥ 18 và [uv](https://docs.astral.sh/uv/) (`winget install astral-sh.uv` trên Windows). Không cần cài
+Python: script Aizen chạy bằng `uv run`, uv tự tải Python. Trong thư mục gốc của dự án:
+
 ```bash
-git clone https://github.com/tankhangkm12/Aizen-Skills.git && cd Aizen-Skills
-node bin/cli.js sync        # liên kết mọi skill vào ~/.claude/skills, ~/.agents/skills, …
-npm test                    # (tuỳ chọn) kiểm tra bộ skill
+npx skills add tankhangkm12/Aizen-Skills -a antigravity -s '*' -y   # chỉ dự án này; thêm claude-code nếu dùng
+uv run .agents/skills/aizen-core/scripts/core/guard.py install      # hook, pre-push, session rules, .aizen/
 ```
 
-Mở **session mới** của agent sau khi sync. Kiểm tra: gõ `/aizen-build` trong Claude Code, hoặc hỏi
-"liệt kê các skill bạn có". Cập nhật sau này: `git pull && node bin/cli.js sync`.
+Mở **session mới** của agent. Kiểm tra: gõ `/aizen-build`, hoặc hỏi "liệt kê các skill bạn có", và xem
+`.agents/hooks.json` có lệnh `uv run --script …guard.py hook …`. Cập nhật: `npx skills update` rồi chạy lại `guard.py install`.
 
-Skill cộng đồng dùng kèm (không chép, luôn theo bản mới): `node bin/cli.js external install archify && node bin/cli.js sync`
-để tài liệu thiết kế có thêm sơ đồ HTML tương tác (cần Node ≥ 18 và Chrome). Cập nhật: `node bin/cli.js external update archify`.
+Skill cộng đồng dùng kèm, ví dụ archify (sơ đồ HTML tương tác, cần Chrome): `npx skills add tt-a1i/archify -a antigravity -y`.
 
-Python 3 cần cho script của `aizen-build` và `aizen-core` (`state.py`, `check.py`, `graph.py`, …). Graphify (code map)
-được đề nghị cài khi cần — bạn duyệt một lần. Cài cả bộ: mọi entry dùng luật chung ở `aizen-core` và kiến thức ở các pack.
+Sửa chính bộ skill (live-sync): clone repo, `npm install` (chỉ tải, không tự liên kết), rồi trong dự án
+`node <repo>/bin/cli.js sync --project` — xem README › Cài đặt › Cách 2. Graphify (code map) được đề nghị cài khi
+cần (`uv tool install graphifyy`) — bạn duyệt một lần. Cài cả bộ: mọi entry dùng luật chung ở `aizen-core`.
 
 ## 2. Gọi skill
 
@@ -99,7 +101,7 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 
 ### Điều khiển dự án: `.aizen/PROJECT.md` và backlog
 
-Sau `node bin/cli.js sync --project` trong thư mục dự án, mở **`.aizen/PROJECT.md`** — file duy nhất cần đọc:
+Sau khi cài cho dự án (`guard.py install` hoặc `sync --project`), mở **`.aizen/PROJECT.md`** — file duy nhất cần đọc:
 mục 0 "Cần bạn ngay" (run bị chặn, câu hỏi chờ trả lời, việc chờ duyệt, push bị chặn), mục 1–9 để hiểu dự án,
 mục 11 việc agent đã / đang / sắp làm. File tự cập nhật; muốn sửa nội dung thì sửa nguồn ở mục 13.
 
@@ -164,7 +166,7 @@ Cả hai skill làm việc ngay trong repo Aizen-Skills và theo [chuẩn skill 
   `.aizen/cache/import/<tên>/baseline/`, đề xuất thay đổi, rồi so sánh bản mới với bản cũ.
 - Skill tự cải thiện: khi skill làm chưa tốt, agent ghi sổ phản hồi (`feedback.py log`) rồi báo bạn một dòng. Vấn
   đề lặp ≥ 2 lần (hoặc bạn phàn nàn) → agent đề xuất sửa qua `aizen-skill-creator`, thêm eval case để lỗi không quay lại.
-  Xem sổ: `python skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
+  Xem sổ: `uv run skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
 - Không bao giờ ghi đè skill trùng tên; thư mục tạm nằm ở `.aizen/cache/` (đã git-ignore).
 - Skill chép về không có giấy phép → agent báo trước khi tuỳ biến; bạn quyết định giữ riêng hay không.
 

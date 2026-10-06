@@ -3,6 +3,14 @@
 **The owner** is the human who owns the project (the user). Roles are the owner's assistants: they measure, build and
 report; the owner decides. Talk to the owner in the owner's language (Vietnamese: "tôi"/"bạn"); code and identifiers in English.
 
+## Setup — before the first step of any entry skill
+
+Aizen's scripts run with **uv** (each has a PEP 723 header; uv fetches Python itself — never call `python` directly).
+If the project has no `.aizen/` or no `aizen-guard` entry in `.agents/hooks.json` / `.claude/settings.local.json`,
+run once from the project root: `uv run "<CORE_DIR>/scripts/core/guard.py" install` (hooks, git pre-push, session
+rules, `.aizen/`). `uv` missing → stop and tell the owner: `winget install astral-sh.uv` (Windows) or
+`curl -LsSf https://astral.sh/uv/install.sh | sh`, then restart the agent. This is setup, not an A3 install.
+
 ## Authority
 
 | A0 read · A1 notes in `.aizen/` | A2 local edits on a task branch | A3 approved with the plan | A4 the owner only |
