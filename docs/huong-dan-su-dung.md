@@ -104,12 +104,16 @@ Sau `node bin/cli.js sync --project` trong thư mục dự án, Claude Code và 
 
 ```bash
 aizen guard check --task T-12        # còn thiếu gì (exit 0 = đủ)
-aizen guard waive --task T-12 --step check-docs --reason "module chỉ sửa tài liệu, không có test"
+aizen guard waive --task T-12 --step check-docs --reason "module chỉ sửa tài liệu, không có test" \
+  --evidence "git diff --stat: 2 files, docs/** only"   # hoặc đường dẫn file (được băm)
 ```
 
 - Task chuyển `blocked` do guard → đọc dòng `guard:` cuối `## Log` trong `state.md`, chọn: làm tiếp, miễn bước
   (waive), sửa plan, hoặc dừng.
 - `git push` nhánh của task bị chặn khi checklist chưa đủ — đúng ý đồ; `--no-verify` nếu bạn chủ động bỏ qua.
+- Waiver chỉ có hiệu lực khi reviewer ghi `waiver <id>: accepted` trong `review.md`.
+- Báo cáo test/review phải do chính tester/reviewer viết (hook ghi lại ai viết); review phải dẫn `path:line`
+  và guard mở từng dòng ở đúng SHA để kiểm.
 - Task cũ bỏ dở chặn sửa code: `state.py status --task <ID> --set stopped`.
 
 ### Mẹo để agent làm tốt nhất

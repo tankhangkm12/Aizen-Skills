@@ -65,7 +65,8 @@ Never batch everything into one card, never skip a module, never start a writer 
 
 More than one unit → integration worktree, `int/<TASK>` from the base, `git merge --no-ff` each unit branch in
 plan order. Clean merge is yours. Conflict → `git merge --abort` and dispatch a `dev` with `UNIT=int` naming
-both branches and the agreed behaviour. Never resolve a conflict by hand.
+both branches and the agreed behaviour. Never resolve a conflict by hand. Then, in the `int/<TASK>` worktree:
+`check.py --task <TASK> --unit int` → `evidence-int.json` (the guard requires it PASS at the int tip).
 
 ## S5 — Test (1 × tester)
 

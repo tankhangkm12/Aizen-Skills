@@ -250,10 +250,20 @@ Cài **theo từng dự án**: `node bin/cli.js sync --project` (hoặc `aizen g
 | Stop | chạy checklist (`checklist` trong `aizen-build/manifest.json`); còn thiếu → agent phải làm tiếp, kèm đúng danh sách thiếu |
 | git pre-push | cùng checklist cho nhánh `int/<TASK>` và `feature/<TASK>-*` |
 
-Checklist chỉ đòi **đủ những gì plan đã chốt**: plan đã duyệt · evidence `check.py` PASS ở đúng tip của từng module
-· báo cáo test · review **PASS** ghi đúng SHA hiện tại · không file nào đổi ngoài write set đã duyệt (chống
-over-engineering) · `pr-body.md` khi xong. Bước thật sự không áp dụng → `aizen guard waive --task <ID> --step <id>
---reason "..."` (ghi lại, phải liệt kê trong `pr-body.md`); `plan` và `review` không miễn được. Ba lần định dừng
+Checklist chỉ đòi **đủ những gì plan đã chốt**, và **mỗi mục phải có bằng chứng do người khác kiểm**:
+
+| Mục | Bằng chứng | Ai kiểm |
+|---|---|---|
+| `plan` | lời duyệt của bạn trong `run.json` (chỉ `state.py` ghi) | script |
+| `check-<unit>`, `check-int` | `evidence-*.json` do `check.py` tự chạy lệnh, đúng SHA tip của nhánh module và `int/<TASK>` | script (đối chiếu git) |
+| `test` | `test*.md` ghi SHA hiện tại, **do chính tester viết** | script đọc ledger: coordinator tự viết → trượt |
+| `review` | `review*.md` verdict PASS, SHA hiện tại, mỗi kết luận có `path:line` | reviewer độc lập (không viết code task này); script mở từng `path:line` ở SHA đó, dòng không tồn tại → trượt |
+| `scope` | `git diff` so với base + ledger | script: file ngoài write set → trượt (chống over-engineering) |
+| `pr-body` | `pr-body.md` khi xong, liệt kê bước đã miễn | script |
+
+Bước thật sự không áp dụng → `aizen guard waive --task <ID> --step <id> --reason "..." --evidence <file | 1 dòng
+output>` (file được băm, sửa sau là mất hiệu lực). Waiver chỉ tính khi reviewer ghi `waiver <id>: accepted`;
+`plan`, `check-int`, `review` không miễn được. Ba lần định dừng
 liền mà không làm gì thêm (hoặc 10 lần tổng) → task chuyển `blocked`, agent được dừng, bạn quyết định.
 
 Giới hạn: hook lỗi thì cho qua (không làm kẹt agent); `--dangerously-skip-permissions` hoặc hook không chạy (đã có

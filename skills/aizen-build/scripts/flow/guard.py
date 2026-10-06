@@ -6,7 +6,8 @@ The agent no longer decides when a task is finished: the harness asks this scrip
     G=<SKILL_DIR>/scripts/flow/guard.py
     python $G install [--workspace .]          # Claude Code + Antigravity hooks + git pre-push, this project only
     python $G check   --task SHOP-42           # the checklist, as the Stop hook sees it (exit 0 pass, 1 open items)
-    python $G waive   --task SHOP-42 --step check-api --reason "docs-only module, no code to test"
+    python $G waive   --task SHOP-42 --step check-docs --reason "docs-only module, no code to test" \
+                      --evidence "git diff --stat: 2 files, docs/** only"   # or a file path (hashed)
     python $G hook pre|post|stop --agent claude|agy   # called by the harness, JSON payload on stdin
     python $G prepush                          # git pre-push: task branches only push when the checklist passes
 
@@ -19,10 +20,13 @@ What runs where:
                allowed, the owner decides.
   pre-push     same checklist for branches int/<TASK> and feature/<TASK>-*.
 
-The checklist asks for enough, never for more: each module's evidence PASS at its branch tip, the test report,
-a PASS review of the current tip, no file changed outside the approved write sets, pr-body.md at the end.
-A step that truly does not apply is waived with a reason (logged, listed in pr-body.md); `plan` and `review`
-cannot be waived. Hooks fail open (an internal error never blocks the agent); pre-push fails closed.
+The checklist asks for enough, never for more, and every item is proven by an artifact someone other than the
+author checks: check.py evidence PASS at each module's tip and at int/<TASK> (the machine ran the commands), the
+tester's and reviewer's reports written from their own sessions (the ledger is the witness, never the
+coordinator), a PASS review of the current tip whose `path:line` citations exist at that SHA, no file changed
+outside the approved write sets, pr-body.md at the end. A step that truly does not apply is waived with a reason
+and evidence (a file is hashed), and counts only once the reviewer writes `waiver <id>: accepted`; `plan`,
+`check-int` and `review` cannot be waived. Hooks fail open (an internal error never blocks the agent); pre-push fails closed.
 Python ≥ 3.9, standard library only.
 """
 from __future__ import annotations
@@ -201,6 +205,47 @@ def changed(ws: Path, base: str, branch: str) -> list[str]:
 
 # ── the checklist ────────────────────────────────────────────────────────────────────────────────────────
 
+def show(ws: Path, rev: str, path: str) -> list[str] | None:
+    """Lines of `path` at commit `rev` (the working tree when rev is empty); None when it does not exist there."""
+    if rev:
+        try:
+            r = subprocess.run(["git", "-C", str(ws), "show", f"{rev}:{path}"], capture_output=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return r.stdout.decode("utf-8", "replace").splitlines() if r.returncode == 0 else None
+    f = ws / path
+    return f.read_text(encoding="utf-8", errors="replace").splitlines() if f.is_file() else None
+
+
+CITE = re.compile(r"(?<![\w/.-])((?:[\w.-]+/)*[\w.-]+\.[A-Za-z0-9]+):(\d+)(?:-(\d+))?\b")
+
+
+def citations(text: str) -> list[tuple[str, int]]:
+    """`path:line` references in a report (URLs and times like 10:30 excluded)."""
+    out = []
+    for m in CITE.finditer(text):
+        path = m.group(1)
+        if "://" in text[max(0, m.start() - 8):m.start()] or path.replace(".", "").isdigit():
+            continue
+        out.append((path.lstrip("./"), int(m.group(3) or m.group(2))))
+    return out
+
+
+def writers(ws: Path, task: str) -> tuple[dict[str, str], set[str]]:
+    """{file: who wrote it last} and the set of writers of code files, from the ledger (hooks are the witness)."""
+    last, code = {}, set()
+    for e in ledger(ws, task):
+        who = e.get("writer") or e.get("session", "")
+        for f in e.get("files", []):
+            last[f] = who
+            if not local_only(f) or f.startswith(".worktrees/"):
+                code.add(who)
+        for name in re.findall(r"\.aizen/reports/[^\s'\"]+\.md", e.get("cmd", "")):
+            if re.search(r">|\btee\b|Set-Content|Out-File|write_text", e["cmd"]):
+                last[name] = who
+    return last, code
+
+
 def evaluate(ws: Path, task: str) -> tuple[list[str], list[str]]:
     """Open items and accepted waivers of one task. Empty open list = the task may finish."""
     run = tasks(ws).get(task)
@@ -209,17 +254,30 @@ def evaluate(ws: Path, task: str) -> tuple[list[str], list[str]]:
     modules, base = plan(ws, task)
     reports = ws / ".aizen" / "reports" / task
     waivers = read_json(tdir(ws, task) / "waivers.json", {})
+    coordinator = guard_state(ws, task).get("coordinator")
     unit_tip = {u: tip(ws, f"feature/{task}-{u}") for u in modules}
     int_tip = tip(ws, f"int/{task}")
     built = [t for t in unit_tip.values() if t]
     final_tip = int_tip or (built[0] if len(built) == 1 else "")
+    last_writer, code_writers = writers(ws, task)
+    review_text = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in sorted(reports.glob("review*.md")))
     open_items, waived = [], []
 
     def item(step_id: str, waivable: bool, problem: str) -> None:
         if waivable and step_id in waivers:
-            waived.append(f"{step_id}: {waivers[step_id].get('reason', '')}")
+            waived.append(step_id)
         else:
             open_items.append(f"[{step_id}] {problem}")
+
+    def evidence(sid: str, waivable: bool, path: Path, want_tip: str, cmd: str, what: str) -> None:
+        ev = read_json(path, None)
+        if not isinstance(ev, dict):
+            item(sid, waivable, f"no evidence for {what} — run `{cmd}`")
+        elif ev.get("result") != "pass":
+            item(sid, waivable, f"{what}: check.py result is {str(ev.get('result')).upper()} — fix it, re-run `{cmd}`")
+        elif want_tip and not (want_tip.startswith(str(ev.get("sha", ""))[:7]) and not ev.get("dirty")):
+            item(sid, waivable, f"{what}: evidence is for {str(ev.get('sha'))[:7]}"
+                 f"{' (dirty tree)' if ev.get('dirty') else ''}, branch tip is {want_tip[:7]} — commit, re-run `{cmd}`")
 
     for c in checklist():
         kind, cid, waivable = c.get("type"), c.get("id", ""), bool(c.get("waivable"))
@@ -230,40 +288,67 @@ def evaluate(ws: Path, task: str) -> tuple[list[str], list[str]]:
                 item(cid, False, "plan not approved — confirm every part with the owner, then `state.py approve`")
             if not modules:
                 item(cid, False, f"no `## Module` in .aizen/plans/{task}.md")
+        elif kind == "evidence" and c.get("final"):
+            if int_tip:  # several units merged: the integrated branch is proven by the machine, not by a report
+                evidence(cid, waivable, reports / c["path"], int_tip,
+                         f"check.py --task {task} --unit int` in the int/{task} worktree", f"int/{task}")
         elif kind == "evidence":
             for u, globs in modules.items():
-                if not globs:
-                    continue  # read-only module: nothing to check
-                sid = cid.replace("{unit}", u)
-                ev = read_json(reports / c["path"].replace("{unit}", u), None)
-                cmd = f"check.py --task {task} --unit {u}"
-                if not isinstance(ev, dict):
-                    item(sid, waivable, f"no evidence for module {u} — run `{cmd}` in its worktree")
-                elif ev.get("result") != "pass":
-                    item(sid, waivable, f"module {u}: check.py result is {str(ev.get('result')).upper()} — fix it, re-run `{cmd}`")
-                elif unit_tip[u] and not (unit_tip[u].startswith(str(ev.get("sha", ""))[:7]) and not ev.get("dirty")):
-                    item(sid, waivable, f"module {u}: evidence is for {str(ev.get('sha'))[:7]}"
-                         f"{' (dirty tree)' if ev.get('dirty') else ''}, branch tip is {unit_tip[u][:7]} — commit, re-run `{cmd}`")
+                if globs:  # read-only module: nothing to check
+                    evidence(cid.replace("{unit}", u), waivable, reports / c["path"].replace("{unit}", u),
+                             unit_tip[u], f"check.py --task {task} --unit {u}` in its worktree", f"module {u}")
         elif kind == "report":
             files = sorted(reports.glob(c["glob"]))
             if not files:
                 item(cid, waivable, f"no .aizen/reports/{task}/{c['glob']} — {c.get('hint', 'write it')}")
                 continue
+            texts = {f: f.read_text(encoding="utf-8", errors="replace") for f in files}
             if c.get("fresh") and final_tip:
-                stale = [f.name for f in files
-                         if not any(final_tip.startswith(s) for s in SHA.findall(f.read_text(encoding="utf-8")))]
+                stale = [f.name for f, t in texts.items() if not any(final_tip.startswith(x) for x in SHA.findall(t))]
                 if stale:
                     item(cid, waivable, f"{', '.join(stale)} do not name the current tip {final_tip[:7]} — "
                          "re-run that pass on the current SHA")
-            if c.get("verdict"):
+            if c.get("by"):
                 for f in files:
-                    v = VERDICT.findall(f.read_text(encoding="utf-8"))
+                    key = f.relative_to(ws).as_posix()
+                    who = last_writer.get(key)
+                    if not coordinator:
+                        item(cid, waivable, "who wrote the reports is unknown (no coordinator in the ledger) — "
+                             "the task must start with `state.py init` while the guard hooks are installed")
+                        break
+                    if who is None:
+                        item(cid, waivable, f"{f.name}: no ledger record of who wrote it — the {c['by']} writes it "
+                             "with its file tool from its own session")
+                    elif who == coordinator:
+                        item(cid, waivable, f"{f.name} was written by the coordinator, not by an independent "
+                             f"{c['by']} — dispatch the {c['by']}")
+                    elif c.get("not_author") and who in code_writers:
+                        item(cid, waivable, f"{f.name}: its author also wrote code in this task — "
+                             f"dispatch a fresh {c['by']}")
+            if c.get("verdict"):
+                for f, t in texts.items():
+                    v = VERDICT.findall(t)
                     got = v[-1].upper().replace(" ", "_") if v else "none"
                     if got != c["verdict"]:
                         nxt = ("fix loop: `state.py round`, re-dispatch the owning devs with the finding ids"
                                if run.get("round", 0) < 2 else
                                "fix-loop limit reached: `state.py status --set blocked` and give the owner options")
                         item(cid, waivable, f"{f.name}: verdict {got}, need {c['verdict']} — {nxt}")
+            if c.get("citations"):
+                for f, t in texts.items():
+                    refs = citations(t)
+                    if len(refs) < c["citations"]:
+                        item(cid, waivable, f"{f.name}: no `path:line` evidence — every finding and every area "
+                             "judged PASS cites the file and line it was read from")
+                        continue
+                    bad = []
+                    for path, line in refs:
+                        lines = show(ws, final_tip, path) if not path.startswith(".aizen/") else show(ws, "", path)
+                        if lines is None or line < 1 or line > len(lines):
+                            bad.append(f"{path}:{line}")
+                    if bad:
+                        item(cid, waivable, f"{f.name}: cited evidence not found at {final_tip[:7] or 'the tree'}: "
+                             f"{', '.join(bad[:6])}{' …' if len(bad) > 6 else ''}")
         elif kind == "scope":
             union = [g for gs in modules.values() for g in gs]
             outside: set[str] = set()
@@ -284,13 +369,32 @@ def evaluate(ws: Path, task: str) -> tuple[list[str], list[str]]:
                 shown = sorted(outside)
                 item(cid, waivable, f"changed outside the approved write sets: {', '.join(shown[:8])}"
                      f"{' …' if len(shown) > 8 else ''} — revert them, or re-confirm the module with the owner")
-    if waived and run["status"] == "done":
+
+    # a waiver counts only with its evidence intact and the reviewer's acceptance
+    accepted = []
+    for w in waived:
+        rec = waivers.get(w, {})
+        ev_path = rec.get("evidence_file")
+        if ev_path:
+            p = ws / ev_path
+            if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != rec.get("sha256"):
+                open_items.append(f"[waiver {w}] its evidence {ev_path} changed or is gone — waive again")
+                continue
+        m = re.findall(rf"waiver\s+`?{re.escape(w)}`?\s*:\s*\**\s*(accepted|rejected)", review_text, re.I)
+        if not m:
+            open_items.append(f"[waiver {w}] not judged by the reviewer — review.md needs `waiver {w}: accepted` "
+                              "or `rejected` with a reason")
+        elif m[-1].lower() == "rejected":
+            open_items.append(f"[waiver {w}] rejected by the reviewer — do the step")
+        else:
+            accepted.append(f"{w}: {rec.get('reason', '')}")
+    if accepted and run["status"] == "done":
         body = reports / "pr-body.md"
         text = body.read_text(encoding="utf-8") if body.is_file() else ""
-        missing = [w.split(":")[0] for w in waived if w.split(":")[0] not in text]
+        missing = [w.split(":")[0] for w in accepted if w.split(":")[0] not in text]
         if missing:
             open_items.append(f"[waivers] list the waived steps in pr-body.md (## Waived): {', '.join(missing)}")
-    return open_items, waived
+    return open_items, accepted
 
 
 # ── ledger ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -335,6 +439,7 @@ def parse(agent: str, payload: dict) -> dict:
         tool = payload.get("tool_name", "")
         args = payload.get("tool_input") or {}
         session = payload.get("session_id", "")
+        writer = session + (f"/{payload['agent_id']}" if payload.get("agent_id") else "")
         cwd = payload.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
         writes = tool in CLAUDE_WRITE
         files = [args[k] for k in ("file_path", "notebook_path") if isinstance(args.get(k), str)]
@@ -343,6 +448,7 @@ def parse(agent: str, payload: dict) -> dict:
         tool = call.get("name", "")
         args = call.get("args") or {}
         session = payload.get("conversationId", "")
+        writer = session  # an Antigravity sub-agent runs in its own conversation
         paths = payload.get("workspacePaths") or []
         cwd = args.get("Cwd") or (paths[0] if paths else os.getcwd())
         writes = bool(AGY_WRITE.search(tool)) and tool not in SHELL_TOOLS
@@ -354,7 +460,7 @@ def parse(agent: str, payload: dict) -> dict:
     for k in ("command", "CommandLine", "commandLine", "cmd"):
         if isinstance(args.get(k), str):
             cmd = args[k]
-    return {"tool": tool, "session": session, "cwd": Path(cwd), "writes": writes, "files": files, "cmd": cmd,
+    return {"tool": tool, "session": session, "writer": writer, "cwd": Path(cwd), "writes": writes, "files": files, "cmd": cmd,
             "error": str(payload.get("error") or "")[:200]}
 
 
@@ -415,11 +521,12 @@ def hook(event: str, agent: str, payload: dict) -> tuple[dict | None, str]:
             return None, "skip"
         init = re.search(r"state\.py[\"']?\s+init\b.*--task[= ]([A-Za-z0-9._-]+)", ev["cmd"])
         for t in watched(ws):
-            append(ws, t, {"ts": now(), "agent": agent, "session": ev["session"], "tool": ev["tool"],
+            append(ws, t, {"ts": now(), "agent": agent, "session": ev["session"], "writer": ev["writer"],
+                           "tool": ev["tool"],
                            "files": files if ev["writes"] else [], "cmd": ev["cmd"][:300], "error": ev["error"]})
             if init and init.group(1) == t:
                 g = guard_state(ws, t)
-                g.setdefault("coordinator", ev["session"])
+                g.setdefault("coordinator", ev["writer"])
                 write_json(tdir(ws, t) / "guard.json", g)
         return None, "recorded"
 
@@ -427,7 +534,7 @@ def hook(event: str, agent: str, payload: dict) -> tuple[dict | None, str]:
     blocks = []
     for t, run in watched(ws).items():
         g = guard_state(ws, t)
-        if g.get("coordinator") and ev["session"] and g["coordinator"] != ev["session"]:
+        if g.get("coordinator") and ev["writer"] and g["coordinator"] != ev["writer"]:
             continue  # a role's sub-agent stopping, not the coordinator
         if run["status"] not in GATED:
             continue  # planning: asking the owner is the job
@@ -492,7 +599,7 @@ def cmd_check(ws: Path, task: str) -> int:
     return 0 if not open_items else 1
 
 
-def cmd_waive(ws: Path, task: str, step: str, reason: str) -> int:
+def cmd_waive(ws: Path, task: str, step: str, reason: str, evidence: str) -> int:
     ids = {c["id"] for c in checklist()}
     fixed = {c["id"] for c in checklist() if not c.get("waivable")}
     base_id = re.sub(r"-[A-Za-z0-9._]+$", "-{unit}", step) if step not in ids else step
@@ -508,11 +615,23 @@ def cmd_waive(ws: Path, task: str, step: str, reason: str) -> int:
     if not (tdir(ws, task) / "run.json").is_file():
         print(f"no task {task}", file=sys.stderr)
         return 2
+    rec = {"reason": reason.strip(), "ts": now()}
+    f = ws / evidence
+    if evidence and f.is_file():
+        rec.update(evidence_file=f.resolve().relative_to(ws.resolve()).as_posix(),
+                   sha256=hashlib.sha256(f.read_bytes()).hexdigest())
+    elif len(evidence.strip()) >= 10:
+        rec["evidence"] = evidence.strip()  # one line of real output, a commit, a hash
+    else:
+        print("--evidence: a file in the project (hashed) or one line of real output/commit/hash (≥ 10 characters)",
+              file=sys.stderr)
+        return 2
     p = tdir(ws, task) / "waivers.json"
     w = read_json(p, {})
-    w[step] = {"reason": reason.strip(), "ts": now()}
+    w[step] = rec
     write_json(p, w)
-    print(f"waived {step} — list it under '## Waived' in pr-body.md")
+    print(f"waived {step} — counts once the reviewer writes `waiver {step}: accepted`; list it under "
+          "'## Waived' in pr-body.md")
     return 0
 
 
@@ -621,6 +740,7 @@ def main(argv=None) -> int:
     w.add_argument("--task", required=True)
     w.add_argument("--step", required=True)
     w.add_argument("--reason", required=True)
+    w.add_argument("--evidence", required=True, help="file in the project (hashed) or one line of real output")
     a = ap.parse_args(argv)
 
     if a.cmd == "hook":
@@ -646,7 +766,7 @@ def main(argv=None) -> int:
         return 2
     if a.cmd == "check":
         return cmd_check(root, a.task)
-    return cmd_waive(root, a.task, a.step, a.reason)
+    return cmd_waive(root, a.task, a.step, a.reason, a.evidence)
 
 
 # ── self-check ───────────────────────────────────────────────────────────────────────────────────────────
@@ -720,20 +840,49 @@ def _selfcheck() -> None:
         hook("post", "claude", c("Bash", {"command": "ls"}))  # progress resets the idle counter
         assert hook("stop", "agy", {"conversationId": "S1", "workspacePaths": [str(ws)]})[0]["decision"] == "continue"
 
-        # do the work: evidence at the tip, test report, PASS review of the tip, waive the scope item
+        # do the work: evidence at the tip; reports written by the roles' own sessions, with real citations
         rep = ws / ".aizen" / "reports" / T
         rep.mkdir(parents=True)
         write_json(rep / "evidence-api.json", {"result": "pass", "sha": unit[:12], "dirty": False})
-        (rep / "test.md").write_text(f"all green @ {unit[:7]}")
-        (rep / "review.md").write_text(f"Target int @ {unit[:7]}\nVerdict: CHANGES_REQUIRED\n")
+        tester = {"session_id": "S1", "agent_id": "tst", "cwd": str(ws)}
+        reviewer = {"session_id": "S1", "agent_id": "rev", "cwd": str(ws)}
+
+        def report(who, name, text):
+            (rep / name).write_text(text)
+            hook("post", "claude", {**who, "tool_name": "Write", "tool_input": {"file_path": str(rep / name)}})
+
+        report(tester, "test.md", f"all green @ {unit[:7]}")
+        report({"session_id": "S1", "cwd": str(ws)}, "review.md", f"@ {unit[:7]} src/api/a.py:1\nVerdict: PASS\n")
+        assert any("written by the coordinator" in i for i in evaluate(ws, T)[0]), evaluate(ws, T)[0]
+        report(reviewer, "review.md", f"@ {unit[:7]} src/api/a.py:1\nVerdict: CHANGES_REQUIRED\n")
         assert any("verdict CHANGES_REQUIRED" in i for i in evaluate(ws, T)[0])
-        (rep / "review.md").write_text(f"Target @ {unit[:7]}\nVerdict: PASS\n")
-        assert [i for i in evaluate(ws, T)[0]] == [i for i in evaluate(ws, T)[0] if i.startswith("[scope]")]
-        assert cmd_waive(ws, T, "review", "the reviewer agreed it is fine") == 2  # never waivable
-        assert cmd_waive(ws, T, "scope", "short") == 2
-        assert cmd_waive(ws, T, "scope", "shared helper the owner asked for in chat") == 0
-        assert evaluate(ws, T)[0] == []
+        report(reviewer, "review.md", f"Reviewed @ {unit[:7]}\nVerdict: PASS\n")
+        assert any("no `path:line` evidence" in i for i in evaluate(ws, T)[0])
+        report(reviewer, "review.md", f"Reviewed @ {unit[:7]}: src/api/a.py:1, src/api/a.py:99\nVerdict: PASS\n")
+        assert any("src/api/a.py:99" in i for i in evaluate(ws, T)[0])
+        dev = {"session_id": "S1", "agent_id": "dev1", "cwd": str(ws)}
+        hook("post", "claude", {**dev, "tool_name": "Edit", "tool_input": {"file_path": str(ws / ".worktrees/api/src/api/a.py")}})
+        report(dev, "review.md", f"Reviewed @ {unit[:7]}: src/api/a.py:1\nVerdict: PASS\n")
+        assert any("also wrote code" in i for i in evaluate(ws, T)[0])
+        report(reviewer, "review.md", f"Reviewed @ {unit[:7]}: src/api/a.py:1 (handler)\nVerdict: PASS\n")
+        assert [i for i in evaluate(ws, T)[0] if not i.startswith("[scope]")] == [], evaluate(ws, T)[0]
+
+        # waivers: never for review; need reason + evidence; count only once the reviewer accepts them
+        assert cmd_waive(ws, T, "review", "the reviewer agreed it is fine", "x" * 12) == 2
+        assert cmd_waive(ws, T, "scope", "short", "x" * 12) == 2
+        assert cmd_waive(ws, T, "scope", "shared helper the owner asked for in chat", "ok") == 2
+        (ws / ".aizen" / "owner-note.txt").write_text("owner: put the helper in src/util")
+        assert cmd_waive(ws, T, "scope", "shared helper the owner asked for in chat", ".aizen/owner-note.txt") == 0
+        assert any("not judged by the reviewer" in i for i in evaluate(ws, T)[0])
+        report(reviewer, "review.md", f"@ {unit[:7]}: src/api/a.py:1\nwaiver scope: rejected — no\nVerdict: PASS\n")
+        assert any("rejected by the reviewer" in i for i in evaluate(ws, T)[0])
+        report(reviewer, "review.md", f"@ {unit[:7]}: src/api/a.py:1\nwaiver scope: accepted — owner note\nVerdict: PASS\n")
+        assert evaluate(ws, T)[0] == [], evaluate(ws, T)[0]
+        (ws / ".aizen" / "owner-note.txt").write_text("edited later")
+        assert any("changed or is gone" in i for i in evaluate(ws, T)[0])
+        (ws / ".aizen" / "owner-note.txt").write_text("owner: put the helper in src/util")
         assert hook("stop", "claude", {"session_id": "S1", "cwd": str(ws)})[0] is None
+        assert hook("stop", "claude", {**reviewer})[0] is None
 
         # done: pr-body.md must exist and list the waivers; pre-push gates the task branch
         run["status"] = "done"
@@ -751,6 +900,14 @@ def _selfcheck() -> None:
         sh(ws, "commit", "-q", "-m", "more")
         sh(ws, "checkout", "-q", "main")
         assert any(i.startswith("[check-api]") and "branch tip" in i for i in evaluate(ws, T)[0])
+
+        # several units merged → the integrated branch needs its own machine evidence (not waivable)
+        sh(ws, "branch", f"int/{T}", f"feature/{T}-api")
+        assert any(i.startswith("[check-int]") for i in evaluate(ws, T)[0])
+        assert cmd_waive(ws, T, "check-int", "the units were already checked one by one", "x" * 12) == 2
+        write_json(rep / "evidence-int.json", {"result": "pass", "sha": tip(ws, f"int/{T}"), "dirty": False})
+        assert not any(i.startswith("[check-int]") for i in evaluate(ws, T)[0])
+        sh(ws, "branch", "-D", f"int/{T}")
 
         # escalation: three stops in a row without new work → blocked, stop allowed
         run["status"] = "fixing"

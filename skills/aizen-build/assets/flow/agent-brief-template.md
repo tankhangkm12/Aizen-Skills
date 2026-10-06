@@ -36,3 +36,6 @@ Quality gate: python "{{CORE_DIR}}/scripts/core/check.py" --task {{TASK}} --unit
 
 ## Report
 Full report: .aizen/reports/{{TASK}}/{{REPORT}}  ·  Return ≤ 15 lines ending with `Deviations:`.
+Write the report file yourself with your file tool — the guard records who wrote it and refuses a report the
+coordinator wrote. Every finding and every area you judge PASS cites its evidence as `path:line` at the SHA you
+worked on; the guard opens each citation and fails the report when the line does not exist.

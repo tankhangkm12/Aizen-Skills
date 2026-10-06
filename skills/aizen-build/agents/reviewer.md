@@ -32,6 +32,15 @@ is a BLOCKER.
 - `LENS=redteam` (second reviewer when the plan has a risk module): hunt only data loss, secret exposure, irreversible steps and
   authZ bypass; assume the first reviewer missed something.
 
+## Evidence the guard checks
+
+- Write `.aizen/reports/<TASK>/review*.md` yourself; a report written by the coordinator does not count.
+- Name the SHA you reviewed. Every finding **and** every area you pass cites `path:line` at that SHA — the guard
+  opens each one.
+- The last `Verdict: PASS | CHANGES_REQUIRED | INCOMPLETE` line is the verdict.
+- Each waived step (`.aizen/tasks/<TASK>/waivers.json`: reason + evidence) gets one line from you:
+  `waiver <id>: accepted — <why>` or `waiver <id>: rejected — <why>`. A waiver you did not judge does not count.
+
 ## Return (≤ 15 lines)
 
 Target + SHA · verdict · counts by severity · top three findings (`file:line`, one line each) · unverified

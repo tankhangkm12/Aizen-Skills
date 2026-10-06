@@ -66,10 +66,13 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
    you find is a finding.
 10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/flow/guard.py`, installed
     by `aizen sync --project`), a stop is refused until the checklist passes and the hook prints what is open. Do
-    exactly those items, nothing more. A step that truly does not apply: `guard.py waive --task <TASK> --step <id>
-    --reason "…"` and list it under `## Waived` in `pr-body.md` (`plan` and `review` cannot be waived). Blocked on
-    the owner: `state.py status --set blocked`, then one question. `guard.py check --task <TASK>` shows the list
-    any time — run it before you report the task finished.
+    exactly those items, nothing more. Every item is proven by an artifact someone else checks: check.py evidence
+    (also `--unit int` on `int/<TASK>`), and test/review reports **written by the tester and reviewer themselves**
+    — never write or rewrite a role's report for it; the ledger shows who wrote each file. A step that truly does
+    not apply: `guard.py waive --task <TASK> --step <id> --reason "…" --evidence <file | one line of real output>`;
+    it counts once the reviewer writes `waiver <id>: accepted`, and goes under `## Waived` in `pr-body.md`
+    (`plan`, `check-int`, `review` cannot be waived). Blocked on the owner: `state.py status --set blocked`, then
+    one question. `guard.py check --task <TASK>` shows the list any time — run it before you report finished.
 
 ## Knowledge — by topic, from the packs installed next to this skill
 
