@@ -8,6 +8,7 @@ chỉ hỏi bạn về lựa chọn và rủi ro. Cách dùng chung: [huong-dan-
 ```text
 /aizen-build
 Task: <MÃ-TASK, vd SHOP-42>
+Tên nghiệp vụ: <2–4 từ, vd checkout-coupon — thành tên nhánh feature/checkout-coupon>
 Mục tiêu: <một câu kiểm chứng được>
 Tiêu chí xong:
 - <AC-1: khi … thì …>
@@ -20,6 +21,16 @@ Branch gốc: <develop>
 Cho phép sẵn (A3): <cài graphify · chạy Postgres local bằng docker compose · npm install>
 Hỏi tôi xác nhận từng module trước khi code; sau khi tôi approve thì làm hết không hỏi thêm.
 ```
+
+## Nhờ soạn prompt (phỏng vấn trước)
+
+```text
+/aizen-prompt-architect
+Tôi muốn: <ý tưởng / lỗi / thay đổi, kể bằng lời thường>
+Dành cho: <aizen-build | aizen-init>  · Ticket nếu có: <TET-12>
+```
+
+Trên AI web: dán [aizen-web-kit.md](aizen-web-kit.md) trước, rồi gửi phần "Tôi muốn: …".
 
 ## aizen-build — sửa bug
 

@@ -15,6 +15,7 @@ and knowledge packs point here instead of restating them.
 | Need | Read / run |
 |---|---|
 | who may do what (A0–A4), when to ask, `BLOCKED` / `HANDOFF` | `references/core/rules.md` |
+| how to reason before acting: frame, facts, options, failure, smallest step; playbooks for bugs, design, unknown tools, performance, data/money/concurrency, being stuck | `references/core/reasoning.md` (short form: `rules/reasoning.md`, a session rule) |
 | options, recommendations, research before proposing | `references/core/decisions.md` |
 | least code, the reuse ladder, size signals, `ponytail:` debt markers | `references/core/code-quality.md` |
 | comments, functions, naming — language-independent style | `references/core/code-style.md` |

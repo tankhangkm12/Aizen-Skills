@@ -1,0 +1,41 @@
+{
+  "skill_name": "aizen-prompt-architect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Giúp tôi viết prompt cho aizen-build: tôi muốn người dùng giữ ghế tàu Tết vài phút trong lúc thanh toán.",
+      "should_trigger": true,
+      "expected_output": "One round of at most five questions with options and defaults (hold time, expiry behaviour, scope), then one /aizen-build prompt.",
+      "files": [],
+      "expectations": [
+        "Asks at most five questions in one message, each with options and a marked default",
+        "Does not ask about framework, folder layout or test runner",
+        "The prompt has Task, Tên nghiệp vụ (e.g. seat-hold), Loại, Mục tiêu, Tiêu chí xong, Phạm vi and Điểm dừng",
+        "Has a refusal case for a seat already held (e.g. 409) and an edge case for concurrent holds or expiry",
+        "Writes no code and no plan"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Phỏng vấn tôi rồi soạn task sửa lỗi: đăng nhập thỉnh thoảng trả 500.",
+      "should_trigger": true,
+      "expected_output": "Questions about reproduction, evidence and since when; then a bug prompt with expected vs actual and how to reproduce.",
+      "files": [],
+      "expectations": [
+        "Asks for a way to reproduce and for evidence (log or request) instead of guessing the cause",
+        "The prompt uses Loại: bugfix and a business name without a task code",
+        "Pushing, deploying and deleting data are not pre-approved"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Implement the seat hold API with Redis in this repo now.",
+      "should_trigger": false,
+      "expected_output": "Handled by aizen-build, not by the prompt architect.",
+      "files": [],
+      "expectations": [
+        "aizen-prompt-architect is not used; the request goes to aizen-build"
+      ]
+    }
+  ]
+}
