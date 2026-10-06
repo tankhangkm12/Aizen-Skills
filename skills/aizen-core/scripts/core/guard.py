@@ -176,6 +176,14 @@ def is_code(path: str) -> bool:
     return not path.startswith(".aizen/") or path.startswith(".aizen/worktrees/")
 
 
+DESIGN_DOCS = re.compile(r"^docs/.+\.(md|ya?ml|json|sql|txt|puml|mmd|html)$", re.I)
+
+
+def is_design_doc(path: str) -> bool:
+    """Plan and design documents (`docs/…`): rules.md lets the planner write them before approval."""
+    return bool(DESIGN_DOCS.match(path))
+
+
 WT = re.compile(r"^\.aizen/worktrees/([^/]+)/(.+)$")
 
 
@@ -1080,7 +1088,8 @@ def deny_reason(ws: Path, ev: dict, files: list[str]) -> str | None:
         if run["status"] in ("planning", "waiting") and not run.get("decision"):
             if run["skill"] == "aizen-build":
                 modules, _, ui = plan(ws, rid)
-                early = [f for f in code if not any(WT.match(f) and WT.match(f).group(1) == f"{rid}-{u}" for u in ui)]
+                early = [f for f in code if not is_design_doc(f)
+                         and not any(WT.match(f) and WT.match(f).group(1) == f"{rid}-{u}" for u in ui)]
                 others = any(r["skill"] == "aizen-build" and r.get("decision") for r in runs.values())
                 if early and not others:
                     return (f"run {rid}: the plan is not approved — no code before `state.py approve` (abandoned? "
