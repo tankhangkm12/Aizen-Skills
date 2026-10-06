@@ -159,6 +159,29 @@ AI web về tiến độ, rồi nhờ nó soạn câu trả lời gửi lại ag
   một lần lệnh `git rm -r --cached …` hook in ra (lịch sử cũ vẫn còn).
 - Team cố ý chia sẻ các file này: `"hide_ai_files": false` trong `.aizen/config/guard.json`.
 
+### Tài liệu dự án gọn gàng trong `docs/`
+
+Agent viết tài liệu thiết kế vào `docs/` theo bố cục cố định (`product/`, `architecture/`, `api/`, `data/`, `ui/`,
+`ops/`, `guides/`) để cả team đọc trên GitHub; mỗi file mở đầu bằng `# Tiêu đề` và một dòng tóm tắt, không nhắc tới
+`.aizen/` hay mã run. `docs/README.md` là mục lục tự sinh.
+
+Dự án cài Aizen trước bản này (tài liệu nằm rời trong `docs/` hoặc trong `.aizen/knowledge/`):
+
+```powershell
+uv run .agents/skills/aizen-core/scripts/core/docs.py migrate           # xem dự kiến chuyển, chưa đổi gì
+uv run .agents/skills/aizen-core/scripts/core/docs.py migrate --apply   # chuyển bằng git mv + đặt "docs": "docs"
+uv run .agents/skills/aizen-core/scripts/core/docs.py check             # còn gì cần sửa trong nội dung
+```
+
+Làm trên một nhánh riêng (`docs/reorganize`), xem `git status`, rồi commit. Phần `check` báo về nội dung (thiếu dòng
+tóm tắt, còn mã run, còn đường dẫn `.aizen/`) thì giao cho agent: "sửa theo `docs.py check`".
+
+### Song song: bao nhiêu agent cùng lúc
+
+Mặc định tối đa **2** module chạy cùng lúc (`"parallel": {"max": 2}` trong `.aizen/config/guard.json`). Agent lấy
+đợt từ `state.py waves --task <TASK>`: module ghi chung file thì chạy sau. Xem hiệu quả sau mỗi run ở mục
+"Thời gian" của `.aizen/out/latest.md`: hệ số gần 1.0× nghĩa là các agent chờ nhau — tăng `max` không giúp gì.
+
 ### Điều khiển dự án: `.aizen/PROJECT.md` và backlog
 
 Sau khi cài cho dự án (`guard.py install` hoặc `sync --project`), mở **`.aizen/PROJECT.md`** — file duy nhất cần đọc:

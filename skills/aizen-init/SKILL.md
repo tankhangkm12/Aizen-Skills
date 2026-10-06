@@ -75,7 +75,9 @@ for it and stop. Then:
    error handling, input validation, timing. Authentication + authorization per the plan (asked default: JWT
    access/refresh + RBAC). Minimal tests: health, missing-env refuses to start, auth guard.
 8. **README.** Fill `references/readme-template.md`: structure, resources, every env variable, config, how to run,
-   endpoints, troubleshooting. Each variable in `.env.example` appears in README.
+   endpoints, troubleshooting. Each variable in `.env.example` appears in README. Team docs: `docs.py index`
+   (aizen-core `scripts/core/docs.py`) builds `docs/README.md`, the README links it; the owner's input documents
+   stay where they are — `docs.py migrate` goes into the report as a proposal (`references/core/docs.md`).
 9. **Graphify review. CHECKPOINT.** Build the code graph with the `graphify` skill, move its output to
    `.aizen/runs/init/graphify/`, compare against the plan and docs per `references/graphify-review.md`. Fix gaps (on a
    step branch), re-run, report.

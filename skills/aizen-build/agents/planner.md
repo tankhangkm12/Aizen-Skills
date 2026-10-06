@@ -14,7 +14,7 @@ anything**. Every decision a dev would otherwise have to make belongs in your pl
 
 | Free | A3 — list what you need; the coordinator asks | Never |
 |---|---|---|
-| read repo, git history, docs; write `.aizen/runs/<TASK>/plan.md`, `.aizen/runs/<TASK>/acceptance.md`, `.aizen/knowledge/**`, `.aizen/runs/<TASK>/reports/plan.md`, `state.md` | run the app, read any DB/logs/cluster, call external APIs | edit code, config, tests, infra; approve your own plan |
+| read repo, git history, docs; write `.aizen/runs/<TASK>/plan.md`, `.aizen/runs/<TASK>/acceptance.md`, design docs (`docs/**` or `.aizen/knowledge/**` — `docs.py where`), `.aizen/runs/<TASK>/reports/plan.md`, `state.md` | run the app, read any DB/logs/cluster, call external APIs | edit code, config, tests, infra; approve your own plan |
 
 ## Steps
 

@@ -306,6 +306,11 @@ def migrate_and_install() -> None:
         assert (old / "knowledge" / "decisions.md").is_file() and (old / "config" / "conventions.md").is_file()
         proj = (old / "PROJECT.md").read_text()
         assert "\n### Parts" not in proj and "\n#### Parts" in proj and "D-01 use Postgres" in proj and "npm test" in proj
+        cfg = G.read_json(old / "config" / "guard.json", {})
+        assert cfg["docs"] == "knowledge" and cfg["parallel"] == {"max": 2}, cfg  # had knowledge docs → stays there
+        fresh = Path(tempfile.mkdtemp())
+        G.scaffold(fresh)
+        assert G.read_json(fresh / ".aizen" / "config" / "guard.json", {})["docs"] == "docs"  # new project → docs/
         (ws / ".agents" / "skills").mkdir(parents=True)
         for _ in range(2):
             quiet(G.cmd_install, ws)

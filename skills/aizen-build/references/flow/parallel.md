@@ -1,12 +1,24 @@
-# Parallel work — units, isolation, integration, resuming (v26)
+# Parallel work — units, isolation, integration, resuming, measuring (v26)
 
 Independent units run at the same time; each runs its own checks; they meet in one integration step.
 
 ## 1. How many
 
-The plan's chosen option sets the number of `dev` instances. Limits that still apply: the host (Claude Code runs
-up to ~20 sub-agents at once), machine resources (each member needs its own ports, containers, DB), and any number
-the owner set when confirming delivery. Every extra unit costs a dispatch, a worktree and a merge — prefer fewer, larger units.
+At most **`parallel.max`** units run at once — `.aizen/config/guard.json` → `"parallel": {"max": 2}` by default. Two
+is the safe number on one machine: each member needs its own worktree, ports, containers and database, and every
+extra unit costs a dispatch, a merge and the owner's attention when something breaks. The owner raises it when
+the numbers in §6 say parallel work paid off and the machine has room. Prefer fewer, larger units.
+
+The waves come from the plan, not from judgment:
+
+```
+uv run "<SKILL_DIR>/scripts/flow/state.py" waves --task <TASK>
+```
+
+It reads each module's `Files (write set)` and `after:`, puts a unit in the first wave after its dependencies,
+and moves it to a later wave when it shares a path with a member (prefix match on the globs — conservative) or
+the wave is full. The planner copies the result into the plan's `Order / waves`; the coordinator launches exactly
+those waves. A unit that should run earlier needs a narrower write set or a settled seam, not a bigger wave.
 
 ## 2. When two writers may run at the same time — all three, or sequence them
 
@@ -55,7 +67,21 @@ Merging into a shared branch is A4 — the owner does it.
 - Cleanup of worktrees and `int/*` branches is a separate step after the owner pushed or abandoned the work (A3 if
   anything unpushed would be lost).
 
-## 6. Bounded effort
+## 6. Measuring — did parallel work pay off?
+
+The hooks time-stamp every write and command with who did it, so the run measures itself:
+
+```
+uv run "<CORE_DIR>/scripts/core/journal.py" stats --run <TASK>
+```
+
+prints each worker's first and last action and, for the sub-agents, their summed working time against the time
+any of them was working. A factor near **1.0×** means the units ran one after the other (waiting on seams, merge
+conflicts, a shared database) — the next plan should use fewer, larger units. Clearly above 1 with clean merges →
+raising `parallel.max` is worth trying. `.aizen/out/latest.md` shows the same lines under "Thời gian" once two or
+more sub-agents worked.
+
+## 7. Bounded effort
 
 Two correction attempts for a persistent failure inside one run, then stop and report. Flaky test: ≤ 2 reruns, all
 recorded. Fix loop across the task: ≤ 2 rounds.

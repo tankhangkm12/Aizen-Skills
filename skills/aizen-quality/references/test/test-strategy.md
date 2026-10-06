@@ -1,4 +1,4 @@
-# Test strategy → `.aizen/knowledge/system/test-plan.md`
+# Test strategy → `test-plan` (`docs.py where test-plan`)
 
 Input: SRS (AC-nn), LLD, API contract, UI designs. Real bugs live at boundaries and error branches:
 priority is covering every failure case, not many happy-path cases. `tester` executes this plan.

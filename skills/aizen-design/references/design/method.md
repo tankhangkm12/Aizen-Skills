@@ -1,6 +1,8 @@
 # Design — how it will be built (v24)
 
-Used by `planner` when `STAGE=design`. Output: docs in `.aizen/knowledge/`, never code.
+Used by `planner` when `STAGE=design`. Output: design docs at the path `uv run "<CORE_DIR>/scripts/core/docs.py" where <name> [--name <module>]`
+prints — `docs/` when the project publishes its docs (the default for new projects), else `.aizen/knowledge/` — never code.
+Team docs follow `references/core/docs.md` (aizen-core): `# Title`, a one-line summary, no links into `.aizen/`.
 
 ## Rules
 

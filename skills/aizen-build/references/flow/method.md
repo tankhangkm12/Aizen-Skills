@@ -124,8 +124,9 @@ gh pr create --draft --base <target> --head <branch> --title "<title>" --body-fi
 Collect `L-nn` lessons into `.aizen/knowledge/lessons.md`. A lesson about the skill itself (a step, brief, script or rule
 that was wrong or missing) also goes to the skill feedback log: `feedback.py log --skill aizen-build …`
 (`aizen-skill-creator/scripts/authoring/feedback.py`, see the repo's `continuous-improvement` rule). Record in
-`.aizen/knowledge/` what this task changed: new `D-nn` in `decisions.md`, the module's design/API/data docs, a
-flow in `system/flows.md` — `.aizen/PROJECT.md` is compiled from them. Then `guard.py done --run <TASK>`
+the design docs (`docs.py where …` — `docs/` or `.aizen/knowledge/`) what this task changed: new `D-nn` in `decisions.md`, the module's design/API/data docs, a
+flow in `system/flows.md` — `.aizen/PROJECT.md` is compiled from them. Docs in `docs/`: `docs.py index`, then
+`docs.py check` — fix every problem in a file this run touched (`references/core/docs.md`), list the others. Then `guard.py done --run <TASK>`
 (aizen-core): it checks the contract and marks the run done, or prints what is still open.
 
 ## Checks between steps

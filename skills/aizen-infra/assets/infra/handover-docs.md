@@ -1,13 +1,15 @@
 # DevSecOps Handover Documentation Templates
 
-When completing Stage 4.5, generate the following 3 markdown documents inside the target project repository under `docs/`:
+When completing Stage 4.5, generate the following 3 markdown documents in the project's `docs/ops/` (layout: `references/core/docs.md` of aizen-core — `# Title`, then a one-line summary):
 
 ---
 
-## 1. docs/INFRA_DOCS.md (Infrastructure Topology)
+## 1. docs/ops/infrastructure.md (Infrastructure Topology)
 
 ```markdown
 # Infrastructure Documentation
+
+Where each part of <project> runs, how traffic and data flow between them, and who owns what.
 
 ## Overview
 - Project: <project-name>
@@ -30,10 +32,12 @@ When completing Stage 4.5, generate the following 3 markdown documents inside th
 
 ---
 
-## 2. docs/ENV_VARS.md (Environment Variables & Secrets)
+## 2. docs/ops/environment.md (Environment Variables & Secrets)
 
 ```markdown
 # Environment Variables & Secrets Reference
+
+Every variable and secret <project> needs, per environment — names and purpose only, never values.
 
 ## CI/CD Secrets (Configured in Repository Settings)
 
@@ -60,10 +64,12 @@ When completing Stage 4.5, generate the following 3 markdown documents inside th
 
 ---
 
-## 3. docs/PROCEDURES.md (Operational Runbook)
+## 3. docs/ops/runbook.md (Operational Runbook)
 
 ```markdown
 # Operational Runbook & Standard Procedures
+
+How to deploy, roll back and recover <project>, step by step, for whoever is on call.
 
 ## 1. Routine Deployment Workflow
 1. Develop feature on `feature/<name>` branch.

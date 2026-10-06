@@ -30,7 +30,8 @@ Template: `assets/plan/plan-template.md`.
   real-environment migration, CI step or alert → an `infra` unit for `devops`. None → say "no infra unit" so
   nobody looks for one. Infra units never contain application code; an app change the delivery path needs is a
   `dev` unit sequenced before it.
-- **Waves**: a wave is safe to run in parallel only under `references/flow/parallel.md`.
+- **Waves**: a wave is safe to run in parallel only under `references/flow/parallel.md`; print them with
+  `state.py waves --task <TASK>` (write sets + `after:`, capped by `parallel.max`) and copy the result into the plan.
 - **Local-only**: no unit pushes; the finish block carries the push / `gh pr create --draft` commands.
 - Work outside the docs (refactor, perf, a bug found) is never planned silently → "Proposals" with options.
 

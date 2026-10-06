@@ -40,7 +40,7 @@ Options: A (recommended) … · B … — only when there is a real choice
 Questions: <preference/risk only, choices + default>
 
 ## Delivery
-Order / waves: <unit, unit → unit>
+Order / waves: <copied from `state.py waves --task <TASK>` — 1: a ‖ b · 2: c>
 A3 to pre-approve: <exact actions: installs, local DB, downloads — or none>
 Checks: <commands>  ·  Backup: <what / none, why>  ·  Rollback: <how>
 ```
