@@ -1,6 +1,6 @@
 # Bug reports (never fix product code)
 
-One file per bug: `.aizen/reports/<TASK>/<YYYY-MM-DD>-test-bug-BUG-nn-<slug>.md`. Number BUG-nn sequentially per
+One file per bug: `.aizen/runs/<TASK>/reports/<YYYY-MM-DD>-test-bug-BUG-nn-<slug>.md`. Number BUG-nn sequentially per
 task (check existing files). Before writing, check for duplicates in existing bug files.
 
 **With a lens (v24):** ids are `BUG-<lens>-nn`, numbered per lens so parallel testers never collide, and stable

@@ -1,4 +1,4 @@
-# Parallel work — units, isolation, integration, resuming (v24)
+# Parallel work — units, isolation, integration, resuming (v25)
 
 Independent units run at the same time; each runs its own checks; they meet in one integration step.
 
@@ -16,7 +16,7 @@ the owner set when confirming delivery. Every extra unit costs a dispatch, a wor
    registries, lockfiles, i18n bundles, shared enums, error catalog, generated clients. A shared hot file gets **one**
    owner; others list the lines they need in their report.
 3. **Isolation** — each code writer in its own worktree and branch
-   (`git worktree add .worktrees/<unit> -b feature/<TASK>-<unit> <base>`). Two agents never share a checkout.
+   (`git worktree add .aizen/worktrees/<TASK>-<unit> -b feature/<TASK>-<unit> <base>`). Two agents never share a checkout.
 
 **Runtime isolation** — give every member its own:
 

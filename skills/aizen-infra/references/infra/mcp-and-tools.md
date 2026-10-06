@@ -17,7 +17,7 @@ either from the project's nature or from a previous run. Tools appear and disapp
 | IaC | terraform server | `terraform`, `pulumi` | ask the owner to run `plan` and paste it |
 | Containers, registry | docker server | `docker`, `crane`, `skopeo` | ask |
 | Errors, traces, metrics | sentry / datadog / grafana server | provider CLI | ask for a screenshot or an export |
-| Tickets, incidents | jira / linear server | provider CLI | record in `.aizen/reports/` only |
+| Tickets, incidents | jira / linear server | provider CLI | record in `.aizen/runs/<RUN>/reports/` only |
 
 Write the result into the Y0 summary and the report, in one line each:
 `MCP: github, kubernetes · CLI: git, docker, kubectl, helm · thiếu: terraform, cloud CLI`.

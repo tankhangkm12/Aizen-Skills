@@ -28,7 +28,7 @@ filter, list column and state is a schema requirement; filter/sort fields need i
 ### Team conventions — decided once per project, recorded as a `D-nn`, then reused
 
 Some teams standardise table rules beyond the engine's defaults. Offer them as options in fork 3/5, never as
-silent defaults; the choice goes to `.aizen/conventions.md`.
+silent defaults; the choice goes to `.aizen/config/conventions.md`.
 
 | Convention | Gain | Cost / when not |
 |---|---|---|

@@ -1,4 +1,4 @@
-# Evidence, numbers and reports (v24)
+# Evidence, numbers and reports (v25)
 
 The owner steers from what agents report. A confident wrong number, or a claim of DONE that the files
 do not support, steers the owner wrong. So claims carry evidence proportionate to the work, and reports are short enough to actually be read.
@@ -36,7 +36,7 @@ warm-up").
 **Risk modules / merge-release readiness:** every check, run or review names: task · role/instance · time · source SHA (and contract hash or
 artifact digest when relevant) · environment · command or method · exit status · raw output path ·
 limitations. Redact credentials and personal data when collecting, not later. Template:
-`assets/core/evidence-record.json`; `check.py` writes `evidence[-<unit>].json` in this shape.
+`assets/core/evidence-record.json`; `check.py` writes `evidence/<unit|main>.json` in this shape.
 
 - **Claims are not facts.** An agent's "DONE" is checked against the files, branch, SHA and output.
   Trust the file; report the gap.
@@ -47,7 +47,7 @@ limitations. Redact credentials and personal data when collecting, not later. Te
 
 ## 3. Report shape
 
-File: `.aizen/reports/<TASK>/<role>[-<unit>].md` — the exact name is in your brief.
+File: `.aizen/runs/<TASK>/reports/<role>[-<unit>].md` — the exact name is in your brief.
 
 ```markdown
 > **<ROLE> · <TASK> <UNIT> · <STATUS>**

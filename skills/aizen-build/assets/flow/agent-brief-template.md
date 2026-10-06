@@ -12,7 +12,7 @@ Your part: {{PART}}
 Done when: {{DONE}}
 
 ## Agreement
-The owner confirmed the plan module by module: .aizen/plans/{{TASK}}.md + .aizen/tasks/{{TASK}}/state.md
+The owner confirmed the plan module by module: .aizen/runs/{{TASK}}/plan.md + .aizen/runs/{{TASK}}/state.md
 (## Agreed, ## Approval). Once approved it is the contract: do not ask the owner anything — build exactly that.
 Plan silent on a detail → take the simplest option that fits it and list it under `Deviations:`.
 Only stop for: an A3 action not listed below, any A4, data loss, or a step that would break the agreed plan.
@@ -35,7 +35,7 @@ Optional tools: {{OPTIONAL}}
 Quality gate: python "{{CORE_DIR}}/scripts/core/check.py" --task {{TASK}} --unit {{CHECK_UNIT}} --project "{{WORKDIR_CMD}}"
 
 ## Report
-Full report: .aizen/reports/{{TASK}}/{{REPORT}}  ·  Return ≤ 15 lines ending with `Deviations:`.
+Full report: .aizen/runs/{{TASK}}/reports/{{REPORT}}  ·  Return ≤ 15 lines ending with `Deviations:`.
 Write the report file yourself with your file tool — the guard records who wrote it and refuses a report the
 coordinator wrote. Every finding and every area you judge PASS cites its evidence as `path:line` at the SHA you
 worked on; the guard opens each citation and fails the report when the line does not exist.

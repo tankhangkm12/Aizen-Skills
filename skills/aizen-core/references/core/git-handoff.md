@@ -1,10 +1,10 @@
-# Git hand-off — local-only, rebase, PR text (v24)
+# Git hand-off — local-only, rebase, PR text (v25)
 
 Open at the hand-off step. Branches, checkpoints, backup and rollback: `git.md`.
 
 ## 1. Local-only: nothing leaves the machine from an agent
 
-Everything an agent does stays local — commits, task branches, `.aizen/`, worktrees. `.aizen/` and `.worktrees/`
+Everything an agent does stays local — commits, task branches, `.aizen/`, worktrees. `.aizen/` and `.aizen/worktrees/`
 are listed in `.git/info/exclude` and never committed.
 
 A4 for agents (never): `git push` in any form · creating/deleting remote branches or tags ·
@@ -18,7 +18,7 @@ What the agent does instead — in the report, as a copy-paste block for the own
 run it from any folder; `gh` must run inside the project):
 ```
 git push -u origin <task-branch>
-cd "<project>" && gh pr create --draft --base <target> --head <task-branch> --title "<title>" --body-file "<workspace>/.aizen/reports/<TASK>/pr-body.md"
+cd "<project>" && gh pr create --draft --base <target> --head <task-branch> --title "<title>" --body-file "<workspace>/.aizen/runs/<TASK>/reports/pr-body.md"
 ```
 Before handing over, confirm no `.aizen/` file is staged or committed. Repo PR templates and branch/commit
 conventions (`CONTRIBUTING.md`, `.github/pull_request_template.md`) win over these defaults.
@@ -34,7 +34,7 @@ Migration numbering clash: renumber **yours**, never a merged one. Re-run the qu
 ## 3. Draft PR content
 
 Write the full description from `assets/core/pr-draft-template.md` (the repo's own PR template wins) to
-`.aizen/reports/<TASK>/pr-body.md`, including the Rollback block. Hand the owner the push and
+`.aizen/runs/<TASK>/reports/pr-body.md`, including the Rollback block. Hand the owner the push and
 `gh pr create --draft … --body-file …` / `glab mr create --draft …` commands (§1); the owner runs them. No reviewers
 unless the owner names them.
 

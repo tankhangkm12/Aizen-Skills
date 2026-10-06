@@ -1,4 +1,4 @@
-# Bug fix — diagnose in the plan, then fix without asking (v24)
+# Bug fix — diagnose in the plan, then fix without asking (v25)
 
 A wrong hypothesis hides the real bug, so the cause is settled before code changes. **Phase 1 is planning**
 (planner, or you when you plan a one-module fix): its output is the bug's module in the plan, and the owner picks

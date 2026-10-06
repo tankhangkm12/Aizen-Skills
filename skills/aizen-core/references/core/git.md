@@ -1,11 +1,11 @@
-# Git flow, checkpoints, backup and rollback (v24)
+# Git flow, checkpoints, backup and rollback (v25)
 
 Every change is made so that the owner can undo it at any moment. Git is the backup for everything it
 tracks; `.aizen/backups/` is the backup for what it does not.
 
 ## 1. Branch model
 
-`git.model` in `.aizen/conventions.md`: `auto` (default) · `gitflow` · `github`. The repository's own
+`git.model` in `.aizen/config/conventions.md`: `auto` (default) · `gitflow` · `github`. The repository's own
 convention (CONTRIBUTING, `git branch -r`, history) wins; note it once in the report.
 
 | Model | Long-lived | Task branches from | Merge target |
@@ -27,7 +27,7 @@ Parallel writers on one task use one branch each, per unit: `feature/SHOP-42-ord
 `feature/SHOP-42-payment-api`, `feature/SHOP-42-web` (`state.py brief` derives `feature/<TASK>-<unit>`).
 
 A team convention (branch pattern such as `feature/{ticket}-{slug}`, commit subject format) in `CONTRIBUTING.md` or
-`.aizen/conventions.md` replaces the defaults here where they differ.
+`.aizen/config/conventions.md` replaces the defaults here where they differ.
 
 Never create `develop`, `release/*` or any branch on the remote (A4 — the owner creates remote branches). Creating `develop`
 locally for a repo that has none is a decision — ask once, record it as `D-nn`.
@@ -42,7 +42,7 @@ git rev-parse HEAD                # record: start SHA  → report "Rollback" sec
 ```
 
 Never edit on a protected branch, on a detached HEAD or outside a git repository. Worktrees for parallel roles are created the same way:
-`git worktree add .worktrees/<unit> -b feature/<TASK>-<unit> <base>`.
+`git worktree add .aizen/worktrees/<TASK>-<unit> -b feature/<TASK>-<unit> <base>`.
 
 ## 3. Checkpoints during the work
 

@@ -1,8 +1,8 @@
 # Plan — <TASK> — <title>
 
 > Plan vN · State: `DRAFT` | `APPROVED <date>` · Base: `<branch>` @ `<sha>` · Updated: <YYYY-MM-DD>
-> Integration branch: `int/<TASK>` · Finish: push + `gh pr create --draft … --body-file .aizen/reports/<TASK>/pr-body.md`
-> commands for the owner (agents never push) · State: `.aizen/tasks/<TASK>/state.md`
+> Integration branch: `int/<TASK>` · Finish: push + `gh pr create --draft … --body-file .aizen/runs/<TASK>/reports/pr-body.md`
+> commands for the owner (agents never push) · State: `.aizen/runs/<TASK>/state.md`
 > Environments for agents: `local` <, `ENV-02 staging` — every apply still A3> · Production: never agents (A4)
 
 ## 1. Goal and scope

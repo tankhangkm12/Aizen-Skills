@@ -2,7 +2,7 @@
 
 Everything shipped to the browser is public and modifiable. The client's job is to make the **honest**
 path safe and pleasant; it is never the enforcement point. Every rule below assumes the server still
-checks — see the authZ matrix in `.aizen/docs/system/security.md` for who may do what.
+checks — see the authZ matrix in `.aizen/knowledge/system/security.md` for who may do what.
 
 ## A. What never reaches the DOM
 

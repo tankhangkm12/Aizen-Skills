@@ -31,7 +31,7 @@ no duplicates, redacted data; run report numbers add up; release verdict support
 No product code changes; test dependencies approved; branch/commit conventions; CI config untouched unless approved.
 
 ## 5. Test lens reports (v24)
-Each tester runs its lenses and writes `.aizen/reports/<TASK>/test-<lens>.md` (lens guide:
+Each tester runs its lenses and writes `.aizen/runs/<TASK>/reports/test-<lens>.md` (lens guide:
 `tester` `references/test/lenses/<lens>.md`). Review each report against its own lens, and the set as a whole:
 
 | Check | Finding when |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capacity calculator for Aizen roles — numbers computed, not guessed (v24).
+"""Capacity calculator for Aizen roles — numbers computed, not guessed (v25).
 
 Every command prints the formula, the inputs (with which ones are assumptions), a low / expected / high
 table and a sensitivity ranking (which input moves the result most). Results are PROJECTIONS: label them

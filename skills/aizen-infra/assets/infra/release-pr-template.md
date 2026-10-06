@@ -82,12 +82,12 @@ approach requested — say it once, clearly, then follow the owner's decision.
 
 ## Docs
 
-The infrastructure doc updated: sections <n>. Decisions added to `.aizen/docs/DECISIONS.md`: `D-nn`.
+The infrastructure doc updated: sections <n>. Decisions added to `.aizen/knowledge/decisions.md`: `D-nn`.
 
 ---
 
 Pushing, opening this PR, marking it Ready and every later push are the owner's (A4 for agents, local-only,
-`references/core/git-handoff.md` §1): this body goes to `.aizen/reports/<TASK>/pr-body.md` and the report carries the push and
+`references/core/git-handoff.md` §1): this body goes to `.aizen/runs/<TASK>/reports/pr-body.md` and the report carries the push and
 `gh pr create --draft … --body-file …` commands for the owner to run. **Production
 promotion is the owner's to run** — the commands above are written for the owner, not executed
 (`references/infra/authority.md` §1).

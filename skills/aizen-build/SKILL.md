@@ -1,9 +1,9 @@
 ---
 name: aizen-build
-description: "Aizen production engineering coordinator (v24). Takes a task from request to a local branch plus push/PR commands - a planner designs it module by module, the owner confirms each module, then parallel devs write the least code in worktrees -> tester -> independent reviewer (+ redteam) -> fix loop (<= 2 rounds) with no further questions. Shorter routes of the same flow: review a PR/diff/branch, design only (schema, API, architecture), pipeline/infra only. Use to implement a feature, fix a bug, refactor, go from idea to PR, review code, design tables or an API, set up CI/CD, Docker or Kubernetes, or resume a task in .aizen/ (làm tính năng, sửa bug, review PR, thiết kế bảng, dựng pipeline, từ ý tưởng tới PR, tiếp tục task). Not for: bootstrapping a new backend project from its documents (aizen-init), creating or importing skills (aizen-skill-creator, aizen-skill-importer), researching a technology (aizen-tech-learning), or a plain question about code."
+description: "Aizen production engineering coordinator (v25). Takes a task from request to a local branch plus push/PR commands - a planner designs it module by module, the owner confirms each module, then parallel devs write the least code in worktrees -> tester -> independent reviewer (+ redteam) -> fix loop (<= 2 rounds) with no further questions. Shorter routes of the same flow: review a PR/diff/branch, design only (schema, API, architecture), pipeline/infra only. Use to implement a feature, fix a bug, refactor, go from idea to PR, review code, design tables or an API, set up CI/CD, Docker or Kubernetes, or resume a task in .aizen/ (làm tính năng, sửa bug, review PR, thiết kế bảng, dựng pipeline, từ ý tưởng tới PR, tiếp tục task). Not for: bootstrapping a new backend project from its documents (aizen-init), creating or importing skills (aizen-skill-creator, aizen-skill-importer), researching a technology (aizen-tech-learning), or a plain question about code."
 ---
 
-# aizen-build — production engineering coordinator (v24)
+# aizen-build — production engineering coordinator (v25)
 
 You are the main session. You run the flow, dispatch roles, merge their branches and talk to the owner (the user).
 Everyone follows `references/core/rules.md` (read it first) and `references/core/mcp.md`.
@@ -44,8 +44,9 @@ yourself; tester and reviewer still run. Bug: `references/dev/bugfix.md`.
 ## Tools
 
 `state.py` = `python "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init`, `brief`,
-`answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`. `guard.py` (same
-folder): `check`, `waive`, `install` — the done checklist (`manifest.json` → `checklist`) the hooks enforce. A brief carries
+`answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`, `init --backlog BL-nn`
+(an approved backlog item). `guard.py` = `python "<CORE_DIR>/scripts/core/guard.py"` (aizen-core): `check`, `waive`,
+`done`, `verify-brief` — the run contract (`manifest.json` → `contract`) the hooks enforce. A brief carries
 every absolute path, the quality-gate command (`scripts/core/check.py`) and the code-map command
 (`scripts/core/graph.py`, `references/core/code-map.md`). Dispatch mechanics, models and how to confirm the plan:
 `references/flow/platform-claude-code.md` · `references/flow/platform-antigravity.md`.
@@ -61,18 +62,20 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
 5. **Never resolve a merge conflict or do a role's job by hand** (except a one-module task you chose to build); re-dispatch instead.
 6. **Fix loop ≤ 2 rounds** without asking, then options for the owner.
 7. **Local-only** — finish with one copy-paste block of push/PR commands; agents never push.
-8. **State on disk** — `.aizen/tasks/<TASK>/state.md`; on resume run `state.py status` first.
+8. **State on disk** — `.aizen/runs/<TASK>/state.md`; on resume run `state.py status` first.
 9. Relay every `BLOCKED` and `HANDOFF:` line and every `## Proposals` row in the summary; an unreported deviation
    you find is a finding.
-10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/flow/guard.py`, installed
-    by `aizen sync --project`), a stop is refused until the checklist passes and the hook prints what is open. Do
+10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/core/guard.py` of
+    aizen-core, installed by `aizen sync --project`), a stop is refused until the checklist passes and the hook prints what is open. Do
     exactly those items, nothing more. Every item is proven by an artifact someone else checks: check.py evidence
     (also `--unit int` on `int/<TASK>`), and test/review reports **written by the tester and reviewer themselves**
     — never write or rewrite a role's report for it; the ledger shows who wrote each file. A step that truly does
-    not apply: `guard.py waive --task <TASK> --step <id> --reason "…" --evidence <file | one line of real output>`;
+    not apply: `guard.py waive --run <TASK> --step <id> --reason "…" --evidence <file | one line of real output>`;
     it counts once the reviewer writes `waiver <id>: accepted`, and goes under `## Waived` in `pr-body.md`
-    (`plan`, `check-int`, `review` cannot be waived). Blocked on the owner: `state.py status --set blocked`, then
-    one question. `guard.py check --task <TASK>` shows the list any time — run it before you report finished.
+    (`plan`, `check-int`, `review` cannot be waived). Code changed → record what changed in `.aizen/knowledge/`
+    (decisions, module design/API/data, lessons) — the `knowledge` check. Blocked on the owner: `state.py status
+    --set blocked`, then one question. `guard.py check --run <TASK>` shows the list any time; when it passes the
+    guard marks the run done and archives it (`state.py status --set done` is refused).
 
 ## Knowledge — by topic, from the packs installed next to this skill
 

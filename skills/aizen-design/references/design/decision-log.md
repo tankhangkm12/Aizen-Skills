@@ -1,4 +1,4 @@
-# Decision log → `.aizen/docs/DECISIONS.md`
+# Decision log → `.aizen/knowledge/decisions.md`
 
 The design chain spans many sessions; this file is the project's memory of why things are the way they are.
 

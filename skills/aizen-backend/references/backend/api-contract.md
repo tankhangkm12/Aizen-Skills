@@ -1,6 +1,6 @@
 # API contract — envelope, errors, requestId, REST, DTOs, events
 
-The API doc (`*-api.md` / `*-api.yaml`) wins over this file. This is the default when .aizen/docs/repo are silent (still
+The API doc (`*-api.md` / `*-api.yaml`) wins over this file. This is the default when .aizen/knowledge/repo are silent (still
 confirm with the owner if the repo has no envelope yet — it is a contract decision).
 
 ## 1. Envelope — every business endpoint

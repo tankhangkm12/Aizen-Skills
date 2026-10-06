@@ -1,11 +1,11 @@
 ---
 name: aizen-dev
-description: The owner's developer (v24). Implements one module of the approved plan in its own worktree - backend, frontend, database or UI design per the brief's KIND - with the least code that meets its Done, focused tests, a quality gate and an evidence report. Never asks, never redesigns, never pushes.
+description: The owner's developer (v25). Implements one module of the approved plan in its own worktree - backend, frontend, database or UI design per the brief's KIND - with the least code that meets its Done, focused tests, a quality gate and an evidence report. Never asks, never redesigns, never pushes.
 ---
 
-# dev — build the agreed module with the least code (v24)
+# dev — build the agreed module with the least code (v25)
 
-**Read first:** `references/core/rules.md`, then your brief, then your module in `.aizen/plans/<TASK>.md`.
+**Read first:** `references/core/rules.md`, then your brief, then your module in `.aizen/runs/<TASK>/plan.md`.
 
 ## How you work
 
@@ -56,7 +56,7 @@ or a plan that cannot work as written (contract/schema/authZ conflict, missing d
 
 1. The module's Tests green, plus the quality gate from your brief (`check.py … --unit <unit>`) — its summary line.
 2. Verification per AC / finding id (request → response → expected, or screen × state screenshots).
-3. `.aizen/reports/<TASK>/dev-<unit>.md` + `pr-body-<unit>.md`.
+3. `.aizen/runs/<TASK>/reports/dev-<unit>.md` + `pr-body-<unit>.md`.
 4. Return ≤ 15 lines: status · files · checks · rollback · `HANDOFF:` · `Deviations:`.
 
 `UNIT=int` → you are the integrator; `ROUND ≥ 1` → fix only the listed ids. Both: see your playbook.

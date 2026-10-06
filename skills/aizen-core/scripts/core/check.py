@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""check — run the repository's own quality checks and record what really happened (v24).
+"""check — run the repository's own quality checks and record what really happened (v25).
 
     python <CORE_DIR>/scripts/core/check.py --task SHOP-42 --unit api   # detect, run, write evidence
     python <CORE_DIR>/scripts/core/check.py --task SHOP-42 --plan       # print the commands only
@@ -16,7 +16,7 @@ Steps (each skipped when the repository has nothing for it):
   size      size of the build output (dist/, build/, .next/, out/, target/) and the change since this task's
             first run;
 
-Writes <workspace>/.aizen/reports/<TASK>/evidence[-<unit>].json (sha, branch, base, command, exit code,
+Writes <workspace>/.aizen/runs/<TASK>/evidence/<unit|main>.json (sha, branch, base, command, exit code,
 seconds, status, the failing tail) and prints a summary of at most 15 lines. The workspace is the main
 checkout even when run inside a worktree. Reports quote this file instead of re-typing results; a reviewer
 can re-run any step. A missing tool is `unverified`, never `pass`.
@@ -463,16 +463,16 @@ def main() -> int:
         except (AttributeError, ValueError):
             pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--task", required=True, help="task id; evidence goes to .aizen/reports/<TASK>/evidence.json")
+    ap.add_argument("--task", required=True, help="run id; evidence goes to .aizen/runs/<RUN>/evidence/<unit|main>.json")
     ap.add_argument("--project", default="", help="repository or worktree to check (default: the current directory)")
     ap.add_argument("--workspace", default="", help="where .aizen/ lives (default: the main checkout of --project)")
-    ap.add_argument("--unit", default="", help="unit id; evidence goes to evidence-<unit>.json so parallel units never collide")
+    ap.add_argument("--unit", default="", help="unit id (int = the integration branch); evidence goes to evidence/<unit>.json so parallel units never collide")
     ap.add_argument("--steps", default=",".join(STEPS), help="comma list of " + ", ".join(STEPS))
     ap.add_argument("--base", default="", help="base ref for 'what changed' (default: merge-base with develop/main)")
     ap.add_argument("--plan", action="store_true", help="print the detected commands; run nothing")
     ap.add_argument("--offline", action="store_true", help="deps step: no registry look-ups")
     ap.add_argument("--timeout", type=int, default=900, help="seconds per command (default 900)")
-    ap.add_argument("--out", default="", help="evidence path (default <workspace>/.aizen/reports/<TASK>/evidence[-<unit>].json)")
+    ap.add_argument("--out", default="", help="evidence path (default <workspace>/.aizen/runs/<RUN>/evidence/<unit|main>.json)")
     a = ap.parse_args()
     root = Path(a.project or ".").resolve()
     steps = [s.strip() for s in a.steps.split(",") if s.strip()]
@@ -490,8 +490,8 @@ def main() -> int:
                 print(f"{s:9} (built-in step)")
         return 0
     home = Path(a.workspace).resolve() if a.workspace else main_checkout(root)
-    name = f"evidence-{a.unit}.json" if a.unit else "evidence.json"
-    out_file = Path(a.out) if a.out else home / ".aizen" / "reports" / a.task / name
+    name = f"{a.unit or 'main'}.json"
+    out_file = Path(a.out) if a.out else home / ".aizen" / "runs" / a.task / "evidence" / name
     previous = None
     if out_file.is_file():
         try:

@@ -13,9 +13,9 @@ installed `graphify` skill.
    `graphify query "which modules import the pino/pg/redis library directly?"` and
    `graphify path "HealthController" "Database"`.
 4. When the review is done move the output into the agent workspace:
-   `mv graphify-out .aizen/init/graphify/graphify-out` (PowerShell: `Move-Item graphify-out .aizen/init/graphify/`).
+   `mv graphify-out .aizen/runs/init/graphify/graphify-out` (PowerShell: `Move-Item graphify-out .aizen/runs/init/graphify/`).
 
-## Review table (copy into `.aizen/init/reports/step-9.md`)
+## Review table (copy into `.aizen/runs/init/reports/step-9.md`)
 
 | Check | Expected (plan/docs) | Seen in graph | OK? |
 |---|---|---|---|

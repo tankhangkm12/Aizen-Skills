@@ -1,4 +1,4 @@
-# Test strategy → `.aizen/docs/system/test-plan.md`
+# Test strategy → `.aizen/knowledge/system/test-plan.md`
 
 Input: SRS (AC-nn), LLD, API contract, UI designs. Real bugs live at boundaries and error branches:
 priority is covering every failure case, not many happy-path cases. `tester` executes this plan.

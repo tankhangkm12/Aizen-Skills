@@ -1,6 +1,6 @@
 # Choosing the design tool — ask once, record, stick to it
 
-## 1. The question (U1, only when `DECISIONS.md` has no UI-tool row)
+## 1. The question (U1, only when `decisions.md` has no UI-tool row)
 
 ```
 **[`dev` (ui) · U1 · <TASK> · <app>] Q1 — Thiết kế giao diện ở đâu?**

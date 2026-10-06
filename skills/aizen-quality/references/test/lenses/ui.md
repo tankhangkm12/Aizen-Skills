@@ -24,14 +24,14 @@ journeys · WCAG level the owner chose · `references/frontend/web-interface-gui
 
 ## Files
 E2E specs in `<repo e2e root>/ui/...` or suffix `.ui`; screenshots in
-`<main checkout>/.aizen/reports/<TASK>/ui/` (evidence, never committed).
+`<main checkout>/.aizen/runs/<TASK>/reports/ui/` (evidence, never committed).
 
 ## Environment
 Own dev-server port from RUNTIME (check it is free, note the pid, stop it before reporting), own browser
 session; never `close-all` / `kill-all`. Browser missing → visual rows `[unverified]` and the install quote (A3).
 
 ## Report
-`.aizen/reports/<TASK>/test-ui.md`: table `screen · state · width · screenshot · console · a11y · result`,
+`.aizen/runs/<TASK>/reports/test-ui.md`: table `screen · state · width · screenshot · console · a11y · result`,
 BUG table (`BUG-ui-nn`).
 
 ## Never

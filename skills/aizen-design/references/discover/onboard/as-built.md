@@ -76,8 +76,8 @@ claims completeness it does not have.
 ## 5. Handover shape
 
 `.aizen/README.md` gets: which parts are documented, at what depth, as of which commit, and what is
-explicitly out of scope. `.aizen/docs/README.md` gets the per-document status table with a
+explicitly out of scope. `.aizen/knowledge/README.md` gets the per-document status table with a
 confidence column — the share of each document that is `[verified]` versus `[inferred]`, stated
-roughly and honestly. `.aizen/docs/DECISIONS.md` starts as a `D-nn` list of decisions **found in the
+roughly and honestly. `.aizen/knowledge/decisions.md` starts as a `D-nn` list of decisions **found in the
 code**, each marked `[reconstructed — never approved by the owner]`, because a later role must not read
 them as settled policy.

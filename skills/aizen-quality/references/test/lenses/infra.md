@@ -30,7 +30,7 @@ Local tools only, own working dir; a remote state backend or cloud credentials n
 the owner with the exact command, rows marked `[unverified]` meanwhile.
 
 ## Report
-`.aizen/reports/<TASK>/test-infra.md`: table `artifact · command · result`, plan summary (add/change/
+`.aizen/runs/<TASK>/reports/test-infra.md`: table `artifact · command · result`, plan summary (add/change/
 destroy counts and each destroy named), BUG table (`BUG-infra-nn`).
 
 ## Never

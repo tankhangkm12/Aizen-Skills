@@ -5,11 +5,11 @@ Architecture, not visual design: structure, data, states and behaviour. Layout, 
 No API contract yet → design screens, states and components anyway, and produce the **data requirements list** the contract must satisfy — that list is how the backend learns what the frontend needs before either exists.
 
 **FE-0 — Locate.** Read `requirements.md`, `<unit>-api.yaml` if it exists, any existing `*-frontend.md`, the repo
-(is there already a frontend, with conventions to follow?), `DECISIONS.md`. ≤ 10 lines.
+(is there already a frontend, with conventions to follow?), `decisions.md`. ≤ 10 lines.
 
 **FE-1 — Challenge upstream · 🛑.** 2–4 concrete objections against the SRS and the contract: a journey
 with no screen, a permission rule no screen enforces, an endpoint returning data no screen shows, an
-error code no state handles. Record in `.aizen/reports/<TASK>/challenges.md`.
+error code no state handles. Record in `.aizen/runs/<TASK>/reports/challenges.md`.
 
 **FE-2 — Interview · 🛑**, in grouped gates, in this order:
 1. Platform and target: web / mobile web / native shell · browsers and devices to support · does SEO

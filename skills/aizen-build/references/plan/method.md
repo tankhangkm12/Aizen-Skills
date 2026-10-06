@@ -1,4 +1,4 @@
-# Planning — a plan the owner can confirm module by module (v24)
+# Planning — a plan the owner can confirm module by module (v25)
 
 The plan is what the owner confirms part by part and what every role then follows without asking. Write it so
 each module can be read, judged and approved on its own, and so a dev can build it without thinking twice.
@@ -6,12 +6,12 @@ each module can be read, judged and approved on its own, and so a dev can build 
 ## Steps
 
 1. **Locate.** Read only the docs and code this change needs (code map first: `references/core/code-map.md`);
-   `.aizen/tasks/<TASK>/state.md` when resuming — `## Agreed` is settled, do not reopen it.
+   `.aizen/runs/<TASK>/state.md` when resuming — `## Agreed` is settled, do not reopen it.
 2. **Measure, never ask facts.** Paths, versions, config, current behaviour → read-only tools, labelled. An
    unverified assumption becomes a measurement module first. Only preferences and risk choices become
    questions, each with choices and a recommended default.
 3. **Root cause first** for bugs: `[verified]` only when reproduced or the causing line was read at this SHA.
-4. **Split into modules** (below) and write `.aizen/plans/<TASK>.md`. Risk module → add the fields of
+4. **Split into modules** (below) and write `.aizen/runs/<TASK>/plan.md`. Risk module → add the fields of
    `planning-method.md`.
 5. **Decide the details now.** Anything a dev would otherwise have to think about — names, signatures, status
    codes, columns, file paths, edge cases, test cases — goes in the module. Open choices go to the owner as

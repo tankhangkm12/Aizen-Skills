@@ -2,7 +2,7 @@
 """UI measurement helpers for Aizen frontend roles — numbers, not eyeballing (v24).
 
   uikit.py contrast "#1d4ed8" "#ffffff"                  WCAG 2.x contrast ratio and AA/AAA verdicts
-  uikit.py palette shot.png [--top 8] [--tokens .aizen/docs/.../design-tokens.json]
+  uikit.py palette shot.png [--top 8] [--tokens .aizen/knowledge/.../design-tokens.json]
                                                          dominant colours, share of pixels, nearest design
                                                          token (CIE76 delta-E) and contrast vs the dominant one
   uikit.py diff ref.png shot.png [--threshold 24] [--max-percent 2] [--out diff.png]

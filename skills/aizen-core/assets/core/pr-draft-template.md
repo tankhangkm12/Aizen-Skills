@@ -1,6 +1,6 @@
 ## 1. Context
 - **Task / issue:** <TASK> · #<issue>
-- **Plan:** `.aizen/plans/<file>.md` — **Unit:** <unit> — <one-sentence goal> · kind: <be|fe|db|ui|infra>
+- **Plan:** `.aizen/runs/<TASK>/plan.md` — **Unit:** <unit> — <one-sentence goal> · kind: <be|fe|db|ui|infra>
 - **Docs followed:** <doc> §<section> (<IDs>)
 - **Branch:** `<branch>` → `<target>` · **Head SHA:** `<sha>` · **Write set respected:** yes/no
 - **Why:** <1–2 sentences, business language>

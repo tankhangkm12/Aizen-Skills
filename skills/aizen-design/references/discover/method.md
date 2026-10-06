@@ -17,7 +17,7 @@ Used by `planner` when `STAGE=discover`, or before planning in an unfamiliar rep
 
 ## Scope (every task, part of the plan)
 
-Turn the short prompt into facts without asking the owner: read README, `.aizen/docs/`, the repo tree and
+Turn the short prompt into facts without asking the owner: read README, `.aizen/knowledge/`, the repo tree and
 `git log` of the named paths; measure versions, contracts, configs. Record in the plan:
 goal (checkable) · out of scope · constraints (measured) · done-when · assumptions (`verified` + evidence, or the
 command that would verify it) · risk signals (live cluster, secrets, production, migration, destructive,
@@ -31,12 +31,12 @@ multi-service — unsure = true) · questions (preferences/risk only, with choic
   with a **Not found** table. Show it before going deep.
 - **K2 Deep read** per service (`references/discover/onboard/as-built.md`): validation, permission checks,
   transaction boundaries, retries, idempotency, uniqueness by constraint vs by code.
-- **K3 Write as-built docs** into `.aizen/docs/` with labels; decisions found in code marked
+- **K3 Write as-built docs** into `.aizen/knowledge/` with labels; decisions found in code marked
   `[reconstructed — never approved]`.
 - **K4 Contradictions and unknowns**, each naming who could answer.
 - **K5 Risk map** (`references/discover/onboard/risk-map.md`) ranked by impact × how quietly it fails.
 - Report from `assets/discover/onboard-report-template.md`.
-- **K6 Conventions** for coding agents (`references/discover/onboard/conventions.md`) → `.aizen/conventions.md`.
+- **K6 Conventions** for coding agents (`references/discover/onboard/conventions.md`) → `.aizen/config/conventions.md`.
 - Docs vs code drift → `references/discover/onboard/reconcile.md`.
 
 ## Requirements (new idea) — Q0–Q5

@@ -3,7 +3,7 @@
 
 # Style guide `minimalist` — editorial, warm monochrome, flat bento grids, muted accents
 
-Used only when the project's chosen style (`.aizen/conventions.md` → `ui.style`) is `minimalist`.
+Used only when the project's chosen style (`.aizen/config/conventions.md` → `ui.style`) is `minimalist`.
 
 > **The owner overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 

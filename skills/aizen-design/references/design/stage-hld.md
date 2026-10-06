@@ -1,4 +1,4 @@
-# HLD → `.aizen/docs/system/architecture.md`
+# HLD → `.aizen/knowledge/system/architecture.md`
 
 Input: `idea.md`, `requirements.md`. The most expensive forks live here; everything later builds on them.
 

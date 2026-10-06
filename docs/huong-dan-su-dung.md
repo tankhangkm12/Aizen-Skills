@@ -92,29 +92,38 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 
 ### Theo dõi và tiếp tục
 
-- Trạng thái task: `.aizen/tasks/<TASK>/state.md` (phần `## Agreed` ghi từng câu bạn đã xác nhận).
-- Plan: `.aizen/plans/<TASK>.md`; báo cáo từng role: `.aizen/reports/<TASK>/`.
+- Trạng thái task: `.aizen/runs/<TASK>/state.md` (phần `## Agreed` ghi từng câu bạn đã xác nhận).
+- Plan: `.aizen/runs/<TASK>/plan.md`; báo cáo từng role: `.aizen/runs/<TASK>/reports/`.
 - Tiếp tục task bị ngắt: "/aizen-build tiếp tục task <TASK>" — agent đọc `state.md`, không hỏi lại phần đã chốt.
-- `.aizen/`, `.worktrees/` và `graphify-out/` được tự thêm vào `.git/info/exclude` (không đụng file được git theo dõi).
+- `.aizen/`, `.aizen/worktrees/` và `graphify-out/` được tự thêm vào `.git/info/exclude` (không đụng file được git theo dõi).
 
-### Guard — khi agent đòi dừng mà chưa xong
+### Điều khiển dự án: `.aizen/PROJECT.md` và backlog
 
-Sau `node bin/cli.js sync --project` trong thư mục dự án, Claude Code và Antigravity gọi `guard.py` mỗi khi agent
-định dừng. Chưa đủ checklist thì agent bị đẩy lại làm tiếp với danh sách cụ thể. Bạn cũng xem được:
+Sau `node bin/cli.js sync --project` trong thư mục dự án, mở **`.aizen/PROJECT.md`** — file duy nhất cần đọc:
+mục 0 "Cần bạn ngay" (run bị chặn, câu hỏi chờ trả lời, việc chờ duyệt, push bị chặn), mục 1–9 để hiểu dự án,
+mục 11 việc agent đã / đang / sắp làm. File tự cập nhật; muốn sửa nội dung thì sửa nguồn ở mục 13.
 
 ```bash
-aizen guard check --task T-12        # còn thiếu gì (exit 0 = đủ)
-aizen guard waive --task T-12 --step check-docs --reason "module chỉ sửa tài liệu, không có test" \
-  --evidence "git diff --stat: 2 files, docs/** only"   # hoặc đường dẫn file (được băm)
+aizen backlog add --title "rate limit cho API public" --skill aizen-build   # thêm việc (trạng thái proposed)
+aizen backlog approve BL-05                                                # chỉ bạn duyệt — hook chặn agent
+aizen guard check --run T-12                                               # run còn thiếu gì (exit 0 = đủ)
+aizen guard stop --run T-12 --reason "đổi hướng"                            # dừng một run
+aizen project                                                              # biên soạn lại bản đồ ngay
 ```
 
-- Task chuyển `blocked` do guard → đọc dòng `guard:` cuối `## Log` trong `state.md`, chọn: làm tiếp, miễn bước
-  (waive), sửa plan, hoặc dừng.
-- `git push` nhánh của task bị chặn khi checklist chưa đủ — đúng ý đồ; `--no-verify` nếu bạn chủ động bỏ qua.
-- Waiver chỉ có hiệu lực khi reviewer ghi `waiver <id>: accepted` trong `review.md`.
-- Báo cáo test/review phải do chính tester/reviewer viết (hook ghi lại ai viết); review phải dẫn `path:line`
-  và guard mở từng dòng ở đúng SHA để kiểm.
-- Task cũ bỏ dở chặn sửa code: `state.py status --task <ID> --set stopped`.
+Mỗi skill chạy thành một run trong `.aizen/runs/<RUN>/`. Agent tích `sheet.md` kèm bằng chứng, guard kiểm từng ô,
+chạy các luật tất định, rồi một verifier độc lập chấm (≥ 80%). Chưa đủ thì agent bị đẩy lại làm tiếp với danh
+sách cụ thể; đủ thì guard tự đánh dấu `done` và chuyển run vào `archive/`.
+
+- Run chuyển `blocked` → mục 0 của `PROJECT.md` có lý do; chọn: làm tiếp, cho miễn bước, sửa plan, hoặc dừng.
+- Miễn bước: agent chạy `guard.py waive … --evidence <file | 1 dòng output>`; chỉ có hiệu lực khi verifier (hoặc
+  reviewer) ghi `accepted`.
+- Báo cáo test/review và `verdict.json` phải do chính tester/reviewer/verifier viết (hook ghi lại ai viết); mọi kết
+  luận đạt phải dẫn `path:line` và guard mở từng dòng để kiểm.
+- `git push` nhánh của run bị chặn khi contract chưa đủ — đúng ý đồ; `--no-verify` nếu bạn chủ động bỏ qua.
+- Run cũ bỏ dở chặn sửa code: `aizen guard stop --run <ID> --reason "…"`.
+- Bắt mọi sửa code phải có run: `"require_task": true` trong `.aizen/config/guard.json`. Chia sẻ `knowledge/` và
+  `PROJECT.md` với team: `"share_knowledge": true`, rồi `aizen guard install`.
 
 ### Mẹo để agent làm tốt nhất
 
@@ -122,7 +131,7 @@ aizen guard waive --task T-12 --step check-docs --reason "module chỉ sửa tà
 - Có `CLAUDE.md`/`AGENTS.md` trong project ghi lệnh build/test, quy ước code — mọi role đều đọc.
 - Có test chạy được (`npm test`, `pytest`…): `check.py` chỉ báo PASS khi có test thật sự chạy; không có test thì
   kết quả là `UNVERIFIED`, không phải PASS.
-- Ghi bài học vào `.aizen/lessons.md` (agent tự thêm `L-nn` cuối task) — lần sau agent đọc trước khi sửa code.
+- Ghi bài học vào `.aizen/knowledge/lessons.md` (agent tự thêm `L-nn` cuối task) — lần sau agent đọc trước khi sửa code.
 - Duyệt cài graphify ở task đầu tiên: các role tìm code và phạm vi ảnh hưởng nhanh hơn nhiều.
 
 ## 4. Các skill khác — cần đưa gì
@@ -152,10 +161,10 @@ Cả hai skill làm việc ngay trong repo Aizen-Skills và theo [chuẩn skill 
 | Push | chỉ khi bạn đồng ý | chỉ khi bạn đồng ý |
 
 - Cải thiện skill đã có trong repo: dùng `aizen-skill-creator` ("cải thiện skill <tên>: <vấn đề>"); nó lưu bản cũ vào
-  `.aizen-work/<tên>/baseline/`, đề xuất thay đổi, rồi so sánh bản mới với bản cũ.
+  `.aizen/cache/import/<tên>/baseline/`, đề xuất thay đổi, rồi so sánh bản mới với bản cũ.
 - Skill tự cải thiện: khi skill làm chưa tốt, agent ghi sổ phản hồi (`feedback.py log`) rồi báo bạn một dòng. Vấn
   đề lặp ≥ 2 lần (hoặc bạn phàn nàn) → agent đề xuất sửa qua `aizen-skill-creator`, thêm eval case để lỗi không quay lại.
   Xem sổ: `python skills/aizen-skill-creator/scripts/authoring/feedback.py list --open`.
-- Không bao giờ ghi đè skill trùng tên; thư mục tạm nằm ở `.aizen-work/` (đã git-ignore).
+- Không bao giờ ghi đè skill trùng tên; thư mục tạm nằm ở `.aizen/cache/` (đã git-ignore).
 - Skill chép về không có giấy phép → agent báo trước khi tuỳ biến; bạn quyết định giữ riêng hay không.
 

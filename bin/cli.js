@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { runInstall, discoverSkills, runGuard } = require('./install');
+const { runInstall, discoverSkills, runGuard, coreScripts } = require('./install');
 const { updateSkills, setupScheduler } = require('./updater');
 const agentsConfig = require('./agents-config');
 const external = require('./external');
@@ -25,10 +25,12 @@ CÁC LỆNH CHÍNH:
   auto-update         Cấu hình tác vụ tự động cập nhật ngầm hàng ngày
                       Ví dụ: aizen auto-update enable  (hoặc disable)
   status              Hiển thị danh sách skills và trạng thái liên kết với các Agent
-  guard               Ép agent làm đủ quy trình aizen-build (hook Claude Code + Antigravity + pre-push):
+  guard               Hợp đồng chung cho mọi skill (hook Claude Code + Antigravity + pre-push):
                       aizen guard install            cài cho dự án hiện tại (sync --project tự làm)
-                      aizen guard check --task <ID>  xem checklist còn thiếu gì
-                      aizen guard waive --task <ID> --step <id> --reason "..."
+                      aizen guard check --run <ID>   xem checklist của một run còn thiếu gì
+                      aizen guard stop --run <ID> --reason "..."
+  project             Biên soạn lại .aizen/PROJECT.md — bản đồ dự án (tự cập nhật sau mỗi thay đổi)
+  backlog             Việc sắp làm: aizen backlog list | add --title "..." --skill <skill> | approve BL-nn | drop BL-nn
   external            Skill cộng đồng dùng trực tiếp, không chép (externals.json):
                       aizen external list | install <tên> | update <tên> | remove <tên>
   help, -h            Hiển thị trợ giúp này
@@ -92,6 +94,14 @@ async function main() {
 
     case 'guard':
       process.exitCode = runGuard(args.slice(1).length ? args.slice(1) : ['--help']);
+      break;
+
+    case 'backlog':
+      process.exitCode = runGuard(['backlog', ...args.slice(1)]);
+      break;
+
+    case 'project':
+      process.exitCode = runGuard(args.slice(1), {}, path.join(coreScripts, 'project.py'));
       break;
 
     case 'external':

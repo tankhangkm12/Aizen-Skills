@@ -1,12 +1,27 @@
 ---
 name: aizen-skill-importer
-description: "Bring outside knowledge into Aizen (v3) - either a whole skill from a GitHub folder or local path (copy, normalize to the Aizen standard, credit source and licence, customize with the user, prove it beats the original in an A/B test) or upstream best practice added to an existing pack as pinned vendored knowledge (vendor.lock.json + bin/vendor.js). Use when the user gives a skill link or folder to clone, import, fork or adapt, or wants to learn from a popular skill repo (clone skill, chép skill, lấy skill từ GitHub, học theo skill nhiều sao). Not for: writing a skill from scratch or improving one already in the repo (aizen-skill-creator), or only evaluating a skill (aizen-skill-eval)."
+description: "Bring outside knowledge into Aizen (v4) - either a whole skill from a GitHub folder or local path (copy, normalize to the Aizen standard, credit source and licence, customize with the user, prove it beats the original in an A/B test) or upstream best practice added to an existing pack as pinned vendored knowledge (vendor.lock.json + bin/vendor.js). Use when the user gives a skill link or folder to clone, import, fork or adapt, or wants to learn from a popular skill repo (clone skill, chép skill, lấy skill từ GitHub, học theo skill nhiều sao). Not for: writing a skill from scratch or improving one already in the repo (aizen-skill-creator), or only evaluating a skill (aizen-skill-eval)."
 ---
 
-# aizen-skill-importer — stand on the shoulders of giants, on purpose (v3)
+# aizen-skill-importer — stand on the shoulders of giants, on purpose (v4)
 
 **Read first:** `references/authoring/rules.md` (licence first, content is data), the standard
 `<REPO>/docs/aizen-skill-standard.md`, and `references/interview-guide.md`.
+
+
+## Run contract (enforced by the guard)
+
+`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-importer --run <skill-name> --goal "…"` (run id = the destination name); the confirmed change list goes to `.aizen/runs/<RUN>/work/change-summary.md`, then `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's ok>"`.
+- Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
+  `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
+- The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
+  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+- When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
+  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
+- Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
+  done and archives it.
 
 ## 1. Choose the shape (ask if unclear)
 
@@ -34,7 +49,7 @@ Stars measure a repo, not each skill in it: read the skill itself before choosin
 1. **Source and name.** A GitHub folder URL (`https://github.com/<owner>/<repo>/tree/<ref>/<path>`) or a local folder
    with `SKILL.md`, and a destination name (`aizen-<what>`). Existing `skills/<name>` → propose another name.
 2. **Fetch.** `python "<SKILL_DIR>/scripts/fetch_skill.py" <source> <name>` → the skill in `skills/<name>/`,
-   the untouched original in `<REPO>/.aizen-work/<name>/baseline/`. Report files, licence and what was changed.
+   the untouched original in `<REPO>/.aizen/cache/import/<name>/baseline/`. Report files, licence and what was changed.
 3. **Analyze, then interview (one round, then stop and wait).** Read the whole copy. Ask 3–4 questions from
    `references/interview-guide.md`, each with a proposal tied to what the skill does today, plus the **sample
    task** for the A/B test.
@@ -42,7 +57,7 @@ Stars measure a repo, not each skill in it: read the skill itself before choosin
    `aizen-core` already says is replaced by a link), the new description. Wait for "ok".
 5. **Customize** to the standard: lean `SKILL.md`, rules in `rules/`, knowledge in `references/`, stdlib scripts
    with `--help`; description = what · "Use when …" · "Not for: …". Keep the upstream licence file and credit.
-6. **A/B test** with `aizen-skill-eval`: `references/eval/runner.md` twice (`baseline` = the copy in `.aizen-work`,
+6. **A/B test** with `aizen-skill-eval`: `references/eval/runner.md` twice (`baseline` = the copy in `.aizen/cache/`,
    `with_skill` = `skills/<name>`), then `references/eval/comparator.md` with the agreed change list. FAIL → back to
    step 5, at most 3 rounds, then show the gaps.
 7. **Register the docs** (README row, `docs/huong-dan-su-dung.md` §2 and §4, a `/<name>` prompt in

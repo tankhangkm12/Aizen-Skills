@@ -1,7 +1,7 @@
 # TypeScript / NestJS (Node backend)
 
 Read after `references/backend/principles.md`. Repo `tsconfig`, ESLint, Prettier win. ORM (TypeORM/Prisma/MikroORM),
-validation library and broker come from .aizen/docs/repo; silent → ask (one question, researched bundles).
+validation library and broker come from .aizen/knowledge/repo; silent → ask (one question, researched bundles).
 
 ## 1. TypeScript
 `strict`, `noImplicitAny`, `strictNullChecks`, `noUnusedLocals/Parameters`, `noFallthroughCasesInSwitch` ·

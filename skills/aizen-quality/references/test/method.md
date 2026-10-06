@@ -33,7 +33,7 @@ A risk outside your lenses → one line `HANDOFF: needs tester LENS=<lens> — <
   `references/frontend/visual-check.md` + `scripts/frontend/uikit.py` for evidence).
 - **T3 Run and triage** the new tests and the full existing suite. Each failure: test bug (fix the test) · product
   bug (`bug-report.md`) · doc ambiguity (ask) · environment/flaky (≤ 2 reruns).
-- **T4 Report** `.aizen/reports/<TASK>/test.md` from `assets/test/test-lens-report.md`: SHA, counts with denominators,
+- **T4 Report** `.aizen/runs/<TASK>/reports/test.md` from `assets/test/test-lens-report.md`: SHA, counts with denominators,
   ACs covered/uncovered, perf vs NFR, and the BUG table
   `| ID | Title | Severity | Repro | Evidence |` with ids `BUG-<lens>-nn` (stable across rounds).
   Severity: Critical/High → BLOCKER, Medium → SHOULD-FIX, Low → SUGGESTION.

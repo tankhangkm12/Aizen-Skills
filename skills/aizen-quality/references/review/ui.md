@@ -8,7 +8,7 @@ reflect is itself a finding.
 ## 1. Oracles
 
 Requirements (journeys, FR/UC, AC) · the frontend architecture (SCR list, states, CMP tree) · the API
-contract (fields, error codes) · WCAG 2.2 at the level recorded in the doc · `DECISIONS.md`.
+contract (fields, error codes) · WCAG 2.2 at the level recorded in the doc · `decisions.md`.
 
 ## 2. Checks, heaviest first
 
