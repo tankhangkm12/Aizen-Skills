@@ -1,6 +1,6 @@
 {
   "name": "aizen-build",
-  "version": "24.3.0",
+  "version": "24.4.0",
   "description": "Production engineering coordinator: plan module by module with the owner, then planner/dev/tester/reviewer/devops roles build, test, review and fix to a local branch with push/PR commands; also review-only, design-only and pipeline-only work",
   "framework": "Aizen",
   "kind": "entry",
@@ -33,10 +33,17 @@
       "waivable": true
     },
     {
+      "id": "check-int",
+      "type": "evidence",
+      "final": true,
+      "path": "evidence-int.json"
+    },
+    {
       "id": "test",
       "type": "report",
       "glob": "test*.md",
       "fresh": true,
+      "by": "tester",
       "waivable": true,
       "hint": "dispatch the tester (S5) on the current SHA"
     },
@@ -45,6 +52,9 @@
       "type": "report",
       "glob": "review*.md",
       "fresh": true,
+      "by": "reviewer",
+      "not_author": true,
+      "citations": 1,
       "verdict": "PASS",
       "hint": "dispatch the reviewer (S6) at the current SHA"
     },
