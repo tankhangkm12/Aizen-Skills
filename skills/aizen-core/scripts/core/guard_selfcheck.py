@@ -69,6 +69,10 @@ def build_run() -> None:
         # pre: no code before approval; guard-owned files never; the owner approves backlog items
         out, _ = G.hook("pre", "claude", claude(ws, "Edit", {"file_path": str(ws / "src/api/a.py")}))
         assert out["hookSpecificOutput"]["permissionDecision"] == "deny", out
+        # design docs are not code: the planner drafts them before approval (rules.md: plan/design docs anytime)
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / "docs/srs.md")}))[0] is None
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / "docs/api/openapi.yaml")}))[0] is None
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / "docs/build.gradle")}))[0]
         assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(rd / "plan.md")}))[0] is None
         assert G.hook("pre", "claude", claude(ws, "Edit", {"file_path": str(rd / "run.json")}))[0]
         assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / ".aizen/PROJECT.md")}))[0]
