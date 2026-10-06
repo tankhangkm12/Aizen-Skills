@@ -50,4 +50,4 @@ smallest diff and a check, not a ceremony — size changes the plan, not the pri
 
 Every Aizen path `references/<topic>/…`, `assets/<topic>/…` or `scripts/<topic>/…` belongs to the skill whose
 `manifest.json` lists `<topic>` under `topics`. This pack owns `core`. Run scripts by absolute path:
-`python "<CORE_DIR>/scripts/core/check.py" …` (`<CORE_DIR>` = this skill's folder; a brief prints it).
+`uv run "<CORE_DIR>/scripts/core/check.py" …` (`<CORE_DIR>` = this skill's folder; a brief prints it).

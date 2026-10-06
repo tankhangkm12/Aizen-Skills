@@ -40,7 +40,7 @@ viết đường dẫn đó. Ví dụ `references/core/rules.md` từ `aizen-ini
 - Thêm pack/topic mới **không phải sửa code**: `state.py` (brief) và lint đều đọc manifest.
 - Một topic chỉ có một chủ; lint báo topic trùng.
 - `agents/` và `rules/` luôn thuộc chính skill đang viết.
-- Script chạy bằng đường dẫn tuyệt đối: `python "<SKILL_DIR>/scripts/<topic>/x.py"`; script của skill khác dùng
+- Script chạy bằng đường dẫn tuyệt đối: `uv run "<SKILL_DIR>/scripts/<topic>/x.py"`; script của skill khác dùng
   `<CORE_DIR>`, `<FRONTEND_DIR>`… = thư mục của `aizen-core`, `aizen-frontend`… (brief in bảng đường dẫn).
 
 ## 3. `SKILL.md`
@@ -108,7 +108,7 @@ skill chỉ ghi đè theo `id` hoặc khóa. Skill không xuất file: `"contrac
     {"id": "publish", "evidence": ["url"], "waivable": true}
   ],
   "rules": [
-    {"id": "tree", "type": "command", "run": "python3 \"{skill_dir}/scripts/check_tree.py\" \"{output}\""},
+    {"id": "tree", "type": "command", "run": "uv run \"{skill_dir}/scripts/check_tree.py\" \"{output}\""},
     {"id": "diagram-size", "type": "per_block", "what": "mermaid_nodes", "max": 15}
   ],
   "expectations": [{"id": "E1", "text": "…"}],
@@ -152,6 +152,10 @@ External: không bao giờ tự cài/cập nhật (người dùng gõ `aizen ext
 ## 7. `scripts/`
 
 - Python 3 thư viện chuẩn (hoặc Node không cần cài thêm). Phụ thuộc ngoài → kiểm tra có chưa, in lệnh cài, hỏi trước.
+- Mỗi file `.py` mở đầu bằng header PEP 723 (`# /// script` · `# requires-python = ">=3.9"` · `# dependencies = []` ·
+  `# ///`) và được gọi bằng `uv run "<SKILL_DIR>/scripts/…"` — không bao giờ `python …` (uv tự tải Python; người dùng
+  chỉ cần cài uv). `npm test` từ chối script thiếu header và tài liệu còn gọi `python <script>`. Phụ thuộc tuỳ chọn
+  nặng → không khai báo, gợi ý `uv run --with <gói> …` khi cần.
 - Có `--help`; exit code rõ (0 ok, 1 lỗi, 2 sai cách dùng, 3 chưa kiểm chứng được); không ghi đè file của người dùng
   khi chưa có `--force`; không bao giờ nhận giá trị secret qua tham số dòng lệnh.
 - Logic không hiển nhiên có `--selfcheck` (assert) và một dòng trong `tests/check-scripts.js`.

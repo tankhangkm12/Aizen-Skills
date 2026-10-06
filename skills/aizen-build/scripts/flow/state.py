@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """state.py — task state and briefs for the aizen-build coordinator (v25).
 
     S=<SKILL_DIR>/scripts/flow/state.py
-    python $S init    --task SHOP-42 --goal "add coupon to checkout"
-    python $S brief   --task SHOP-42 --role planner --stage design
-    python $S answer  --task SHOP-42 --module coupon-api --text "B: one endpoint, keep legacy"   # one per module
-    python $S approve --task SHOP-42 --text "plan v2 approved"   # the contract: roles never ask again
-    python $S brief  --task SHOP-42 --role dev --kind be --unit coupon-api --sha 1a2b3c --write-set "src/coupon/**"
-    python $S round  --task SHOP-42          # exit 3 past the fix-loop limit
-    python $S status --task SHOP-42 [--set done]
+    uv run $S init    --task SHOP-42 --goal "add coupon to checkout"
+    uv run $S brief   --task SHOP-42 --role planner --stage design
+    uv run $S answer  --task SHOP-42 --module coupon-api --text "B: one endpoint, keep legacy"   # one per module
+    uv run $S approve --task SHOP-42 --text "plan v2 approved"   # the contract: roles never ask again
+    uv run $S brief  --task SHOP-42 --role dev --kind be --unit coupon-api --sha 1a2b3c --write-set "src/coupon/**"
+    uv run $S round  --task SHOP-42          # exit 3 past the fix-loop limit
+    uv run $S status --task SHOP-42 [--set done]
 
 Files: <workspace>/.aizen/runs/<TASK>/state.md (human-readable; a `## Notes` section you add is kept), run.json
 (machine state) and plan.md; the guard (aizen-core scripts/core/guard.py) marks the run done. Workspace = --workspace or the current directory. Standard library only.
@@ -179,7 +183,7 @@ def cmd_status(ws: Path, a) -> str:
     run = load(ws, a.task)
     if a.set == "done":
         raise SystemExit("the guard marks a run done when every check passes: "
-                         "python <CORE_DIR>/scripts/core/guard.py done --run " + a.task)
+                         "uv run <CORE_DIR>/scripts/core/guard.py done --run " + a.task)
     if a.set and a.set != run["status"]:
         run["log"].append(f"{now()} status {run['status']} → {a.set}")
         run["status"] = a.set

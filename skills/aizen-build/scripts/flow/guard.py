@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """guard.py moved to aizen-core (scripts/core/guard.py) in v25 — one engine for every skill.
 
 This shim keeps hooks installed by v24 working: it runs the core guard with the same arguments.

@@ -1,6 +1,6 @@
 {
   "name": "aizen-skills",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Aizen agent skill suite (entry skills + topic packs, shared core, pinned upstream knowledge) with auto-installation and live-sync for Claude Code, Antigravity / Gemini CLI, Cursor and Windsurf.",
   "main": "bin/cli.js",
   "bin": {
@@ -8,7 +8,7 @@
     "aizen-skills": "./bin/cli.js"
   },
   "scripts": {
-    "postinstall": "node ./bin/install.js --auto",
+    "postinstall": "node ./bin/install.js --postinstall",
     "install:skills": "node ./bin/cli.js install",
     "sync": "node ./bin/cli.js sync",
     "update:skills": "node ./bin/cli.js update",
@@ -36,7 +36,6 @@
   "files": [
     "bin",
     "skills",
-    "rules",
     "plugin.json",
     "README.md",
     "LICENSE",

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """fetch_skill.py — copy a skill into Aizen-Skills and bring it to the Aizen structure (docs/aizen-skill-standard.md).
 
-    python <SKILL_DIR>/scripts/fetch_skill.py <source> <name> [--repo <Aizen-Skills checkout>]
-    python <SKILL_DIR>/scripts/fetch_skill.py --selfcheck
+    uv run <SKILL_DIR>/scripts/fetch_skill.py <source> <name> [--repo <Aizen-Skills checkout>]
+    uv run <SKILL_DIR>/scripts/fetch_skill.py --selfcheck
 
 <source> = a GitHub folder URL (https://github.com/<owner>/<repo>/tree/<ref>/<path>) or a local folder holding SKILL.md.
 Result:

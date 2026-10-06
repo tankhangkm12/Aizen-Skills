@@ -43,9 +43,9 @@ yourself; tester and reviewer still run. Bug: `references/dev/bugfix.md`.
 
 ## Tools
 
-`state.py` = `python "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init`, `brief`,
+`state.py` = `uv run "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init`, `brief`,
 `answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`, `init --backlog BL-nn`
-(an approved backlog item). `guard.py` = `python "<CORE_DIR>/scripts/core/guard.py"` (aizen-core): `check`, `waive`,
+(an approved backlog item). `guard.py` = `uv run "<CORE_DIR>/scripts/core/guard.py"` (aizen-core): `check`, `waive`,
 `done`, `verify-brief` — the run contract (`manifest.json` → `contract`) the hooks enforce. A brief carries
 every absolute path, the quality-gate command (`scripts/core/check.py`) and the code-map command
 (`scripts/core/graph.py`, `references/core/code-map.md`). Dispatch mechanics, models and how to confirm the plan:
@@ -66,7 +66,7 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
 9. Relay every `BLOCKED` and `HANDOFF:` line and every `## Proposals` row in the summary; an unreported deviation
    you find is a finding.
 10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/core/guard.py` of
-    aizen-core, installed by `aizen sync --project`), a stop is refused until the checklist passes and the hook prints what is open. Do
+    aizen-core, installed by the setup step in `references/core/rules.md`), a stop is refused until the checklist passes and the hook prints what is open. Do
     exactly those items, nothing more. Every item is proven by an artifact someone else checks: check.py evidence
     (also `--unit int` on `int/<TASK>`), and test/review reports **written by the tester and reviewer themselves**
     — never write or rewrite a role's report for it; the ledger shows who wrote each file. A step that truly does

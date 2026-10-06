@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Gate for aizen-init: may step N start?
 
 Checks that every earlier step left its report in .aizen/runs/init/reports/step-<k>.md with `Status: done` (or

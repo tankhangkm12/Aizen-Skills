@@ -4,7 +4,7 @@
 
 - Define each role once per session: `define_subagent` with name `aizen-<role>` (planner, dev, tester,
   reviewer, devops) and the content of `agents/<role>.md` + `references/core/rules.md` as its instructions.
-- One role instance = one `invoke_subagent` call; prompt = the full output of `python "<SKILL_DIR>/scripts/flow/state.py" brief …`,
+- One role instance = one `invoke_subagent` call; prompt = the full output of `uv run "<SKILL_DIR>/scripts/flow/state.py" brief …`,
   header line first, nothing before it.
 - A wave = every `invoke_subagent` of that wave **in one turn**; collect with `manage_subagents` /
   `send_message`, then read the report files (files are the fact).

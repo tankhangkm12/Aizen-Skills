@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Check the required inputs and prepare the agent workspace for aizen-init.
 
 Needs a GitHub/GitLab repo URL and at least one project document (file, folder or http(s) link).

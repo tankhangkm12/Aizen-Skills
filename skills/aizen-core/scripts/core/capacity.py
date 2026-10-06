@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Capacity calculator for Aizen roles — numbers computed, not guessed (v25).
 
 Every command prints the formula, the inputs (with which ones are assumptions), a low / expected / high

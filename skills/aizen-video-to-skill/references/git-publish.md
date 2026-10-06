@@ -34,4 +34,4 @@ If `AGENT.md` has no skills index, propose adding a "Skills" section and show it
 - No secrets, tokens, cookies or personal data in any file.
 - No large binaries (mp3/video/model files); remove `audio.mp3` and work folders.
 - No long verbatim transcript text; transcript stays out of the repo unless the user asks.
-- `python3 scripts/validate_skill.py <folder>` passes.
+- `uv run scripts/validate_skill.py <folder>` passes.

@@ -25,7 +25,7 @@ Whenever a decision depends on scale — before the owner chooses, not after:
 | How much traffic leaves the service? | `bandwidth --rps … --payload-kb …` |
 
 Run it with the host's Python (`python3` / `python` / `py`) from the skill's folder
-(`python "<CORE_DIR>/scripts/core/capacity.py"`, the absolute skill path from your brief); paste
+(`uv run "<CORE_DIR>/scripts/core/capacity.py"`, the absolute skill path from your brief); paste
 its table into the report or decision. `--json` gives machine-readable output.
 
 Something the script does not model (queue depth, cache hit ratio, cost of a managed service, bundle

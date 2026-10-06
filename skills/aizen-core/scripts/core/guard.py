@@ -1,23 +1,28 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """guard.py — one engine that holds every Aizen skill to its contract (v25).
 
 The agent does not decide when its work is finished; this script does, from artifacts someone else can check.
 
     G=<CORE_DIR>/scripts/core/guard.py
-    python $G start  --skill aizen-tech-learning --goal "Redis 7.2 for a 100k GET/s cache" [--backlog BL-05]
+    uv run $G start  --skill aizen-tech-learning --goal "Redis 7.2 for a 100k GET/s cache" [--backlog BL-05]
                      [--output tech-tree/redis.md] [--run ID] [--go]
-    python $G ask    --run R --question "workload: 100k GET/s, 1 KB values?"    # waiting for the owner, may stop
-    python $G go     --run R --text "<the owner's answer>"                      # planning/waiting → working
-    python $G check  --run R            # the checklist as the gate sees it (exit 0 pass, 1 open items)
-    python $G waive  --run R --step publish --reason "…" --evidence <file | one line of real output>
-    python $G verify-brief --run R      # what the independent verifier must judge, and the verdict.json format
-    python $G done   --run R            # same as the gate at a stop: pass → done, archived, backlog updated
-    python $G stop   --run R --reason "…"                                       # abandon (shown to the owner)
-    python $G backlog add --title "…" --skill aizen-build [--after BL-04] | approve BL-05 | drop BL-05
-    python $G install [--workspace .]   # hooks for Claude Code + Antigravity + git pre-push, this project only
-    python $G migrate                   # move an older .aizen/ layout into this one
-    python $G hook pre|post|stop --agent claude|agy   # called by the harness, JSON payload on stdin
-    python $G prepush                   # git pre-push: a run's branches push only when its checklist passes
+    uv run $G ask    --run R --question "workload: 100k GET/s, 1 KB values?"    # waiting for the owner, may stop
+    uv run $G go     --run R --text "<the owner's answer>"                      # planning/waiting → working
+    uv run $G check  --run R            # the checklist as the gate sees it (exit 0 pass, 1 open items)
+    uv run $G waive  --run R --step publish --reason "…" --evidence <file | one line of real output>
+    uv run $G verify-brief --run R      # what the independent verifier must judge, and the verdict.json format
+    uv run $G done   --run R            # same as the gate at a stop: pass → done, archived, backlog updated
+    uv run $G stop   --run R --reason "…"                                       # abandon (shown to the owner)
+    uv run $G backlog add --title "…" --skill aizen-build [--after BL-04] | approve BL-05 | drop BL-05
+    uv run $G install [--workspace .]   # hooks (via uv) for Claude Code + Antigravity + git pre-push, session rules —
+                                        # this project only; after `npx skills add` this is the one setup step
+    uv run $G migrate                   # move an older .aizen/ layout into this one
+    uv run $G hook pre|post|stop --agent claude|agy   # called by the harness, JSON payload on stdin
+    uv run $G prepush                   # git pre-push: a run's branches push only when its checklist passes
 
 Contract = assets/core/contract.default.json merged with the `contract` of the skill's manifest.json:
   steps         rows of runs/<RUN>/sheet.md the agent fills — `| id | [x] | file:… cmd:… sha:… out:… url:… |`;
@@ -1172,8 +1177,8 @@ def message(rid: str, open_items: list[str]) -> str:
     return (f"Aizen guard: run {rid} is not finished — do not stop yet. Open items:\n"
             + "\n".join(f"- {i}" for i in open_items)
             + f"\nDo exactly these, nothing more. The sheet: .aizen/runs/{rid}/sheet.md. A step that truly does not "
-              f'apply: python "{g}" waive --run {rid} --step <id> --reason "<why>" --evidence <file | real output>. '
-              f'Need the owner: python "{g}" ask --run {rid} --question "<one question>".')
+              f'apply: uv run "{g}" waive --run {rid} --step <id> --reason "<why>" --evidence <file | real output>. '
+              f'Need the owner: uv run "{g}" ask --run {rid} --question "<one question>".')
 
 
 # ── git pre-push ─────────────────────────────────────────────────────────────────────────────────────────
@@ -1289,11 +1294,45 @@ def scaffold(ws: Path) -> None:
         write_json(a / "config" / "guard.json", {"require_task": False, "share_knowledge": False})
 
 
+UV_HINT = ("uv not found on PATH. Aizen runs its scripts with uv (it fetches Python by itself):\n"
+           "  Windows: winget install astral-sh.uv   ·   macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh\n"
+           "then open a new terminal (restart the agent app) and run this install again.")
+
+
+def guard_entry(ws: Path) -> str:
+    """Path of this script as the project sees it — the copy under the project's skill folder, not the place a
+    junction resolves to — so hooks keep working after the source repo moves (moving the project: install again)."""
+    for base in (".agents/skills", ".claude/skills"):
+        p = ws / base / "aizen-core" / "scripts" / "core" / "guard.py"
+        if p.is_file():
+            return p.absolute().as_posix()
+    return Path(__file__).resolve().as_posix()
+
+
+def install_rules(ws: Path) -> list[str]:
+    """Session rules shipped in aizen-core/rules → each agent the project has skills for. Antigravity needs a
+    `trigger` front-matter or it ignores the file; Claude Code reads plain Markdown."""
+    src = sorted((HERE.parent.parent / "rules").glob("*.md"))
+    done = []
+    for skills, rules, head in ((".agents/skills", ".agents/rules", "---\ntrigger: always_on\n---\n"),
+                                (".claude/skills", ".claude/rules", "")):
+        if not (ws / skills).is_dir() or not src:
+            continue
+        d = ws / rules
+        d.mkdir(parents=True, exist_ok=True)
+        for f in src:
+            (d / f"aizen-{f.name}").write_text(head + f.read_text(encoding="utf-8"), encoding="utf-8")
+        done.append(f"{rules}/ ({len(src)})")
+    return done
+
+
 def cmd_install(ws: Path) -> int:
     ws = ws.resolve()
-    me = Path(__file__).resolve().as_posix()
-    py = Path(sys.executable).as_posix()
-    call = lambda ev, agent: f'"{py}" "{me}" hook {ev} --agent {agent}'  # noqa: E731
+    if not shutil.which("uv"):
+        print(f"✗ {UV_HINT}", file=sys.stderr)
+        return 3
+    me = guard_entry(ws)
+    call = lambda ev, agent: f'uv run --quiet --script "{me}" hook {ev} --agent {agent}'  # noqa: E731
     moved = cmd_migrate(ws) if (ws / ".aizen").is_dir() else []
     scaffold(ws)
     for m in moved:
@@ -1321,6 +1360,8 @@ def cmd_install(ws: Path) -> int:
     write_json(ap_, ag)
     print(f"✓ Claude Code hooks → {cp}")
     print(f"✓ Antigravity hooks → {ap_}")
+    for r in install_rules(ws):
+        print(f"✓ session rules → {r}")
     refresh(ws)
     print(f"✓ project map → {az(ws) / 'PROJECT.md'}")
     hooks_dir = git(ws, "rev-parse", "--path-format=absolute", "--git-path", "hooks")
@@ -1329,7 +1370,7 @@ def cmd_install(ws: Path) -> int:
         return 0
     exclude_local(ws)
     pp = Path(hooks_dir) / "pre-push"
-    script = f'#!/bin/sh\n# aizen-guard\nexec "{py}" "{me}" prepush --workspace "$(git rev-parse --show-toplevel)"\n'
+    script = f'#!/bin/sh\n# aizen-guard\nexec uv run --quiet --script "{me}" prepush --workspace "$(git rev-parse --show-toplevel)"\n'
     if pp.is_file() and "aizen-guard" not in pp.read_text(encoding="utf-8", errors="replace"):
         print(f"! {pp} exists and is not Aizen's — add this line to it yourself:\n  {script.splitlines()[-1]}")
     else:

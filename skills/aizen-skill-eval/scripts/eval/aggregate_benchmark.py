@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """
 Aggregate individual run results into benchmark summary statistics.
 
@@ -7,10 +11,10 @@ Reads grading.json files from run directories and produces:
 - delta between with_skill and without_skill configurations
 
 Usage:
-    python aggregate_benchmark.py <benchmark_dir>
+    uv run aggregate_benchmark.py <benchmark_dir>
 
 Example:
-    python aggregate_benchmark.py benchmarks/2026-01-15T10-30-00/
+    uv run aggregate_benchmark.py benchmarks/2026-01-15T10-30-00/
 
 The script supports two directory layouts:
 

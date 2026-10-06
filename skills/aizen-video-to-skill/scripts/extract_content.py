@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Extract the spoken content of a video into text.
 
 Order of attempts:
@@ -148,7 +152,8 @@ def duration(path):
 # ---------- ASR ----------
 def transcribe(mp3, model_name, lang, device):
     if importlib.util.find_spec("faster_whisper") is None:
-        die("faster-whisper not installed. Run scripts/check_env.py and ask the user to approve installation.")
+        die("faster-whisper not installed. Re-run with `uv run --with faster-whisper --script scripts/extract_content.py ...` "
+            "after the user approves the download.")
     from faster_whisper import WhisperModel
 
     compute = "float16" if device == "cuda" else "int8"

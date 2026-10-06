@@ -54,7 +54,7 @@
       {
         "id": "skill",
         "type": "command",
-        "run": "python3 \"{skill_dir}/scripts/validate_skill.py\" \"{output_dir}\""
+        "run": "uv run \"{skill_dir}/scripts/validate_skill.py\" \"{output_dir}\""
       },
       {
         "id": "provenance",

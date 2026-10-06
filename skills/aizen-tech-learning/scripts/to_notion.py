@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """to_notion.py — turn a checked aizen-tech-learning note into Notion-flavored Markdown for notion-create-pages.
 
-    python <SKILL_DIR>/scripts/to_notion.py <note.md> [--out <file>]
-    python <SKILL_DIR>/scripts/to_notion.py --selfcheck
+    uv run <SKILL_DIR>/scripts/to_notion.py <note.md> [--out <file>]
+    uv run <SKILL_DIR>/scripts/to_notion.py --selfcheck
 
 Prints JSON {"title": ..., "out": ...}: the first '# ' heading becomes the page title (removed from the body);
 pipe tables become <table header-row="true">; bare URLs become links; characters Notion treats as markup

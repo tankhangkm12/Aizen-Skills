@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """check_tree.py — check a aizen-tech-learning note before it is published (references/tree-template.md).
 
-    python <SKILL_DIR>/scripts/check_tree.py <note.md> [--min-alternatives 2]
-    python <SKILL_DIR>/scripts/check_tree.py --selfcheck
+    uv run <SKILL_DIR>/scripts/check_tree.py <note.md> [--min-alternatives 2]
+    uv run <SKILL_DIR>/scripts/check_tree.py --selfcheck
 
 Fails when: a section is missing · the component map has no flowchart or < 2 components · a component ID is used
 but not defined, or defined but never used outside the map · a layer (L1–L5) lacks a mermaid diagram,

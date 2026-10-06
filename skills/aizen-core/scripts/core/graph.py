@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """graph.py — keep a graphify code map of the project for every Aizen role (v25).
 
-    python <CORE_DIR>/scripts/core/graph.py --project .            # build or refresh (code only, no LLM, no network)
-    python <CORE_DIR>/scripts/core/graph.py --project . --check    # status only
-    python <CORE_DIR>/scripts/core/graph.py --project . --install  # install graphify first (A3: The owner approved it)
+    uv run <CORE_DIR>/scripts/core/graph.py --project .            # build or refresh (code only, no LLM, no network)
+    uv run <CORE_DIR>/scripts/core/graph.py --project . --check    # status only
+    uv run <CORE_DIR>/scripts/core/graph.py --project . --install  # install graphify first (A3: The owner approved it)
 
 The map lives in <main checkout>/graphify-out/ (also when run from a worktree) and is kept out of git through
 .git/info/exclude, so no tracked file changes. Roles then ask it instead of grepping blind:

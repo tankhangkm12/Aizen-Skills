@@ -48,7 +48,7 @@
       {
         "id": "tree",
         "type": "command",
-        "run": "python3 \"{skill_dir}/scripts/check_tree.py\" \"{output}\""
+        "run": "uv run \"{skill_dir}/scripts/check_tree.py\" \"{output}\""
       },
       {
         "id": "diagram-size",
