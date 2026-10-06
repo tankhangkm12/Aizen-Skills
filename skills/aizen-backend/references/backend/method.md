@@ -52,7 +52,7 @@ All in `references/backend/`.
 
 ## Integrator (`UNIT=int`)
 
-Create `int/<TASK>` from the base in your worktree, merge the listed branches in order, record each SHA, run build
+Create the PR branch (`state.py branch --task <TASK>`) from the base in your worktree, merge the listed branches in order, record each SHA, run build
 + quick checks. No feature work. A conflict in a unit's logic: resolve only when the intended behaviour is clear
 from the docs; otherwise `HANDOFF` to that unit's owner with both sides.
 

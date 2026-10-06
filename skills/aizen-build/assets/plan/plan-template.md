@@ -1,7 +1,7 @@
 # Plan — <TASK> — <title>
 
 > Plan vN · State: `DRAFT` | `APPROVED <date>` · Base: `<branch>` @ `<sha>` · Updated: <YYYY-MM-DD>
-> Integration branch: `int/<TASK>` · Finish: push + `gh pr create --draft … --body-file .aizen/runs/<TASK>/reports/pr-body.md`
+> PR branch: `<type>/<slug>` (`state.py branch --task <TASK>`) · Acceptance cases: `acceptance.md` · Finish: push + `gh pr create --draft … --body-file .aizen/runs/<TASK>/reports/pr-body.md`
 > commands for the owner (agents never push) · State: `.aizen/runs/<TASK>/state.md`
 > Environments for agents: `local` <, `ENV-02 staging` — every apply still A3> · Production: never agents (A4)
 

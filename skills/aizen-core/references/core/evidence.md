@@ -1,4 +1,4 @@
-# Evidence, numbers and reports (v25)
+# Evidence, numbers and reports (v26)
 
 The owner steers from what agents report. A confident wrong number, or a claim of DONE that the files
 do not support, steers the owner wrong. So claims carry evidence proportionate to the work, and reports are short enough to actually be read.

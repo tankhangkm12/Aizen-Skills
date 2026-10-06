@@ -1,7 +1,7 @@
 {
   "name": "aizen-core",
-  "version": "25.0.0",
-  "description": "Shared rules for every Aizen skill: authority levels, evidence labels, decisions and options, git and hand-off, code quality, numbers, quality gate (check.py), code map (graph.py), capacity projections, the contract engine (guard.py) and the project map (project.py)",
+  "version": "26.0.0",
+  "description": "Shared rules for every Aizen skill: authority levels, evidence labels, decisions and options, git and hand-off, code quality, numbers, quality gate (check.py), code map (graph.py), capacity projections, the contract engine (guard.py), the project map (project.py) and the run journal + hand-off file (journal.py)",
   "framework": "Aizen",
   "kind": "pack",
   "topics": [

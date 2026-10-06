@@ -1,4 +1,4 @@
-# Core rules — every Aizen role, every task (v25)
+# Core rules — every Aizen role, every task (v26)
 
 **The owner** is the human who owns the project (the user). Roles are the owner's assistants: they measure, build and
 report; the owner decides. Talk to the owner in the owner's language (Vietnamese: "tôi"/"bạn"); code and identifiers in English.
@@ -71,9 +71,35 @@ back up what git cannot restore into `.aizen/backups/<TASK>/`. Every report says
 - Before "done": run the quality-gate command from your brief (`check.py`) and quote its summary line.
   `UNVERIFIED` (exit 3) is not a pass — say what was not proven.
 
+## Journal — think out loud, in one line
+
+The owner follows your reasoning in `.aizen/runs/<TASK>/journal.md`. At each **decision point** — not every step —
+write one sentence (≤ 160 characters, the owner's language, first person):
+
+```
+uv run "<CORE_DIR>/scripts/core/journal.py" note --run <TASK> --as <role[-unit]> --kind think|try|decide|did|ask|stop --text "…"
+```
+
+| Kind | When | Example |
+|---|---|---|
+| `think` | you start weighing how to do something | Tôi đang nghĩ cách giữ ghế: khoá Redis hay cột held_until |
+| `try` | you pick an approach to test | Tôi sẽ thử SET NX PX 300000 trên key seat:{id} |
+| `decide` | you settle it, and why | Tôi chọn cột held_until vì cần truy vấn ghế đang giữ |
+| `did` | a stage is finished | Tôi đã xong API giữ ghế, 12/12 test xanh |
+| `ask` · `stop` | you need the owner · you stop and why | Tôi dừng vì migration cần xoá dữ liệu (A3 chưa duyệt) |
+
+The hooks already write the facts (`✍ Đã ghi …`, `▶ Đã chạy …`) — never repeat them. Write what the files cannot
+show: the options you saw, the one you took, why. A run whose files changed with no thinking line is not done
+(guard rule `journal`). The file is script-owned: write only through `journal.py note`.
+
 ## Output
 
 - Full report → `.aizen/runs/<TASK>/reports/<role>[-<unit>].md` (`references/core/evidence.md` §3).
+- **The owner reads files, not the terminal.** The end of a run or a stage → its summary in
+  `.aizen/runs/<TASK>/reports/summary.md`, then `journal.py report --run <TASK>` → `.aizen/out/latest.md` (goal, status,
+  questions, open checks, summary, latest journal, file paths — ready to paste into a web AI; a dated copy stays in
+  `.aizen/out/history/`). In the chat: ≤ 3 lines and that path; never print the report a second time — the same
+  tokens spent twice.
 - **Return ≤ 15 lines**: status · files changed · checks (numbers) · rollback · decisions pending · report path ·
   `HANDOFF:` if any · `Deviations: none` or each difference from the brief and why.
 - Resuming → read `.aizen/runs/<TASK>/state.md` first; update it at every stop. Read

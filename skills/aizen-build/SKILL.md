@@ -1,9 +1,9 @@
 ---
 name: aizen-build
-description: "Aizen production engineering coordinator (v25). Takes a task from request to a local branch plus push/PR commands - a planner designs it module by module, the owner confirms each module, then parallel devs write the least code in worktrees -> tester -> independent reviewer (+ redteam) -> fix loop (<= 2 rounds) with no further questions. Shorter routes of the same flow: review a PR/diff/branch, design only (schema, API, architecture), pipeline/infra only. Use to implement a feature, fix a bug, refactor, go from idea to PR, review code, design tables or an API, set up CI/CD, Docker or Kubernetes, or resume a task in .aizen/ (làm tính năng, sửa bug, review PR, thiết kế bảng, dựng pipeline, từ ý tưởng tới PR, tiếp tục task). Not for: bootstrapping a new backend project from its documents (aizen-init), creating or importing skills (aizen-skill-creator, aizen-skill-importer), researching a technology (aizen-tech-learning), or a plain question about code."
+description: "Aizen production engineering coordinator (v26). Takes a task from request to a local branch plus push/PR commands - a planner designs it module by module, the owner confirms each module, then parallel devs write the least code in worktrees -> tester -> independent reviewer (+ redteam) -> fix loop (<= 2 rounds) with no further questions. Shorter routes of the same flow: review a PR/diff/branch, design only (schema, API, architecture), pipeline/infra only. Use to implement a feature, fix a bug, refactor, go from idea to PR, review code, design tables or an API, set up CI/CD, Docker or Kubernetes, or resume a task in .aizen/ (làm tính năng, sửa bug, review PR, thiết kế bảng, dựng pipeline, từ ý tưởng tới PR, tiếp tục task). Not for: bootstrapping a new backend project from its documents (aizen-init), creating or importing skills (aizen-skill-creator, aizen-skill-importer), researching a technology (aizen-tech-learning), or a plain question about code."
 ---
 
-# aizen-build — production engineering coordinator (v25)
+# aizen-build — production engineering coordinator (v26)
 
 You are the main session. You run the flow, dispatch roles, merge their branches and talk to the owner (the user).
 Everyone follows `references/core/rules.md` (read it first) and `references/core/mcp.md`.
@@ -25,7 +25,7 @@ the reviewer states the oracle it used and judges blast radius (`references/revi
 
 | Phase | Steps | The owner |
 |---|---|---|
-| **Agree** | S0 intake + code map → S1 planner writes the plan by module (design decided down to names, files, tests) → S2 you confirm it with the owner **part by part**: scope → each module → delivery (A3 to pre-approve) → `state.py approve` | asked about every part, as many rounds as needed |
+| **Agree** | S0 intake + code map → S1 planner writes the plan by module (design decided down to names, files, tests) → S2 you confirm it with the owner **part by part**: scope → acceptance cases (`acceptance.md`, frozen at approve) → each module → delivery (A3 to pre-approve) → `state.py approve` | asked about every part, as many rounds as needed |
 | **Build** | S3 devs (one per module, parallel waves) → S4 integrate → S5 tester → S6 reviewer (+ `redteam` for risk modules) → S7 fix loop ≤ 2 → S8 summary + push/PR commands | **not asked** — the approved plan is the contract; only a `BLOCKED` (unapproved A3, A4, data loss, plan impossible) reopens one module |
 
 Size changes the plan, not the flow: a one-module task gets a one-module plan, and you may plan and build it
@@ -43,9 +43,11 @@ yourself; tester and reviewer still run. Bug: `references/dev/bugfix.md`.
 
 ## Tools
 
-`state.py` = `uv run "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init`, `brief`,
-`answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`, `init --backlog BL-nn`
-(an approved backlog item). `guard.py` = `uv run "<CORE_DIR>/scripts/core/guard.py"` (aizen-core): `check`, `waive`,
+`state.py` = `uv run "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init --slug`
+(the business name of the branch), `branch` (prints the branch — never the run id), `brief`, `answer`, `approve`
+(refuses while a `## Module` of the plan or the acceptance cases are unconfirmed), `round`, `status`,
+`init --backlog BL-nn` (an approved backlog item). `journal.py` = `uv run "<CORE_DIR>/scripts/core/journal.py"`:
+`note` (one line of reasoning at a decision point), `report` (→ `.aizen/out/latest.md`). `guard.py` = `uv run "<CORE_DIR>/scripts/core/guard.py"` (aizen-core): `check`, `waive`,
 `done`, `verify-brief` — the run contract (`manifest.json` → `contract`) the hooks enforce. A brief carries
 every absolute path, the quality-gate command (`scripts/core/check.py`) and the code-map command
 (`scripts/core/graph.py`, `references/core/code-map.md`). Dispatch mechanics, models and how to confirm the plan:
@@ -68,7 +70,8 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
 10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/core/guard.py` of
     aizen-core, installed by the setup step in `references/core/rules.md`), a stop is refused until the checklist passes and the hook prints what is open. Do
     exactly those items, nothing more. Every item is proven by an artifact someone else checks: check.py evidence
-    (also `--unit int` on `int/<TASK>`), and test/review reports **written by the tester and reviewer themselves**
+    (also `--unit int` on the PR branch when there are several units), the acceptance cases covered by the test
+    report and unchanged since approve, a thinking line in `journal.md` once files changed, and test/review reports **written by the tester and reviewer themselves**
     — never write or rewrite a role's report for it; the ledger shows who wrote each file. A step that truly does
     not apply: `guard.py waive --run <TASK> --step <id> --reason "…" --evidence <file | one line of real output>`;
     it counts once the reviewer writes `waiver <id>: accepted`, and goes under `## Waived` in `pr-body.md`

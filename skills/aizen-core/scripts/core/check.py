@@ -3,7 +3,7 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""check — run the repository's own quality checks and record what really happened (v25).
+"""check — run the repository's own quality checks and record what really happened (v26).
 
     uv run <CORE_DIR>/scripts/core/check.py --task SHOP-42 --unit api   # detect, run, write evidence
     uv run <CORE_DIR>/scripts/core/check.py --task SHOP-42 --plan       # print the commands only

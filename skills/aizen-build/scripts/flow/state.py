@@ -3,10 +3,11 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""state.py — task state and briefs for the aizen-build coordinator (v25).
+"""state.py — task state and briefs for the aizen-build coordinator (v26).
 
     S=<SKILL_DIR>/scripts/flow/state.py
-    uv run $S init    --task SHOP-42 --goal "add coupon to checkout"
+    uv run $S init    --task SHOP-42 --goal "add coupon to checkout" [--slug checkout-coupon] [--type feature] [--ticket SHOP-42]
+    uv run $S branch  --task SHOP-42 [--unit coupon-api]   # the git branch name: <type>/<slug>[-<unit>], never the run id
     uv run $S brief   --task SHOP-42 --role planner --stage design
     uv run $S answer  --task SHOP-42 --module coupon-api --text "B: one endpoint, keep legacy"   # one per module
     uv run $S approve --task SHOP-42 --text "plan v2 approved"   # the contract: roles never ask again
@@ -21,10 +22,12 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parents[2]  # <skill>/scripts/flow/state.py
@@ -36,6 +39,9 @@ MAX_ROUNDS = 2
 REPORT = {"planner": "plan", "dev": "dev", "tester": "test", "reviewer": "review", "devops": "devops"}
 ID = re.compile(r"^[A-Za-z0-9._-]+$")
 NOTES = "\n## Notes\n"
+VERSION = 26
+BRANCH_TYPES = ("feature", "bugfix", "hotfix", "refactor", "test", "docs", "ci", "infra", "chore")
+TC = re.compile(r"\bTC-\d+\b")
 
 
 def now() -> str:
@@ -107,27 +113,96 @@ def cmd_init(ws: Path, a) -> str:
         why = core.can_start(ws, a.backlog)
         if why:
             raise SystemExit(why)
+    name = slugify(a.slug or a.goal)
+    if not name:
+        raise SystemExit("--slug: a short business name for the branch, e.g. seat-hold, payment-timeout")
     save(ws, a.task, {"run": a.task, "skill": "aizen-build", "task": a.task, "goal": a.goal, "status": "planning",
                       "round": 0, "agreed": {}, "decision": None, "outputs": [], "backlog": a.backlog,
+                      "v": VERSION, "slug": name, "branch_type": a.type, "ticket": a.ticket,
                       "created": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "log": [f"{now()} init"]})
     if core:
         core.set_backlog(ws, a.backlog, "doing", a.task)
     added = exclude_local(ws)
+    handoff(ws, a.task)
     note = f" · .git/info/exclude += {', '.join(added)}" if added else ""
-    return f"created {task_dir(ws, a.task) / 'state.md'}{note}"
+    return f"created {task_dir(ws, a.task) / 'state.md'} · branch {branch_name(load(ws, a.task), a.task)}{note}"
 
 
-def backlog_mod():
-    """aizen-core's project.py (owns .aizen/backlog.md), found through the installed packs."""
+def slugify(text: str, limit: int = 32) -> str:
+    """Business name for a branch: ASCII kebab-case, Vietnamese accents folded (`Giữ ghế 5 phút` → `giu-ghe-5-phut`)."""
+    t = unicodedata.normalize("NFKD", text.replace("đ", "d").replace("Đ", "D"))
+    t = re.sub(r"[^a-z0-9]+", "-", t.encode("ascii", "ignore").decode().lower()).strip("-")
+    return t[:limit].rsplit("-", 1)[0] if len(t) > limit and "-" in t[:limit] else t[:limit]
+
+
+WRITE_SET = re.compile(r"^\s*Files\s*\(write set\)\s*:\s*(.+)$", re.M | re.I)
+NO_FILES = {"", "-", "—", "none", "n/a", "(none)"}
+
+
+def writer_units(ws: Path, task: str) -> list[str]:
+    """Modules of the plan that change files (a read-only module gets no branch)."""
+    p = task_dir(ws, task) / "plan.md"
+    if not p.is_file():
+        return []
+    text = p.read_text(encoding="utf-8")
+    heads = list(MODULE.finditer(text))
+    out = []
+    for i, m in enumerate(heads):
+        body = text[m.end():heads[i + 1].start() if i + 1 < len(heads) else len(text)].split("\n## ", 1)[0]
+        line = WRITE_SET.search(body)
+        raw = re.findall(r"`([^`]+)`", line.group(1)) if line else []
+        if any(r.strip().lower() not in NO_FILES for r in raw) or (line and not raw and line.group(1).strip().lower() not in NO_FILES):
+            out.append(m.group(1))
+    return out
+
+
+def branch_name(run: dict, task: str, unit: str | None = None, writers: int | None = None) -> str:
+    """The git branch of a run (references/core/git.md §1): named after the business change, never the run id.
+
+    final (the PR):   <type>/<slug>             — the integration of the units, or the only unit
+    one unit of many: <type>/<slug>-<unit>      — local only, merged into the final branch
+    Runs started before v26 keep their old names (feature/<TASK>-<unit>, int/<TASK>).
+    """
+    if run.get("v", 0) < 26:
+        return f"feature/{task}-{unit}" if unit else f"int/{task}"
+    base = f"{run.get('branch_type') or 'feature'}/{run.get('slug') or slugify(task)}"
+    return base if not unit or (writers is not None and writers <= 1) else f"{base}-{unit}"
+
+
+def cmd_branch(ws: Path, a) -> str:
+    run = load(ws, a.task)
+    return branch_name(run, a.task, a.unit, len(writer_units(ws, a.task)))
+
+
+def acceptance(ws: Path, task: str) -> tuple[Path, list[str]]:
+    p = task_dir(ws, task) / "acceptance.md"
+    text = re.sub(r"~~[^~]*~~", "", p.read_text(encoding="utf-8")) if p.is_file() else ""   # ~~TC-05~~ = dropped
+    return p, sorted(set(TC.findall(text)))
+
+
+def core_mod(name: str):
+    """A script of aizen-core (project.py owns .aizen/backlog.md, journal.py the hand-off), found through the packs."""
     import importlib.util
     core = topic_dirs().get("core")
     if not core:
         raise SystemExit("aizen-core is not installed next to this skill — run `node bin/cli.js sync`")
     sys.path.insert(0, str(core / "scripts" / "core"))
-    spec = importlib.util.spec_from_file_location("project", core / "scripts" / "core" / "project.py")
+    spec = importlib.util.spec_from_file_location(name, core / "scripts" / "core" / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
+
+def backlog_mod():
+    return core_mod("project")
+
+
+def handoff(ws: Path, task: str) -> None:
+    """Refresh .aizen/out/latest.md (journal.py report) at every milestone; never break the command."""
+    try:
+        core_mod("journal").report(ws, task)
+    except (Exception, SystemExit):  # noqa: BLE001
+        pass
 
 
 def cmd_answer(ws: Path, a) -> str:
@@ -157,14 +232,24 @@ def cmd_approve(ws: Path, a) -> str:
     modules = plan_modules(ws, a.task)
     if modules is None:
         raise SystemExit(f"no plan at .aizen/runs/{a.task}/plan.md — the planner writes it before approval")
-    missing = [m for m in ["scope", *modules, "delivery"] if m not in agreed]
+    parts = ["scope", *modules, "delivery"]
+    acc, cases = acceptance(ws, a.task)
+    if run.get("v", 0) >= 26:
+        if not cases:
+            raise SystemExit(f"no acceptance cases at .aizen/runs/{a.task}/acceptance.md — the planner writes TC-nn cases "
+                             "per AC (assets/plan/acceptance-template.md) before approval")
+        parts.insert(1, "acceptance")
+    missing = [m for m in parts if m not in agreed]
     if missing:
         raise SystemExit("not confirmed with the owner yet: " + ", ".join(missing)
                          + " — one `answer --module <part>` each, then approve")
     run.update(decision=f"{now()} {a.text}", status="building")
-    run["log"].append(f"{now()} plan approved: {a.text}")
+    if cases:
+        run["acceptance_sha"] = hashlib.sha256(acc.read_bytes()).hexdigest()
+    run["log"].append(f"{now()} plan approved: {a.text}" + (f" · {len(cases)} acceptance cases frozen" if cases else ""))
     save(ws, a.task, run)
-    return "plan approved — build without further questions"
+    handoff(ws, a.task)
+    return "plan approved — build without further questions" + (f"; {len(cases)} acceptance cases frozen" if cases else "")
 
 
 def cmd_round(ws: Path, a) -> str:
@@ -176,6 +261,7 @@ def cmd_round(ws: Path, a) -> str:
     run["status"] = "fixing"
     run["log"].append(f"{now()} fix round {run['round']}")
     save(ws, a.task, run)
+    handoff(ws, a.task)
     return f"round {run['round']}/{MAX_ROUNDS}"
 
 
@@ -188,6 +274,7 @@ def cmd_status(ws: Path, a) -> str:
         run["log"].append(f"{now()} status {run['status']} → {a.set}")
         run["status"] = a.set
         save(ws, a.task, run)
+        handoff(ws, a.task)
     return (task_dir(ws, a.task) / "state.md").read_text(encoding="utf-8")
 
 
@@ -278,8 +365,8 @@ def cmd_brief(ws: Path, a) -> str:
                            else "every check the plan lists for this part is green or explained"),
         "ROOT": root.as_posix(), "SKILL_DIR": SKILL_DIR.as_posix(), "WORKDIR": workdir,
         "WORKDIR_CMD": (root / worktree).as_posix() if worktree else root.as_posix(),
-        "BRANCH": a.branch or (f"feature/{a.task}-{unit}" if writer else f"int/{a.task}" if a.role in ("tester", "reviewer")
-                               else "(none)"),
+        "BRANCH": a.branch or (branch_name(run, a.task, unit, len(writer_units(ws, a.task))) if writer
+                               else branch_name(run, a.task) if a.role in ("tester", "reviewer") else "(none)"),
         "SHA": a.sha or "(record the start SHA yourself: git rev-parse HEAD)",
         "WRITE_SET": a.write_set or {"planner": f".aizen/runs/{a.task}/plan.md, .aizen/knowledge/**, .aizen/runs/{a.task}/reports/**",
                                      "reviewer": "none (read-only)"}.get(a.role, "the unit's paths in the plan — nothing outside"),
@@ -308,12 +395,16 @@ def main(argv=None) -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "approve", "round", "status")}
+    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "approve", "round", "status", "branch")}
     for p in ps.values():
         p.add_argument("--task", required=True)
         p.add_argument("--workspace", default=".")
     ps["init"].add_argument("--goal", required=True)
     ps["init"].add_argument("--backlog", help="the approved backlog item this run implements (BL-nn)")
+    ps["init"].add_argument("--slug", help="business name of the change for the branch (default: from --goal)")
+    ps["init"].add_argument("--type", choices=BRANCH_TYPES, default="feature", help="branch type (git.md §1)")
+    ps["init"].add_argument("--ticket", help="a real ticket id (Jira, GitHub issue) for `Refs:` in commits — not the run id")
+    ps["branch"].add_argument("--unit")
     b = ps["brief"]
     b.add_argument("--role", choices=ROLES, required=True)
     b.add_argument("--kind", choices=KINDS, default="-")
@@ -323,7 +414,7 @@ def main(argv=None) -> int:
     b.add_argument("--part", help="what this instance must deliver (default: its unit in the plan)")
     b.add_argument("--done", help="checkable done criterion")
     b.add_argument("--sha", help="start / pinned SHA")
-    b.add_argument("--branch", help="default feature/<TASK>-<unit> for writers, int/<TASK> for tester/reviewer")
+    b.add_argument("--branch", help="default <type>/<slug>-<unit> for writers, <type>/<slug> for tester/reviewer (`branch`)")
     b.add_argument("--worktree", help="relative to the project root (default .aizen/worktrees/<TASK>-<unit> for writers)")
     b.add_argument("--write-set", dest="write_set", help="path globs this instance may write")
     b.add_argument("--ports", help="port range, e.g. 4100-4109")
@@ -337,7 +428,8 @@ def main(argv=None) -> int:
     for v in (a.task, getattr(a, "unit", None), getattr(a, "module", None)):
         if v and not ID.match(v):
             raise SystemExit(f"invalid id {v!r} — use letters, digits, . _ -")
-    fn = {"init": cmd_init, "brief": cmd_brief, "answer": cmd_answer, "approve": cmd_approve, "round": cmd_round, "status": cmd_status}
+    fn = {"init": cmd_init, "brief": cmd_brief, "answer": cmd_answer, "approve": cmd_approve, "round": cmd_round,
+          "status": cmd_status, "branch": cmd_branch}
     print(fn[a.cmd](Path(a.workspace), a))
     return 0
 
@@ -365,8 +457,9 @@ def _selfcheck() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         w = ["--workspace", tmp, "--task", "T-1"]
         with contextlib.redirect_stdout(io.StringIO()):
-            main(["init", *w, "--goal", "g"])
+            main(["init", *w, "--goal", "g", "--slug", "Giữ ghế tàu Tết"])
         expect_exit(["init", *w, "--goal", "g"], "exists")
+        assert slugify("Đặt vé — giữ ghế 5 phút!") == "dat-ve-giu-ghe-5-phut" and slugify("x" * 40) == "x" * 32
         import subprocess
         if subprocess.run(["git", "init", "-q", tmp], capture_output=True).returncode == 0:
             assert exclude_local(Path(tmp)) == [".aizen/"] and exclude_local(Path(tmp)) == []
@@ -385,16 +478,23 @@ def _selfcheck() -> None:
         expect_exit(["brief", *w, "--role", "tester"], "not approved")
         expect_exit(["approve", *w], "no plan")
         plan = Path(tmp, ".aizen", "runs", "T-1", "plan.md")
-        plan.write_text("# T-1\n## Scope\n## Module api — API\n## Module ~~old~~ replaced by api\n"
-                        "## Module `ui` — screen\n## Delivery\n", encoding="utf-8")
-        expect_exit(["approve", *w], "scope, ui, delivery")  # every part confirmed before approval
-        for part in ("scope", "ui", "delivery"):
+        plan.write_text("# T-1\n## Scope\n## Module api — API\nFiles (write set): `src/api/**`\n"
+                        "## Module ~~old~~ replaced by api\n"
+                        "## Module `ui` — screen\nFiles (write set): `web/**`\n## Module measure\nFiles (write set): —\n"
+                        "## Delivery\n", encoding="utf-8")
+        assert writer_units(Path(tmp), "T-1") == ["api", "ui"]
+        expect_exit(["approve", *w], "no acceptance cases")  # tests are agreed before the code exists
+        acc = Path(tmp, ".aizen", "runs", "T-1", "acceptance.md")
+        acc.write_text("| TC | AC |\n|---|---|\n| TC-01 | AC-1 |\n| TC-02 | AC-1 |\n", encoding="utf-8")
+        expect_exit(["approve", *w], "scope, acceptance, ui, measure, delivery")  # every part confirmed before approval
+        for part in ("scope", "acceptance", "ui", "measure", "delivery"):
             with contextlib.redirect_stdout(io.StringIO()):
                 main(["answer", *w, "--module", part, "--text", "ok"])
         with contextlib.redirect_stdout(io.StringIO()):
             main(["approve", *w])
         st = sm.read_text(encoding="utf-8")
-        assert "keep v1 endpoint" in st and "- api: B" in st and "plan approved" in st, st
+        assert "keep v1 endpoint" in st and "- api: B" in st and "plan approved" in st and "2 acceptance cases" in st, st
+        assert len(load(Path(tmp), "T-1")["acceptance_sha"]) == 64
         expect_exit(["brief", *w, "--role", "dev", "--kind", "be"], "--unit")
         d1, d2 = brief("--role", "dev", "--kind", "be", "--unit", "u1"), brief("--role", "dev", "--kind", "fe", "--unit", "u2")
         assert "ROLE=dev KIND=be UNIT=u1" in d1 and "dev-u1.md" in d1 and "pr-body-u1.md" in d1
@@ -405,7 +505,14 @@ def _selfcheck() -> None:
         assert "/scripts/core/check.py" in d1 and "aizen-core" in d1, "quality gate must come from aizen-core"
         assert "Optional tools: archify" in d1, "brief names the optional community skills"
         assert "{eval}" not in d1 and "{authoring}" not in d1, "brief lists only the packs aizen-build requires"
-        assert "feature/T-1-u1" in d1 and ".aizen/worktrees/T-1-u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
+        assert "BRANCH=feature/giu-ghe-tau-tet-u1" in d1.replace(" ", "") or "feature/giu-ghe-tau-tet-u1" in d1, d1
+        assert ".aizen/worktrees/T-1-u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1 and "T-1-u1`" not in d1
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            main(["branch", *w])
+        assert out.getvalue().strip() == "feature/giu-ghe-tau-tet"
+        assert branch_name({"v": 25}, "T-9", "api") == "feature/T-9-api" and branch_name({"v": 25}, "T-9") == "int/T-9"
+        assert branch_name({"v": 26, "slug": "seat", "branch_type": "bugfix"}, "T", "api", writers=1) == "bugfix/seat"
         r2 = brief("--role", "reviewer", "--lens", "redteam")
         assert "review-redteam.md" in r2 and "READ-ONLY" in r2
         assert "Code map (ask before reading files): none" in r2

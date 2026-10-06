@@ -1,4 +1,4 @@
-# Asking, options and research — how decisions reach the owner (v25)
+# Asking, options and research — how decisions reach the owner (v26)
 
 The owner decides; a role's job is to make each decision easy to get right: researched, compared on
 numbers, several real options, a recommendation kept separate — and asked as few times as possible.

@@ -7,6 +7,14 @@
 ## Commands
 <exact commands, one per line, runnable from the worktree>
 
+## Acceptance matrix
+<!-- aizen-build: one row per TC-nn of acceptance.md — none left out (the guard checks), none reworded. -->
+| TC | AC | Test (path::name) | Result (pass / fail / blocked) | Note |
+|---|---|---|---|---|
+| TC-01 | AC-1 | tests/acceptance/seat_hold_test.py::test_hold_free_seat | pass | |
+
+Tester-added cases (`[tester-added]`): <test path::name — what the diff revealed>
+
 ## Coverage
 <the lens's own table (see `references/test/lenses/<lens>.md` §Report); uncovered IDs with the reason>
 

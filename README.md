@@ -203,7 +203,7 @@ bạn chủ động gõ. Nếu đã cài archify bằng `npx skills add tt-a1i/a
 
 ## aizen-build — điều phối production
 
-`aizen-build` (v24) điều phối một task từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ `git push`; cuối
+`aizen-build` (v26) điều phối một task từ yêu cầu đến PR, **chỉ làm local** — agent không bao giờ `git push`; cuối
 task bạn nhận khối lệnh push/PR để tự chạy. Hướng dẫn dùng và prompt mẫu:
 [docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md) · [docs/prompt-mau.md](docs/prompt-mau.md).
 
@@ -220,8 +220,8 @@ task bạn nhận khối lệnh push/PR để tự chạy. Hướng dẫn dùng 
 
 | Pha | Làm gì | Bạn |
 |---|---|---|
-| **Thống nhất** | planner khảo sát + thiết kế, viết plan chia theo module (chốt sẵn tên, interface, dữ liệu, file, test) → bạn xác nhận **từng phần**: phạm vi → từng module → cách triển khai (các việc A3 duyệt trước) → `approve` (script **từ chối** nếu còn module chưa xác nhận) | được hỏi chi tiết từng phần |
-| **Thực thi** | `dev` song song (mỗi module một worktree, code tối thiểu) → tích hợp `int/<TASK>` → tester → reviewer (+ `redteam` nếu có module rủi ro) → fix ≤ 2 vòng → tổng kết + lệnh push/PR | **không bị hỏi thêm**; chỉ khi `BLOCKED` (việc A3 chưa duyệt, A4, mất dữ liệu, plan không làm được) |
+| **Thống nhất** | planner khảo sát + thiết kế, viết plan chia theo module (chốt sẵn tên, interface, dữ liệu, file, test) và bộ test case nghiệm thu `acceptance.md` → bạn xác nhận **từng phần**: phạm vi → test case → từng module → cách triển khai (các việc A3 duyệt trước) → `approve` (script **từ chối** nếu còn module chưa xác nhận) | được hỏi chi tiết từng phần |
+| **Thực thi** | `dev` song song (mỗi module một worktree, code tối thiểu) → tích hợp vào nhánh PR `<type>/<slug>` → tester → reviewer (+ `redteam` nếu có module rủi ro) → fix ≤ 2 vòng → tổng kết + lệnh push/PR | **không bị hỏi thêm**; chỉ khi `BLOCKED` (việc A3 chưa duyệt, A4, mất dữ liệu, plan không làm được) |
 
 **5 role** (`agents/`)
 
@@ -243,7 +243,10 @@ dụng (YAGNI → có sẵn trong repo → stdlib → tính năng native → dep
 
 ```bash
 B=~/.claude/skills/aizen-build/scripts/flow; C=~/.claude/skills/aizen-core/scripts/core
-uv run $B/state.py init --task T-12 --goal "..."     # trạng thái task để resume; tự thêm .aizen/ vào .git/info/exclude
+uv run $B/state.py init --task T-12 --goal "..." --slug giu-ghe   # slug = tên nghiệp vụ của nhánh
+uv run $B/state.py branch --task T-12 [--unit api]   # feature/giu-ghe[-api] — không bao giờ là mã run
+uv run $C/journal.py note --run T-12 --kind think --text "Tôi đang nghĩ …" --as planner   # một dòng ở điểm quyết định
+uv run $C/journal.py report                           # → .aizen/out/latest.md
 uv run $B/state.py answer --task T-12 --module api --text "B"   # ghi xác nhận từng phần
 uv run $B/state.py approve --task T-12                # chốt plan → agent làm không hỏi thêm
 uv run $C/check.py --task T-12 --unit api             # lint, typecheck, build, test, secrets, deps → evidence-api.json
@@ -253,6 +256,19 @@ uv run $C/capacity.py --help                          # dự phóng tải/dung l
 
 `check.py` chỉ báo PASS khi có bước thật sự chạy và đạt; thiếu test hoặc không quét được secrets → `UNVERIFIED`
 (exit 3), không bao giờ là PASS. Trạng thái và báo cáo ghi vào `.aizen/` ở gốc project (local-only).
+
+**Theo dõi agent bằng file, không bằng terminal** (v26):
+
+| Bạn muốn | Mở | Ghi bởi |
+|---|---|---|
+| đọc nhanh / dán cho AI web | `.aizen/out/latest.md` (bản cũ ở `out/history/`) | `journal.py report`, tự chạy khi duyệt plan, sang vòng sửa, bị chặn, xong |
+| xem agent nghĩ gì, làm gì, dừng ở đâu | `.aizen/runs/<TASK>/journal.md` — mỗi dòng một câu: 🧠 nghĩ · 🔧 thử · 🔀 chọn · ✍ đã ghi · ▶ đã chạy · ✅ xong · ⛔ dừng | agent (`journal.py note`) ở điểm quyết định; hook tự ghi ✍/▶ |
+| test không thiên vị | `.aizen/runs/<TASK>/acceptance.md` — test case `TC-nn` bạn duyệt cùng plan, khoá khi approve | planner viết, tester làm, dev không được đụng |
+
+**GitHub sạch** (v26): file của agent (`.claude/`, `.agents/`, `AGENTS.md`, `CLAUDE.md`, `.aizen/`…) chỉ nằm ở
+máy (`.git/info/exclude`); nhánh mang tên nghiệp vụ (`feature/giu-ghe`, không `feature/T-12-api`); commit không
+gắn mã run hay dòng đồng tác giả AI — pre-push chặn và in lệnh sửa. Tắt: `"hide_ai_files": false` trong
+`.aizen/config/guard.json`. Chi tiết: [docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md).
 
 Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
 `skills/aizen-build/references/flow/platform-*.md`.
@@ -270,15 +286,15 @@ nó tự chuyển `.aizen/` kiểu cũ sang cấu trúc mới.
 | Phần của contract | Agent làm | Ai kiểm |
 |---|---|---|
 | `steps` → `runs/<RUN>/sheet.md` | tích từng bước kèm bằng chứng: `file:` · `cmd:` · `out:"…"` · `sha:` · `url:` | script: file có thật và mới, lệnh có trong ledger và đạt, dòng output thật sự được in, commit tồn tại, URL được trích trong đầu ra. Tích mà không có bằng chứng → trượt |
-| `rules` | — | script tất định: `count` · `per_block` (≤ N node/diagram) · `labels` (claim có số phải gắn `[verified]/[inferred]/[unverified]/[projected]` hoặc nguồn) · `sections` · `regex` · `command` (vd. `check_tree.py`); aizen-build thêm `approved` · `evidence` · `report` · `scope` · `knowledge` |
+| `rules` | — | script tất định: `count` · `per_block` (≤ N node/diagram) · `labels` (claim có số phải gắn `[verified]/[inferred]/[unverified]/[projected]` hoặc nguồn) · `sections` · `regex` · `command` (vd. `check_tree.py`); aizen-build thêm `approved` · `acceptance` · `evidence` · `report` · `scope` · `knowledge`; mọi skill: `journal` (có sửa file thì phải có dòng suy nghĩ) |
 | `expectations` + `verifier` | dispatch một verifier **sạch** (`references/core/verifier.md`) | verifier độc lập ghi `verdict.json`; guard kiểm người ghi khác người làm, mỗi mục đạt có `path:line` có thật, tỷ lệ ≥ 80% |
 
 | Hook | Việc |
 |---|---|
 | PreToolUse | chặn sửa file của guard (run.json, ledger, waivers, evidence, PROJECT.md); chặn ghi đầu ra/code trước khi bạn xác nhận; chặn ghi ngoài write set của module; chặn agent tự duyệt backlog |
-| PostToolUse | chấm công: ghi mọi lần ghi file / lệnh shell vào `ledger.jsonl` của run, kèm **ai** làm (sub-agent nào) |
+| PostToolUse | chấm công: ghi mọi lần ghi file / lệnh shell vào `ledger.jsonl` của run, kèm **ai** làm (sub-agent nào); thêm dòng ✍/▶ dễ đọc vào `journal.md` |
 | Stop | chạy contract; còn thiếu → agent làm tiếp với đúng danh sách; đủ → run `done`, vào `archive/`, backlog `done`, `PROJECT.md` cập nhật. Ba lần dừng liền không làm gì thêm, hoặc quá số vòng verifier → `blocked`, bạn quyết |
-| git pre-push | chạy lại contract cho nhánh `int/<RUN>` và `feature/<RUN>-*` |
+| git pre-push | chạy lại contract cho nhánh của run (`<type>/<slug>[-<unit>]`); với **mọi** nhánh: chặn file AI trong cây và mã run / dòng đồng tác giả AI trong commit chưa push |
 
 Bước thật sự không áp dụng → `guard.py waive --run <RUN> --step <id> --reason "…" --evidence <file | 1 dòng output>`
 (file được băm, sửa sau là mất hiệu lực). Waiver chỉ tính khi verifier (hoặc reviewer) ghi `accepted`.
@@ -288,10 +304,11 @@ Bước thật sự không áp dụng → `guard.py waive --run <RUN> --step <id
 ```
 .aizen/
 ├── PROJECT.md      👁 bản đồ dự án — file duy nhất bạn đọc (máy biên soạn, có mục lục)
+├── out/            👁 latest.md — báo cáo mới nhất, dán thẳng cho AI web · history/
 ├── backlog.md      ✍ việc sắp làm BL-nn (agent đề xuất, chỉ bạn duyệt)
 ├── config/         guard.json · conventions.md
 ├── knowledge/      system/ · modules/ · decisions.md · lessons.md — hiểu dự án
-├── runs/<RUN>/     run.json · state.md · plan.md · sheet.md · ledger.jsonl · waivers.json · evidence/ · reports/ · verdict.json · work/
+├── runs/<RUN>/     run.json · state.md · plan.md · acceptance.md · journal.md · sheet.md · ledger.jsonl · waivers.json · evidence/ · reports/ · verdict.json · work/
 ├── worktrees/ · cache/ · backups/ · archive/
 ```
 

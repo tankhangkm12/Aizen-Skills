@@ -1,4 +1,4 @@
-# Parallel work — units, isolation, integration, resuming (v25)
+# Parallel work — units, isolation, integration, resuming (v26)
 
 Independent units run at the same time; each runs its own checks; they meet in one integration step.
 
@@ -16,7 +16,7 @@ the owner set when confirming delivery. Every extra unit costs a dispatch, a wor
    registries, lockfiles, i18n bundles, shared enums, error catalog, generated clients. A shared hot file gets **one**
    owner; others list the lines they need in their report.
 3. **Isolation** — each code writer in its own worktree and branch
-   (`git worktree add .aizen/worktrees/<TASK>-<unit> -b feature/<TASK>-<unit> <base>`). Two agents never share a checkout.
+   (`git worktree add .aizen/worktrees/<TASK>-<unit> -b "$(state.py branch --task <TASK> --unit <unit>)" <base>`). Two agents never share a checkout.
 
 **Runtime isolation** — give every member its own:
 
@@ -40,9 +40,9 @@ unapproved A3, an A4 or a plan that cannot work stops the flow (`BLOCKED`).
 
 Separate branches passing their own tests do not prove combined behaviour.
 
-1. `int/<TASK>` from the base; `git merge --no-ff` each unit branch in plan order; record every SHA (coordinator, git only).
+1. The PR branch (`state.py branch --task <TASK>`) from the base; `git merge --no-ff` each unit branch in plan order; record every SHA (coordinator, git only).
 2. Conflict → `git merge --abort`; a `dev` with `UNIT=int` resolves it from the docs, or hands each side back to its owner.
-3. The tester runs against `int/<TASK>`; review and fix rounds run on the integrated SHA.
+3. The tester runs against the PR branch; review and fix rounds run on the integrated SHA.
 4. Failures go back to the unit that caused them, on its own branch; then re-integrate.
 
 Merging into a shared branch is A4 — the owner does it.

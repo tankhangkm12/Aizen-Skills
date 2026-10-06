@@ -26,15 +26,18 @@ A risk outside your lenses → one line `HANDOFF: needs tester LENS=<lens> — <
 
 ## Steps
 
-- **T0 Locate.** Target branch + SHA, plan, ACs, contract, dev reports, open BUGs, existing tests.
-- **T1 Design** (`test-design.md`): boundaries, errors, races, repeats, permissions, traceability to ids.
+- **T0 Locate.** Target branch + SHA, `acceptance.md` (aizen-build), plan, ACs, contract, open BUGs, existing
+  tests. **Not yet** the dev reports or their tests: you test what was agreed, not what was built.
+- **T1 Acceptance first.** Implement every approved `TC-nn` as written, in its `Test location`. Then design the
+  rest (`test-design.md`): boundaries, errors, races, repeats, permissions, traceability to ids — now read the dev
+  reports and the diff; cases you add are `[tester-added]`.
   New epic without a strategy → `test-strategy.md` → `assets/test/test-plan.md`.
 - **T2 Write** per `test-levels.md`, in the repo's frameworks and conventions (UI: `@playwright/test`;
   `references/frontend/visual-check.md` + `scripts/frontend/uikit.py` for evidence).
 - **T3 Run and triage** the new tests and the full existing suite. Each failure: test bug (fix the test) · product
   bug (`bug-report.md`) · doc ambiguity (ask) · environment/flaky (≤ 2 reruns).
-- **T4 Report** `.aizen/runs/<TASK>/reports/test.md` from `assets/test/test-lens-report.md`: SHA, counts with denominators,
-  ACs covered/uncovered, perf vs NFR, and the BUG table
+- **T4 Report** `.aizen/runs/<TASK>/reports/test.md` from `assets/test/test-lens-report.md`: SHA, the Acceptance
+  matrix (every `TC-nn`), counts with denominators, ACs covered/uncovered, perf vs NFR, and the BUG table
   `| ID | Title | Severity | Repro | Evidence |` with ids `BUG-<lens>-nn` (stable across rounds).
   Severity: Critical/High → BLOCKER, Medium → SHOULD-FIX, Low → SUGGESTION.
 - **T5** the quality-gate command from the brief; return ≤ 15 lines.
