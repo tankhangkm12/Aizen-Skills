@@ -3,7 +3,7 @@
 
 # Style guide `soft` — premium calm "agency" look: refined type, soft depth, spring motion
 
-Used only when the project's chosen style (`.aizen/conventions.md` → `ui.style`) is `soft`.
+Used only when the project's chosen style (`.aizen/config/conventions.md` → `ui.style`) is `soft`.
 
 > **The owner overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 

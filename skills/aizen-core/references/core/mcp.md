@@ -1,4 +1,4 @@
-# MCP tools — one rule for every Aizen skill (v24)
+# MCP tools — one rule for every Aizen skill (v25)
 
 - **Current library docs:** before writing or reviewing code against a library, framework or cloud API, use the
   `context7` MCP tools when they are available — training data goes stale, the installed version does not.

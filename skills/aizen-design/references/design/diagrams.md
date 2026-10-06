@@ -28,7 +28,7 @@ One rendered diagram per question the doc answers — not one per ASCII sketch. 
 
 1. Read archify's `SKILL.md` and follow its authoring path (type router, schema, example, then `finalize`). Its
    rules on fresh IDs, evidence and repair limits apply unchanged.
-2. **Location**: `.aizen/docs/<same folder as the doc>/diagrams/<slug>/` holding `candidate.json` and `<slug>.html`
+2. **Location**: `.aizen/knowledge/<same folder as the doc>/diagrams/<slug>/` holding `candidate.json` and `<slug>.html`
    (this is the location archify asks you to honour when the user names one). Link the HTML from the doc, under the
    ASCII diagram it renders.
 3. **Same facts as the ASCII**: every node and arrow in the HTML exists in the ASCII and in the doc's tables, and the

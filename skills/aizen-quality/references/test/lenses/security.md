@@ -7,7 +7,7 @@ Who can do what to whose data: authentication, authorization and ownership, host
 secrets or personal data, abuse of a legitimate feature.
 
 ## Oracle
-The authZ matrix and threat model (`.aizen/docs/.../security.md`, design's `authz-matrix`) · API contract
+The authZ matrix and threat model (`.aizen/knowledge/.../security.md`, design's `authz-matrix`) · API contract
 (documented 401/403/404 per role) · NFR security items · OWASP ASVS level the owner chose.
 
 ## Techniques
@@ -30,7 +30,7 @@ Local app and DB only: own ports and DB from RUNTIME. Staging or shared targets 
 third parties never.
 
 ## Report
-`.aizen/reports/<TASK>/test-security.md`: matrix `endpoint · anon · wrong role · other owner · result`,
+`.aizen/runs/<TASK>/reports/test-security.md`: matrix `endpoint · anon · wrong role · other owner · result`,
 probes run, OWASP mapping, BUG table (`BUG-security-nn`). Redact tokens and personal data in evidence.
 
 ## Never

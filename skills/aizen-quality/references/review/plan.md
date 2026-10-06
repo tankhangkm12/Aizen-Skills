@@ -3,8 +3,8 @@
 Every role executes the plan faithfully, so a plan defect is caught by no later gate — it shows up as rework
 across units. Judge it against the documents it plans from, never against taste.
 
-Inputs: `.aizen/plans/<TASK>.md`, the documents it cites (read them — do not trust the plan's summary),
-the repo structure, `.aizen/tasks/<TASK>/state.md`, and the state of any wave already running.
+Inputs: `.aizen/runs/<TASK>/plan.md`, the documents it cites (read them — do not trust the plan's summary),
+the repo structure, `.aizen/runs/<TASK>/state.md`, and the state of any wave already running.
 
 ## 1. Axes, heaviest first
 

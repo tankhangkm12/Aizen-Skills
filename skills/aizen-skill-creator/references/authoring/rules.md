@@ -1,4 +1,4 @@
-# Authoring rules — creating, improving and importing Aizen skills (v3)
+# Authoring rules — creating, improving and importing Aizen skills (v4)
 
 Shared by `aizen-skill-creator` and `aizen-skill-importer`. Core rules (`references/core/rules.md`) apply too.
 
@@ -9,7 +9,7 @@ Shared by `aizen-skill-creator` and `aizen-skill-importer`. Core rules (`referen
 - **One home per piece of knowledge.** Before writing a rule, search the suite (`grep -rn` over `skills/`): a rule
   that already lives in `aizen-core` or a pack is linked, never copied. A new topic is declared in the owning
   skill's `manifest.json` `topics`, so other skills can resolve it.
-- **Never overwrite or delete** an existing skill folder; baselines and eval runs live in `<REPO>/.aizen-work/`,
+- **Never overwrite or delete** an existing skill folder; baselines and eval runs live in `<REPO>/.aizen/cache/`,
   never in `skills/` (every folder there is installed as a skill).
 - **Docs are part of the skill**: README row, usage-guide rows and a prompt template ship in the same commit.
 - **Imports: licence first.** Keep the upstream licence file and credit the source in `manifest.json`

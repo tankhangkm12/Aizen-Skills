@@ -1,9 +1,9 @@
 ---
 name: aizen-core
-description: Shared core of the Aizen suite (v24) — authority levels A0–A4, evidence labels, decisions and options, git and local-only hand-off, code quality (least code, the reuse ladder), numbers and projections, workspace layout, the quality gate (check.py), the code map (graph.py) and capacity projections. Loaded by every Aizen skill through its brief or its "Read first" line; not a standalone skill, do not trigger it directly.
+description: Shared core of the Aizen suite (v25) — authority levels A0–A4, evidence labels, decisions and options, git and local-only hand-off, code quality (least code, the reuse ladder), numbers and projections, workspace layout, the quality gate (check.py), the code map (graph.py) and capacity projections. Loaded by every Aizen skill through its brief or its "Read first" line; not a standalone skill, do not trigger it directly.
 ---
 
-# Aizen core — the rules every Aizen skill shares (v24)
+# Aizen core — the rules every Aizen skill shares (v25)
 
 One copy of the rules that used to be repeated in every skill. Entry skills (`aizen-build`, `aizen-init`, …)
 and knowledge packs point here instead of restating them.
@@ -25,6 +25,8 @@ and knowledge packs point here instead of restating them.
 | MCP tools (context7, sequentialthinking) | `references/core/mcp.md` |
 | code map: who calls what, blast radius | `references/core/code-map.md` → `scripts/core/graph.py` |
 | quality gate: lint, types, build, tests, secrets, deps → evidence JSON | `scripts/core/check.py` |
+| run contract: sheet, rules, verifier, hooks, backlog — the gate that decides done | `scripts/core/guard.py` · `references/core/verifier.md` · `assets/core/contract.default.json` |
+| the project map `.aizen/PROJECT.md` (one file, table of contents) | `scripts/core/project.py` · `references/core/workspace.md` |
 | capacity, growth, contention projections | `scripts/core/capacity.py` |
 | templates | `assets/core/pr-draft-template.md`, `assets/core/evidence-record.json` |
 

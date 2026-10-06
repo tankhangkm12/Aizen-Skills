@@ -19,3 +19,12 @@ Source: github.com/multica-ai/andrej-karpathy-skills (MIT); Aizen's checked vers
    call it done until the checks ran on the final version.
 
 For a trivial change (a typo, an obvious one-liner) use judgment: same principles, no ceremony.
+
+## Aizen runs end at the gate, not at "done"
+
+In a project with `.aizen/`: start every Aizen skill with `guard.py start` (aizen-build: `state.py init`), tick
+`.aizen/runs/<RUN>/sheet.md` only with evidence a script can check, let an independent agent judge, and never
+claim the work finished — the guard (`aizen-core/scripts/core/guard.py`) decides at your Stop and tells you
+exactly what is still open. Skipping a step is allowed only through `guard.py waive` with a reason and evidence.
+Read `.aizen/PROJECT.md` first to understand the project; never edit it — change its sources.
+

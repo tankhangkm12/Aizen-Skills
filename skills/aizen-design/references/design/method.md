@@ -1,6 +1,6 @@
 # Design — how it will be built (v24)
 
-Used by `planner` when `STAGE=design`. Output: docs in `.aizen/docs/`, never code.
+Used by `planner` when `STAGE=design`. Output: docs in `.aizen/knowledge/`, never code.
 
 ## Rules
 
@@ -30,7 +30,7 @@ Used by `planner` when `STAGE=design`. Output: docs in `.aizen/docs/`, never cod
 
 All guides are in `references/design/`. Pick only the stages the task needs; small changes edit the existing doc.
 
-Each stage: read SRS + existing docs + `DECISIONS.md` → 2–4 objections to the input → write from the template
+Each stage: read SRS + existing docs + `decisions.md` → 2–4 objections to the input → write from the template
 (drop sections that do not apply) → print the stage's exit gate row by row with evidence → record decisions
 (`decision-log.md`).
 

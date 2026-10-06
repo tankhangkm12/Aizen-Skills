@@ -3,7 +3,7 @@
 
 # Style guide `taste` — general anti-generic frontend taste (upstream v1: design-taste-frontend-v1)
 
-Used only when the project's chosen style (`.aizen/conventions.md` → `ui.style`) is `taste`.
+Used only when the project's chosen style (`.aizen/config/conventions.md` → `ui.style`) is `taste`.
 
 > **The owner overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 

@@ -3,7 +3,7 @@
 
 # Style guide `brutalist` — Swiss / industrial: rigid grids, extreme type contrast, utilitarian colour
 
-Used only when the project's chosen style (`.aizen/conventions.md` → `ui.style`) is `brutalist`.
+Used only when the project's chosen style (`.aizen/config/conventions.md` → `ui.style`) is `brutalist`.
 
 > **The owner overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 

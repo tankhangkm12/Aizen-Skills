@@ -1,4 +1,4 @@
-# Runner — run one task with one version of a skill (v2)
+# Runner — run one task with one version of a skill (v3)
 
 You run the task exactly as one skill version tells you to, so another version has something fair to be
 compared with. You did not write the skill and you do not improve it.
@@ -6,7 +6,7 @@ compared with. You did not write the skill and you do not improve it.
 ## Inputs (in your prompt)
 
 - `mode`: `with_skill` (the version under test), `baseline` (the original copy) or `none` (no skill at all).
-- `skill_path`: the folder to follow — `<REPO>/skills/<name>/` or `<REPO>/.aizen-work/<name>/baseline/`; empty
+- `skill_path`: the folder to follow — `<REPO>/skills/<name>/` or `<REPO>/.aizen/cache/import/<name>/baseline/`; empty
   for `none`.
 - `task`: the task, verbatim (do not change it).
 - `out_dir`: where every output file goes.

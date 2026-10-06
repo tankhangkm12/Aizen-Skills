@@ -2,7 +2,7 @@
 """Check the required inputs and prepare the agent workspace for aizen-init.
 
 Needs a GitHub/GitLab repo URL and at least one project document (file, folder or http(s) link).
-On success: creates the project folder if absent, <project>/.aizen/init/{plans,reports,graphify}, writes .aizen/init/inputs.md and appends the
+On success: creates the project folder if absent, <project>/.aizen/runs/init/{plans,reports,graphify}, writes .aizen/runs/init/inputs.md and appends the
 missing lines of assets/gitignore-agent.txt to <project>/.gitignore (never removes anything).
 Exit code: 0 ok, 1 inputs missing/invalid (ask the user), 2 usage error. Standard library only.
 """
@@ -32,7 +32,7 @@ def problems(repo: str | None, docs: list[str]) -> list[str]:
 
 
 def prepare(project: Path, repo: str, docs: list[str]) -> list[str]:
-    ws = project / ".aizen/init"
+    ws = project / ".aizen/runs/init"
     for sub in ("plans", "reports", "graphify"):
         (ws / sub).mkdir(parents=True, exist_ok=True)
     (ws / "inputs.md").write_text(
@@ -60,7 +60,7 @@ def selfcheck() -> None:
         assert problems("https://github.com/a/b", [str(p / "nope.md")])
         (p / ".gitignore").write_text("node_modules/")
         added = prepare(p, "https://github.com/a/b", [str(doc)])
-        assert ".aizen/" in added and (p / ".aizen/init" / "reports").is_dir()
+        assert ".aizen/" in added and (p / ".aizen/runs/init" / "reports").is_dir()
         assert prepare(p, "https://github.com/a/b", [str(doc)]) == []  # idempotent
         assert (p / ".gitignore").read_text().startswith("node_modules/\n")
     print("check_inputs selfcheck ok")
@@ -86,7 +86,7 @@ def main() -> int:
         return 2
     project.mkdir(parents=True, exist_ok=True)
     added = prepare(project, a.repo, a.docs)
-    print(f"ok — workspace {project / '.aizen/init'} ready; .gitignore +{len(added)} lines")
+    print(f"ok — workspace {project / '.aizen/runs/init'} ready; .gitignore +{len(added)} lines")
     return 0
 
 

@@ -6,7 +6,7 @@ pixel difference from the design, contrast numbers, guideline findings.
 
 ## 1. Which browser tool
 
-`.aizen/conventions.md` → `ui.browser`:
+`.aizen/config/conventions.md` → `ui.browser`:
 
 | Value | Use |
 |---|---|
@@ -43,10 +43,10 @@ The MCP server is host configuration — the owner adds it themselves; you only 
   commands are listed under `Deviations:`.
 - **No real accounts.** Test users and seed data only. `state-save` files hold tokens: only when
   `.playwright-cli/` is in `.gitignore`; never commit or report their content.
-- **Evidence location.** `<main checkout>/.aizen/reports/<TASK>/ui/` by absolute path — the main
+- **Evidence location.** `<main checkout>/.aizen/runs/<TASK>/reports/ui/` by absolute path — the main
   checkout is your brief's documents-and-reports path, or the repository root when there is no brief.
   Never inside a worktree. Name: `<SCR>-<state>-<width>.png`. Screenshots are evidence, not source: they
-  stay out of commits unless the owner asks (the installer suggests ignoring `.aizen/reports/*/ui/`).
+  stay out of commits unless the owner asks (the installer suggests ignoring `.aizen/runs/*/reports/ui/`).
 
 ## 3. The loop
 
@@ -73,7 +73,7 @@ playwright-cli -s=$S close                     # then stop the dev server you st
    `open --mobile`.
 3. **Real content.** Long Vietnamese names, 0 / 1 / many rows, very long money values.
 4. **Compare with the design** when an export exists. Exports live in the main checkout at
-   `.aizen/docs/apps/<app>/ui-exports/<SCR>-<slug>--<state>--<breakpoint>.png` (`dev` (ui) handoff);
+   `.aizen/knowledge/apps/<app>/ui-exports/<SCR>-<slug>--<state>--<breakpoint>.png` (`dev` (ui) handoff);
    the breakpoint names map to widths in `<app>-ui.md`. Capture at the export's width and height, then
    `python3 $UIKIT diff <export.png> <shot> --out <shot>-diff.png` — report the percentage and the
    difference box; look at the diff image before judging. PNG at 1x only: an SVG export or an @2x image

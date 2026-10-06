@@ -8,11 +8,11 @@ The same claim checked by two agents must get the same verdict.
 
 | Counts | Does not count |
 |---|---|
-| `.aizen/reports/<TASK>/evidence[-<unit>].json` (command, exit code, SHA) | the summary restating a number |
+| `.aizen/runs/<TASK>/evidence/<unit|main>.json` (command, exit code, SHA) | the summary restating a number |
 | a role report at its path, with the SHA it ran on | "it was discussed" |
 | a review finding quoted with report path and severity | a paraphrase of "quality" |
 | branch / SHA / merge state read from `git` now | "probably merged" |
-| `.aizen/tasks/<TASK>/state.md` decision and log | a decision assumed to be made |
+| `.aizen/runs/<TASK>/state.md` decision and log | a decision assumed to be made |
 
 Support that only points back into the summary is `UNSUPPORTED`.
 

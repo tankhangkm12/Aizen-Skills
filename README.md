@@ -16,6 +16,7 @@ bộ (hoặc ít nhất skill cần dùng cùng các skill trong `requires` củ
 - [Nguyên tắc làm việc của agent](#nguyên-tắc-làm-việc-của-agent)
 - [Kiến trúc bộ skill (SOLID)](#kiến-trúc-bộ-skill-solid)
 - [aizen-build — điều phối production](#aizen-build--điều-phối-production)
+- [Hợp đồng chung và bản đồ dự án](#hợp-đồng-chung--agent-làm-đủ-không-làm-thừa-có-bằng-chứng)
 - [Nâng cấp từ bản trước](#nâng-cấp-từ-bản-trước-đổi-tên)
 - [Cấu trúc repo](#cấu-trúc-repo)
 - [CLI](#cli)
@@ -87,7 +88,7 @@ Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
 | Skill | Dùng khi |
 |---|---|
 | [`aizen-build`](skills/aizen-build) | Mọi việc kỹ thuật trên dự án đang có: tính năng, sửa bug, refactor, từ ý tưởng tới PR; **review** PR/diff; **chỉ thiết kế** (schema, API, kiến trúc); **chỉ dựng** CI/CD, Docker, Kubernetes. Xem [bên dưới](#aizen-build--điều-phối-production). |
-| [`aizen-init`](skills/aizen-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.aizen/init/`, khung code + health check, Docker/compose kèm infra, config tập trung, kết nối infra fail-fast, adapter, AOP + request-id + auth, README, rà lại bằng graphify. |
+| [`aizen-init`](skills/aizen-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.aizen/runs/init/`, khung code + health check, Docker/compose kèm infra, config tập trung, kết nối infra fail-fast, adapter, AOP + request-id + auth, README, rà lại bằng graphify. |
 | [`aizen-skill-creator`](skills/aizen-skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn theo chuẩn Aizen, đặt đúng chỗ (entry hay topic của pack), viết docs, đánh giá, `npm test`, commit. |
 | [`aizen-skill-importer`](skills/aizen-skill-importer) | Đưa tri thức bên ngoài vào Aizen: chép cả skill (ghi nguồn/giấy phép, tuỳ biến, A/B test) hoặc **vendor** best practice của upstream vào một pack, ghim commit. |
 | [`aizen-skill-eval`](skills/aizen-skill-eval) | Đánh giá một skill so với baseline: bộ eval (gồm negative control), chạy độc lập, chấm điểm, A/B, tổng hợp benchmark. |
@@ -237,39 +238,53 @@ python $C/capacity.py --help                          # dự phóng tải/dung l
 Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
 `skills/aizen-build/references/flow/platform-*.md`.
 
-### Guard — ép agent làm đủ, không làm thừa
+## Hợp đồng chung — agent làm đủ, không làm thừa, có bằng chứng
 
-Luật trong SKILL.md agent có thể "quên" hoặc tự cho là không cần (Claude hay bỏ bước, Antigravity hay dừng sớm).
-`guard.py` chuyển quyền nói "xong" từ agent sang hook do Claude Code / Antigravity chạy — agent không bỏ qua được.
-Cài **theo từng dự án**: `node bin/cli.js sync --project` (hoặc `aizen guard install`) trong thư mục dự án.
+Luật viết trong SKILL.md agent có thể "quên" hoặc tự cho là không cần (Claude hay bỏ bước, Antigravity hay dừng
+sớm). Vì vậy **mọi entry skill** khai báo một `contract` trong `manifest.json`, và **một engine chung**
+(`skills/aizen-core/scripts/core/guard.py`) thi hành nó qua hook của Claude Code / Antigravity và git pre-push —
+agent không bỏ qua được. Thêm skill mới chỉ cần khai báo `contract`; `npm test` từ chối entry skill thiếu nó.
+
+Cài **theo từng dự án**: `node bin/cli.js sync --project` (hoặc `aizen guard install`) trong thư mục dự án. Lần đầu
+nó tự chuyển `.aizen/` kiểu cũ sang cấu trúc mới.
+
+| Phần của contract | Agent làm | Ai kiểm |
+|---|---|---|
+| `steps` → `runs/<RUN>/sheet.md` | tích từng bước kèm bằng chứng: `file:` · `cmd:` · `out:"…"` · `sha:` · `url:` | script: file có thật và mới, lệnh có trong ledger và đạt, dòng output thật sự được in, commit tồn tại, URL được trích trong đầu ra. Tích mà không có bằng chứng → trượt |
+| `rules` | — | script tất định: `count` · `per_block` (≤ N node/diagram) · `labels` (claim có số phải gắn `[verified]/[inferred]/[unverified]/[projected]` hoặc nguồn) · `sections` · `regex` · `command` (vd. `check_tree.py`); aizen-build thêm `approved` · `evidence` · `report` · `scope` · `knowledge` |
+| `expectations` + `verifier` | dispatch một verifier **sạch** (`references/core/verifier.md`) | verifier độc lập ghi `verdict.json`; guard kiểm người ghi khác người làm, mỗi mục đạt có `path:line` có thật, tỷ lệ ≥ 80% |
 
 | Hook | Việc |
 |---|---|
-| PreToolUse | chặn sửa code khi plan chưa `approve`; chặn ghi ngoài write set của module trong `.worktrees/<unit>/`; chặn sửa file của guard (run.json, ledger, waivers, evidence) |
-| PostToolUse | chấm công: ghi mọi lần ghi file / lệnh shell vào `.aizen/tasks/<TASK>/ledger.jsonl` |
-| Stop | chạy checklist (`checklist` trong `aizen-build/manifest.json`); còn thiếu → agent phải làm tiếp, kèm đúng danh sách thiếu |
-| git pre-push | cùng checklist cho nhánh `int/<TASK>` và `feature/<TASK>-*` |
+| PreToolUse | chặn sửa file của guard (run.json, ledger, waivers, evidence, PROJECT.md); chặn ghi đầu ra/code trước khi bạn xác nhận; chặn ghi ngoài write set của module; chặn agent tự duyệt backlog |
+| PostToolUse | chấm công: ghi mọi lần ghi file / lệnh shell vào `ledger.jsonl` của run, kèm **ai** làm (sub-agent nào) |
+| Stop | chạy contract; còn thiếu → agent làm tiếp với đúng danh sách; đủ → run `done`, vào `archive/`, backlog `done`, `PROJECT.md` cập nhật. Ba lần dừng liền không làm gì thêm, hoặc quá số vòng verifier → `blocked`, bạn quyết |
+| git pre-push | chạy lại contract cho nhánh `int/<RUN>` và `feature/<RUN>-*` |
 
-Checklist chỉ đòi **đủ những gì plan đã chốt**, và **mỗi mục phải có bằng chứng do người khác kiểm**:
+Bước thật sự không áp dụng → `guard.py waive --run <RUN> --step <id> --reason "…" --evidence <file | 1 dòng output>`
+(file được băm, sửa sau là mất hiệu lực). Waiver chỉ tính khi verifier (hoặc reviewer) ghi `accepted`.
 
-| Mục | Bằng chứng | Ai kiểm |
-|---|---|---|
-| `plan` | lời duyệt của bạn trong `run.json` (chỉ `state.py` ghi) | script |
-| `check-<unit>`, `check-int` | `evidence-*.json` do `check.py` tự chạy lệnh, đúng SHA tip của nhánh module và `int/<TASK>` | script (đối chiếu git) |
-| `test` | `test*.md` ghi SHA hiện tại, **do chính tester viết** | script đọc ledger: coordinator tự viết → trượt |
-| `review` | `review*.md` verdict PASS, SHA hiện tại, mỗi kết luận có `path:line` | reviewer độc lập (không viết code task này); script mở từng `path:line` ở SHA đó, dòng không tồn tại → trượt |
-| `scope` | `git diff` so với base + ledger | script: file ngoài write set → trượt (chống over-engineering) |
-| `pr-body` | `pr-body.md` khi xong, liệt kê bước đã miễn | script |
+### `.aizen/` và bản đồ dự án
 
-Bước thật sự không áp dụng → `aizen guard waive --task <ID> --step <id> --reason "..." --evidence <file | 1 dòng
-output>` (file được băm, sửa sau là mất hiệu lực). Waiver chỉ tính khi reviewer ghi `waiver <id>: accepted`;
-`plan`, `check-int`, `review` không miễn được. Ba lần định dừng
-liền mà không làm gì thêm (hoặc 10 lần tổng) → task chuyển `blocked`, agent được dừng, bạn quyết định.
+```
+.aizen/
+├── PROJECT.md      👁 bản đồ dự án — file duy nhất bạn đọc (máy biên soạn, có mục lục)
+├── backlog.md      ✍ việc sắp làm BL-nn (agent đề xuất, chỉ bạn duyệt)
+├── config/         guard.json · conventions.md
+├── knowledge/      system/ · modules/ · decisions.md · lessons.md — hiểu dự án
+├── runs/<RUN>/     run.json · state.md · plan.md · sheet.md · ledger.jsonl · waivers.json · evidence/ · reports/ · verdict.json · work/
+├── worktrees/ · cache/ · backups/ · archive/
+```
+
+`PROJECT.md`: 0 Cần bạn ngay · 1 Tổng quan · 2 Kiến trúc · 3 Luồng nghiệp vụ · 4 Module · 5 Dữ liệu · 6 Hạ tầng ·
+7 Quy ước · 8 Quyết định · 9 Bài học · 10 Quy trình agent (sơ đồ + contract từng skill) · 11 Việc của agent (đang
+làm / sắp làm / đã làm) · 12 Cách điều khiển · 13 Nguồn. Nội dung lấy từ `knowledge/`, `config/`, `backlog.md`,
+`runs/` — sửa nguồn, bản đồ tự theo; aizen-build không xong khi code đổi mà `knowledge/` chưa ghi lại.
+Chi tiết: `skills/aizen-core/references/core/workspace.md`.
 
 Giới hạn: hook lỗi thì cho qua (không làm kẹt agent); `--dangerously-skip-permissions` hoặc hook không chạy (đã có
-báo cáo với Antigravity trên Windows) thì chỉ còn pre-push chặn. `.aizen/` là local-only nên CI không chạy được
-checklist — pre-push là chốt cuối. Bật chế độ chặt (`{"require_task": true}` trong `.aizen/guard.json`) để cấm sửa
-code khi chưa có task được duyệt.
+báo cáo với Antigravity trên Windows) thì chỉ còn pre-push chặn. `.aizen/` là local-only nên CI không kiểm được run.
+Kiểm `path:line` chứng minh dòng có thật, không chứng minh nhận xét đúng.
 
 ## Cấu trúc repo
 
@@ -309,7 +324,7 @@ qua sổ topic, link markdown tương đối tồn tại, `(vNN)` khớp `manife
 | `thanhtan-backend-coding-init` | `aizen-init` |
 | `skill-creator` / `skill-cloner` / `agent-skill-tester` | `aizen-skill-creator` / `aizen-skill-importer` / `aizen-skill-eval` |
 | `tech-learning-tree` / `video-to-skill` | `aizen-tech-learning` / `aizen-video-to-skill` |
-| workspace `tensura/`, `.thanhtan/` | `.aizen/`, `.aizen/init/` |
+| workspace `tensura/`, `.thanhtan/` | `.aizen/`, `.aizen/runs/init/` |
 
 `git pull && node bin/cli.js sync` dọn link tên cũ và tạo link tên mới. Task đang dở trong `tensura/`: đổi tên thư
 mục thành `.aizen/` rồi `state.py status --task <TASK>`.
@@ -326,7 +341,9 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 | `update` | kéo bản mới (git) rồi sync |
 | `auto-update enable\|disable` | bật/tắt cập nhật ngầm hằng ngày (Task Scheduler / cron) — chỉ repo Aizen, không đụng skill cộng đồng |
 | `external list\|install\|update\|remove <tên>` | skill cộng đồng trong `externals.json` |
-| `guard install\|check\|waive` | hook ép quy trình aizen-build cho dự án hiện tại ([Guard](#guard--ép-agent-làm-đủ-không-làm-thừa)) |
+| `guard install\|check\|stop` | hợp đồng chung cho dự án hiện tại ([Hợp đồng chung](#hợp-đồng-chung--agent-làm-đủ-không-làm-thừa-có-bằng-chứng)) |
+| `project` | biên soạn lại `.aizen/PROJECT.md` |
+| `backlog list\|add\|approve\|drop` | việc sắp làm (chỉ bạn duyệt) |
 | `help` | trợ giúp |
 
 ## Phát triển skill
@@ -340,7 +357,7 @@ Chuẩn đầy đủ: [docs/aizen-skill-standard.md](docs/aizen-skill-standard.m
 2. Mỗi entry phải có: một dòng trong bảng [Danh sách skill](#danh-sách-skill), dòng trong `docs/huong-dan-su-dung.md`
    (§2, §4) và một prompt `/<tên>` trong `docs/prompt-mau.md` — `npm test` kiểm.
 3. `description` quyết định khi nào agent chọn skill: làm gì · "Use when …" · "Not for: …".
-4. Thư mục tạm (baseline, kết quả eval) ở `.aizen-work/` — không bao giờ trong `skills/`.
+4. Thư mục tạm (baseline, kết quả eval) ở `.aizen/cache/` — không bao giờ trong `skills/`.
 5. Kiểm tra rồi đồng bộ:
 
 ```bash
@@ -349,7 +366,7 @@ node bin/cli.js sync
 ```
 
 **Skill tự cải thiện** (`rules/continuous-improvement.md`): khi một skill làm chưa tốt (bạn phàn nàn, script lỗi,
-hướng dẫn sai, phải làm tay), agent ghi một dòng vào sổ `.aizen-work/feedback/<skill>.jsonl` bằng
+hướng dẫn sai, phải làm tay), agent ghi một dòng vào sổ `.aizen/knowledge/feedback/<skill>.jsonl` bằng
 `aizen-skill-creator/scripts/authoring/feedback.py` — không hỏi, không chen task. Chỉ khi bạn phàn nàn trực tiếp, vấn
 đề lặp ≥ 2 lần, hoặc skill ra kết quả sai, agent mới đề xuất sửa; sửa đi qua quy trình improve của
 `aizen-skill-creator` (baseline, eval case mới, bump version, `npm test`, commit). Xem sổ:

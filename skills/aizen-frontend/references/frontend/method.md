@@ -31,7 +31,7 @@ Used by `dev` with `KIND=fe`.
   screenshot, console, diff vs export, contrast. ≤ 3 fix rounds per screen. Against the real API once the
   backend is integrated; mock vs real differences are findings.
 - **F5 Hand off.** the quality-gate command from the brief; PR text with the state table (screenshot paths) →
-  `.aizen/reports/<TASK>/pr-body-<unit>.md`; report + push/PR commands for the owner.
+  `.aizen/runs/<TASK>/reports/pr-body-<unit>.md`; report + push/PR commands for the owner.
 
 ## Guides (load only what the change touches)
 

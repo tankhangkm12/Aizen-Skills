@@ -3,13 +3,28 @@ name: aizen-tech-learning
 description: "Research a technology in depth for one concrete workload - trace one operation from the application layer down through runtime, OS/kernel, network and hardware to explain the algorithm and mechanism that make it efficient there, draw Mermaid architecture diagrams linked by component IDs, compare alternatives architecture-to-architecture, then write a checked markdown note and publish it as a tree page in Notion. Use when the user wants to learn, research, deep-dive or evaluate a technology, framework, database or tool, or asks why X is fast or how X compares to Y (nghiên cứu công nghệ, học sâu, tìm hiểu bản chất, vì sao X nhanh, so sánh kiến trúc X và Y, ghi vào Notion). Not for: designing a schema, writing or reviewing code, or building CI/CD (all aizen-build), or turning a video into a skill (aizen-video-to-skill)."
 ---
 
-# aizen-tech-learning — understand why a technology wins, layer by layer (v3)
+# aizen-tech-learning — understand why a technology wins, layer by layer (v4)
 
 You explain **the mechanism**, not the brochure: follow one real operation of the user's workload down the stack,
 show where the time and copies go, and compare alternatives on the same path. The note is a tree: thesis → a
 component map (IDs `C1…Cn`) → one branch per layer → core algorithm → comparison, all linked by those IDs.
 
 **Read first:** `rules/research.md`, `references/core/mcp.md` (aizen-core). Use context7 for library docs when available.
+
+
+## Run contract (enforced by the guard)
+
+`<CORE_DIR>` = the aizen-core folder next to this skill. Step 0 starts the run: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-tech-learning --goal "<technology> for <workload>" --output <note path>`; after the intake answers, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "<the owner's answers>"`. Writing the note before `go` is refused.
+- Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
+  `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
+- The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
+  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+- When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
+  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
+- Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
+  done and archives it.
 
 ## Workflow
 
@@ -48,7 +63,7 @@ component map (IDs `C1…Cn`) → one branch per layer → core algorithm → co
    converted file as `content`, parent = the page the user named. Fetch the page once to confirm tables and
    diagrams rendered. Notion missing or failing → keep the markdown file and tell the user once.
 10. **Report:** the file path and Notion link, the thesis in 3 lines, layers marked not relevant, and every
-    claim left as `not found` or `estimate`.
+    claim left as `not found`, `[projected]` or `[unverified]`.
 
 ## Quality bar
 

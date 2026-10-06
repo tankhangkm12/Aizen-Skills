@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""graph.py — keep a graphify code map of the project for every Aizen role (v24).
+"""graph.py — keep a graphify code map of the project for every Aizen role (v25).
 
     python <CORE_DIR>/scripts/core/graph.py --project .            # build or refresh (code only, no LLM, no network)
     python <CORE_DIR>/scripts/core/graph.py --project . --check    # status only

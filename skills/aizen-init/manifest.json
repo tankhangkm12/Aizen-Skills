@@ -1,6 +1,6 @@
 {
   "name": "aizen-init",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Bootstrap a team backend project from a repo and its documents in 11 gated steps: Git Flow, plan, skeleton with health checks, Docker/compose, central config, fail-fast infra, adapters, request-id, auth, README, graph review",
   "framework": "Aizen",
   "kind": "entry",
@@ -8,5 +8,19 @@
     "aizen-core",
     "aizen-backend",
     "aizen-infra"
-  ]
+  ],
+  "contract": {
+    "outputs": [],
+    "steps": [],
+    "rules": [
+      {
+        "id": "init-gate",
+        "type": "command",
+        "run": "python3 \"{skill_dir}/scripts/gate.py\" --project \"{ws}\" 11"
+      }
+    ],
+    "verifier": {
+      "required": false
+    }
+  }
 }

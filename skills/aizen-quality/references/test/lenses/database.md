@@ -30,7 +30,7 @@ Own disposable DB `<db>_test_database` (or schema) on own port; container via `d
 <TASK>-test-db`. Never a shared, staging or production database; restoring real dumps is A4.
 
 ## Report
-`.aizen/reports/<TASK>/test-database.md`: table `migration · up · down · up · lock (ms) · rows`, query
+`.aizen/runs/<TASK>/reports/test-database.md`: table `migration · up · down · up · lock (ms) · rows`, query
 table `query · rows · plan · time`, BUG table (`BUG-database-nn`).
 
 ## Never

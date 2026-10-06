@@ -8,7 +8,7 @@
   Before recording a skip, name the later steps that depend on it (e.g. skipping Docker breaks step 5/10
   evidence) and get the user's confirmation; a skip covers only the step the user named.
 - **Checkpoints wait.** Steps 1, 5, 9, 10 end with the user's "ok"; never set `Approved: yes` yourself.
-- **Agent workspace is `.aizen/init/` only.** Plans, reports, notes, graph output, scratch files go there — never
+- **Agent workspace is `.aizen/runs/init/` only.** Plans, reports, notes, graph output, scratch files go there — never
   loose in the project root or elsewhere. Project files (code, Docker, README, .env) live where the project needs them.
 - **Agent files stay out of git.** `.aizen/`, agent config folders and `graphify-out/` are in `.gitignore`
   (`assets/gitignore-agent.txt`); `CLAUDE.md` / `AGENTS.md` are kept (team instructions).

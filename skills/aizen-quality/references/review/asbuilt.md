@@ -63,7 +63,7 @@ invisible and inherited.
 ## 3. Finding format
 
 ```markdown
-### A-1 · Blocker · `.aizen/docs/modules/order/order-design.md` §4.2 · Claim contradicted by code
+### A-1 · Blocker · `.aizen/knowledge/modules/order/order-design.md` §4.2 · Claim contradicted by code
 - **Problem:** the document states cancel is refused for SHIPPED orders [verified from code], but the
   guard checks `status !== DELIVERED` only — SHIPPED orders can be cancelled.
 - **Failure scenario:** a test suite written from this document asserts a 409 for SHIPPED and fails;

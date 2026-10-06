@@ -3,11 +3,26 @@ name: aizen-video-to-skill
 description: "Turn a video into a reusable agent skill. Takes a public YouTube link or a local video/audio file, extracts its spoken content (existing subtitles first, otherwise ffmpeg, mp3, then speech-to-text), then distills that content into a new, standards-compliant skill folder (SKILL.md + scripts + references) that any agent can use. Use this whenever the user shares a YouTube URL or a video/audio file and wants a skill, workflow, playbook, SOP, checklist or 'agent instructions' built from it, or says things like 'learn from this video', 'make a skill from this tutorial', 'turn this video into instructions for agents', even if they never say the word 'skill'. Not for: importing an existing skill from GitHub (aizen-skill-importer) or writing a skill from your own knowledge (aizen-skill-creator)."
 ---
 
-# aizen-video-to-skill — a skill from one video (v2)
+# aizen-video-to-skill — a skill from one video (v3)
 
 Converts the knowledge in one video into a new skill that other agents can load and follow. Two stages: **(A) get the transcript reliably**, then **(B) write a skill from it** following the standard skill layout.
 
 Why this is split into scripts + judgment: transcript extraction is deterministic and should be done by the bundled scripts (so every agent gets the same result); deciding what in a video is worth turning into instructions is judgment, so that part is yours.
+
+
+## Run contract (enforced by the guard)
+
+`<CORE_DIR>` = the aizen-core folder next to this skill. Step 1 starts the run: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-video-to-skill --goal "<what the skill should help with>" --output out/<name>/SKILL.md`; after the owner confirms the goal, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Publishing still needs the owner's yes (`python "<CORE_DIR>/scripts/core/guard.py" ask`).
+- Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
+  `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
+- The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
+  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+- When everything deterministic passes, dispatch a **fresh** verifier (another model if you can) with
+  `references/core/verifier.md` + the output of `python "<CORE_DIR>/scripts/core/guard.py" verify-brief --run <RUN>`. It writes `verdict.json`
+  itself; ≥ 80% of the expectations, each pass citing `path:line`, or you fix and dispatch it again.
+- Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
+  done and archives it.
 
 ## Ground rules (read first)
 

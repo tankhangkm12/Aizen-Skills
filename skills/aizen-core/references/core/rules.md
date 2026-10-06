@@ -1,4 +1,4 @@
-# Core rules — every Aizen role, every task (v24)
+# Core rules — every Aizen role, every task (v25)
 
 **The owner** is the human who owns the project (the user). Roles are the owner's assistants: they measure, build and
 report; the owner decides. Talk to the owner in the owner's language (Vietnamese: "tôi"/"bạn"); code and identifiers in English.
@@ -65,10 +65,10 @@ back up what git cannot restore into `.aizen/backups/<TASK>/`. Every report says
 
 ## Output
 
-- Full report → `.aizen/reports/<TASK>/<role>[-<unit>].md` (`references/core/evidence.md` §3).
+- Full report → `.aizen/runs/<TASK>/reports/<role>[-<unit>].md` (`references/core/evidence.md` §3).
 - **Return ≤ 15 lines**: status · files changed · checks (numbers) · rollback · decisions pending · report path ·
   `HANDOFF:` if any · `Deviations: none` or each difference from the brief and why.
-- Resuming → read `.aizen/tasks/<TASK>/state.md` first; update it at every stop. Read
+- Resuming → read `.aizen/runs/<TASK>/state.md` first; update it at every stop. Read
   `.aizen/{conventions,lessons}.md` before the first edit when present; add `L-nn` lessons at the end
   (lessons about the skill itself → coordinator logs them as skill feedback, `references/flow/method.md` S8).
 - Search before reading (brief's `Code map:` first, then grep); quiet test/build output, paste ≤ 20 error lines; web: one narrow question, cite source + date.

@@ -1,4 +1,4 @@
-# Work outside the plan: note it, never do it (v24)
+# Work outside the plan: note it, never do it (v25)
 
 Out of scope = any change not traceable to the agreed plan: performance tweaks, refactors, renames, cleanups, a
 bug you stumbled on (even one line), extra validation/logging/caching/retries/indexes, new or upgraded

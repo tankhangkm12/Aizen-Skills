@@ -1,4 +1,4 @@
-# Asking, options and research — how decisions reach the owner (v24)
+# Asking, options and research — how decisions reach the owner (v25)
 
 The owner decides; a role's job is to make each decision easy to get right: researched, compared on
 numbers, several real options, a recommendation kept separate — and asked as few times as possible.
@@ -115,5 +115,5 @@ access on this host → say so once and label version/behaviour claims `[unverif
 
 ## 8. Record
 
-Decisions go to `.aizen/docs/DECISIONS.md` as `D-nn` with: question · options compared (table or
+Decisions go to `.aizen/knowledge/decisions.md` as `D-nn` with: question · options compared (table or
 link) · chosen · decided by · date · sources · what would reopen it.

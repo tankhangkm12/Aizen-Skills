@@ -1,35 +1,58 @@
-# Workspace — where things live (v24)
+# Workspace — where things live (v25)
 
-Everything Aizen roles write lives under `.aizen/` at the workspace root (the project root unless
-`CLAUDE.md`/`AGENTS.md` names another). `.aizen/`, `.worktrees/` are local-only: add them to `.git/info/exclude`,
-never stage them.
+Everything an Aizen agent writes to do its work lives under `.aizen/` at the workspace root (the project root
+unless `CLAUDE.md`/`AGENTS.md` names another). The product itself (code, the notes a skill produces) lives where
+the owner wants it. `.aizen/` is local-only (`.git/info/exclude`, never staged) unless the owner sets
+`"share_knowledge": true` in `config/guard.json` — then `knowledge/` and `PROJECT.md` can be committed.
 
 ## 1. Layout
 
 ```
 .aizen/
-├── docs/
-│   ├── README.md · DECISIONS.md          index + status of each doc · D-nn decision log
-│   ├── system/                           system-map, idea, requirements, architecture, security, test-plan, infrastructure
-│   ├── modules/<module>/                 <module>-design.md (LLD) · <module>-database.md · <module>-api.md + .yaml
-│   └── apps/<app>/                       <app>-frontend.md · <app>-ui.md · design-tokens.json · ui-exports/
-├── plans/<TASK>.md                       the plan (planner)
-├── conventions.md                        one page: naming, patterns, commands — read before the first edit
-├── lessons.md                            L-nn lessons from past tasks
-├── tasks/<TASK>/state.md · run.json      written by scripts/flow/state.py — read first when resuming
-├── reports/<TASK>/
-│   ├── plan.md · dev-<unit>.md · test[-<unit>].md · review[-redteam].md · devops[-<unit>].md
-│   │                                     (exact name in each brief)
-│   ├── pr-body[-<unit>].md               Draft PR text for `gh pr create --body-file` (one per unit; the
-│   │                                     coordinator merges them into pr-body.md for the final PR)
-│   └── evidence[-<unit>].json            written by scripts/core/check.py (always in the main checkout)
-└── backups/<TASK>/                       DB dumps and copies taken before a change (git.md §4)
+├── PROJECT.md              👁 the project map — the one file the owner reads (compiled by scripts/core/project.py)
+├── backlog.md              ✍ work to come: BL-nn · skill · status · after · run (agents propose, the owner approves)
+├── config/
+│   ├── guard.json          require_task · share_knowledge
+│   └── conventions.md      one page: naming, patterns, commands — read before the first edit
+├── knowledge/              understanding the project — outlives every run
+│   ├── system/             overview · requirements · architecture · flows · data · infrastructure · security · test-plan
+│   ├── modules/<module>/   <module>-design.md (LLD) · <module>-database.md · <module>-api.md + .yaml
+│   ├── apps/<app>/         <app>-frontend.md · <app>-ui.md · design-tokens.json · ui-exports/
+│   ├── decisions.md        D-nn decision log
+│   └── lessons.md          L-nn lessons from past runs
+├── runs/<RUN>/             one run of one skill — read state.md first when resuming
+│   ├── run.json        🔒  skill, goal, status, backlog item, outputs, owner's decision, log
+│   ├── state.md            the human view (aizen-build: written by scripts/flow/state.py)
+│   ├── plan.md             the plan (aizen-build planner; any skill that plans)
+│   ├── sheet.md        ✍  steps the agent ticks with checkable evidence + the guard's checks
+│   ├── ledger.jsonl    🔒  every file write and command, with who did it (hooks)
+│   ├── waivers.json    🔒  steps waived, with reason and hashed evidence
+│   ├── evidence/       🔒  check.py results (<unit|main|int>.json) and rule results
+│   ├── reports/            role reports: dev-<unit>.md · test[-<lens>].md · review[-redteam].md · pr-body[-<unit>].md
+│   ├── verdict.json        the independent verifier's judgement
+│   └── work/               intermediate files of the run
+├── worktrees/<RUN>-<unit>/ git worktrees of parallel units
+├── cache/                  re-creatable: eval/<skill>/ (benchmarks), import/<name>/baseline/, prepush.json
+├── backups/<RUN>/          DB dumps and copies taken before a change (git.md §4)
+└── archive/<RUN>/          runs that finished (moved here by the guard)
 ```
 
-Microservices: `docs/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api.md` + `.yaml`, `<svc>-database.md`,
+🔒 written only by the Aizen scripts and hooks (an agent edit is denied) · ✍ filled by the agent, checked by the
+guard · 👁 read-only, compiled. `<RUN>` = the task id for aizen-build (`SHOP-42`), `<skill>-<yyyymmdd>-<slug>`
+for the others. The graphify code map stays in `graphify-out/` at the root (the tool decides that path).
+
+## Contract — how every run ends
+
+Every entry skill declares a `contract` in its `manifest.json` (`docs/aizen-skill-standard.md`); the guard
+(`scripts/core/guard.py`, run by the agent's Stop hook) holds the run to it: the sheet's evidence checks out,
+the deterministic rules pass, an independent verifier passes the expectations. Only then is the run `done`.
+Start: `guard.py start --skill <skill> --goal "…"` (aizen-build: `state.py init`). Owner needed:
+`guard.py ask`, then `guard.py go` with their answer.
+
+Microservices: `knowledge/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api.md` + `.yaml`, `<svc>-database.md`,
 `<svc>-infrastructure.md` and `modules/<module>/<module>-design.md`. Names are lower-kebab-case.
 
-## 2. Logical names → paths (under `.aizen/docs/`)
+## 2. Logical names → paths (under `.aizen/knowledge/`)
 
 | Logical name | Monolith | Microservices |
 |---|---|---|
@@ -40,7 +63,7 @@ Microservices: `docs/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api.md` 
 | frontend architecture · UI design | `apps/<app>/<app>-frontend.md` · `<app>-ui.md` | same |
 | infrastructure doc | `system/infrastructure.md` | `services/<svc>/<svc>-infrastructure.md` |
 
-An existing repo with its own docs folder keeps it; record the mapping in `.aizen/conventions.md`.
+An existing repo with its own docs folder keeps it; record the mapping in `.aizen/config/conventions.md`.
 
 ## 3. Priority when sources conflict
 
@@ -74,7 +97,7 @@ vendored rule that conflicts with a pack guide on substance → follow the pack 
 | `EP` · `THR` `CTL` | endpoint/event · threat, control | planner (design) |
 | `TC` `BUG` | test case, bug | tester |
 | `F` | review finding | reviewer |
-| `D` | decision | whoever records it in `DECISIONS.md` |
+| `D` | decision | whoever records it in `decisions.md` |
 | `U` `X` `R` | unknown, contradiction, risk in as-built docs | planner (discover) |
 | `L` | lesson | any role |
 

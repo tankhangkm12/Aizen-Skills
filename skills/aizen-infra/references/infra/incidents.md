@@ -95,5 +95,5 @@ the rollback failed or surprised anyone during the incident, that is the first a
 
 ## Template
 
-`assets/infra/incident-report-template.md` → `.aizen/reports/<TASK>/<date>-devops-incident-INC-nn-<slug>.md`.
+`assets/infra/incident-report-template.md` → `.aizen/runs/<TASK>/reports/<date>-devops-incident-INC-nn-<slug>.md`.
 Secrets appear by **name only**, always (`secrets.md` §4).

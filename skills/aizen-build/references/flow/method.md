@@ -1,7 +1,7 @@
-# Build flow — one flow for every task (v24)
+# Build flow — one flow for every task (v25)
 
 You are the main session. You run this flow, dispatch roles, merge branches and talk to the owner. Roles do the
-specialist work. State lives in `.aizen/tasks/<TASK>/`. Below, `state.py` means
+specialist work. State lives in `.aizen/runs/<TASK>/`. Below, `state.py` means
 `python "<SKILL_DIR>/scripts/flow/state.py"` and `graph.py` means `python "<CORE_DIR>/scripts/core/graph.py"`
 (`<SKILL_DIR>` = this skill's folder, `<CORE_DIR>` = the `aizen-core` folder next to it).
 
@@ -23,7 +23,7 @@ build that module yourself); tester and reviewer still run.
 ## S1 — Plan and design (1 × planner)
 
 Dispatch `planner` with `state.py brief --task <TASK> --role planner [--stage discover|design]`. It measures
-facts itself and writes `.aizen/plans/<TASK>.md` in the module shape (`references/plan/method.md`): scope,
+facts itself and writes `.aizen/runs/<TASK>/plan.md` in the module shape (`references/plan/method.md`): scope,
 then one block per **module** (= unit: behaviour, interface/contract, data, files/write set, tests, risk,
 options, open questions), then delivery (order, A3 actions, rollback). Risk modules (auth, money/stock/quota,
 tenants, schema/data migration, concurrency, public contract, CI/CD/IaC, live systems, secrets, destructive,
@@ -45,7 +45,7 @@ recommended option first; Antigravity: `ask_question`; otherwise one numbered me
 4. Every change the owner asks for goes into the plan (small: edit it yourself; structural: re-dispatch the planner
    with the owner's words as `--inputs`), then re-confirm **only that module**.
 5. **Approve** — "approve plan <TASK> (vN)?" → `state.py approve --task <TASK> --text "<the owner's words>"`.
-   It refuses while `scope`, `delivery` or any `## Module <id>` of `.aizen/plans/<TASK>.md` has no recorded answer
+   It refuses while `scope`, `delivery` or any `## Module <id>` of `.aizen/runs/<TASK>/plan.md` has no recorded answer
    — the rule "never skip a module" is enforced, not remembered.
 
 Never batch everything into one card, never skip a module, never start a writer before `approve`
@@ -53,7 +53,7 @@ Never batch everything into one card, never skip a module, never start a writer 
 
 ## S3 — Build (N × dev, one message per wave)
 
-- Per unit: `git worktree add .worktrees/<unit> -b feature/<TASK>-<unit> <base>`, its own ports and DB name.
+- Per unit: `git worktree add .aizen/worktrees/<TASK>-<unit> -b feature/<TASK>-<unit> <base>`, its own ports and DB name.
 - `state.py brief --task <TASK> --role dev --kind <be|fe|db|ui> --unit <unit> --sha <start SHA>
   --write-set "<globs>" --a3 "<approved A3 actions>"` → dispatch **all units of a wave in one message**. Infra
   units: `--role devops --unit <unit>`.
@@ -66,7 +66,7 @@ Never batch everything into one card, never skip a module, never start a writer 
 More than one unit → integration worktree, `int/<TASK>` from the base, `git merge --no-ff` each unit branch in
 plan order. Clean merge is yours. Conflict → `git merge --abort` and dispatch a `dev` with `UNIT=int` naming
 both branches and the agreed behaviour. Never resolve a conflict by hand. Then, in the `int/<TASK>` worktree:
-`check.py --task <TASK> --unit int` → `evidence-int.json` (the guard requires it PASS at the int tip).
+`check.py --task <TASK> --unit int` → `evidence/int.json` (the guard requires it PASS at the int tip).
 
 ## S5 — Test (1 × tester)
 
@@ -98,19 +98,21 @@ the simplest way to do an agreed thing — the roles decide and list under `Devi
 
 ## S8 — Finish (you)
 
-Merge the units' `pr-body-<unit>.md` into `.aizen/reports/<TASK>/pr-body.md`. Risk module that ships →
+Merge the units' `pr-body-<unit>.md` into `.aizen/runs/<TASK>/reports/pr-body.md`. Risk module that ships →
 add the release/rollback packet (`assets/infra/release-packet.md`). One summary: what changed per module, checks with
 numbers, verdict, open risks, `Deviations:`, and one copy-paste block:
 
 ```bash
 git push -u origin <branch>
-gh pr create --draft --base <target> --head <branch> --title "<title>" --body-file .aizen/reports/<TASK>/pr-body.md
+gh pr create --draft --base <target> --head <branch> --title "<title>" --body-file .aizen/runs/<TASK>/reports/pr-body.md
 ```
 
-Collect `L-nn` lessons into `.aizen/lessons.md`. A lesson about the skill itself (a step, brief, script or rule
+Collect `L-nn` lessons into `.aizen/knowledge/lessons.md`. A lesson about the skill itself (a step, brief, script or rule
 that was wrong or missing) also goes to the skill feedback log: `feedback.py log --skill aizen-build …`
-(`aizen-aizen-skill-creator/scripts/feedback.py`, see the repo's `continuous-improvement` rule). Then
-`state.py status --task <TASK> --set done`.
+(`aizen-skill-creator/scripts/authoring/feedback.py`, see the repo's `continuous-improvement` rule). Record in
+`.aizen/knowledge/` what this task changed: new `D-nn` in `decisions.md`, the module's design/API/data docs, a
+flow in `system/flows.md` — `.aizen/PROJECT.md` is compiled from them. Then `guard.py done --run <TASK>`
+(aizen-core): it checks the contract and marks the run done, or prints what is still open.
 
 ## Checks between steps
 

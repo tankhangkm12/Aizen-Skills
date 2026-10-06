@@ -1,7 +1,7 @@
 # <app> — frontend architecture
 
 > Sources: `requirements.md` §<n> · `<unit>-api.yaml` **version <v>** · design system: <name or none>
-> Decisions: `DECISIONS.md` D-<nn>, D-<nn> · Confidence: `[verified]` `[inferred]` `[unverified]`
+> Decisions: `decisions.md` D-<nn>, D-<nn> · Confidence: `[verified]` `[inferred]` `[unverified]`
 
 ## 1. Platform & strategy
 | Item | Decision | Why (requirement it serves) |

@@ -35,5 +35,6 @@ desktop.ini
 # graphify knowledge graph output
 graphify-out/
 
-# Skill work area (baselines, eval runs) — never inside skills/
+# Agent workspace (runs, eval runs, baselines, skill feedback) — never inside skills/
+.aizen/
 .aizen-work/

@@ -7,7 +7,7 @@
     python <SKILL_DIR>/scripts/authoring/feedback.py resolve --skill <id> --id <n> --commit <sha>
     python <SKILL_DIR>/scripts/authoring/feedback.py --selfcheck
 
-Entries are JSONL in <repo>/.aizen-work/feedback/<skill>.jsonl (local, git-ignored). `list` groups similar open
+Entries are JSONL in <repo>/.aizen/knowledge/feedback/<skill>.jsonl (local, git-ignored). `list` groups similar open
 entries so a problem seen twice is visible as `x2`. Repo = --repo, else found like new_skill.py.
 Exit code: 0 ok, 1 repo/entry not found, 2 usage error. Standard library only.
 """
@@ -27,7 +27,7 @@ KINDS = ("bug", "gap", "friction", "wrong-doc")
 
 
 def log_dir(repo: Path) -> Path:
-    return repo / ".aizen-work" / "feedback"
+    return repo / ".aizen" / "knowledge" / "feedback"
 
 
 def read(path: Path) -> list[dict]:

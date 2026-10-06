@@ -8,7 +8,7 @@
 Result:
   <repo>/skills/<name>/                     the copy: frontmatter name = <name>, nested SKILL.md renamed to guide.md,
                                             manifest.json with "source" (url, ref, license)
-  <repo>/.aizen-work/<name>/baseline/       the untouched original, for the A/B test (git-ignored, not installed)
+  <repo>/.aizen/cache/import/<name>/baseline/       the untouched original, for the A/B test (git-ignored, not installed)
 Never overwrites: an existing skills/<name> is refused. GITHUB_TOKEN (optional) raises the GitHub API rate limit.
 Exit code: 0 done, 1 refused or fetch failed, 2 usage error. Standard library only.
 """
@@ -109,7 +109,7 @@ def clone(source: str, name: str, repo: Path) -> tuple[Path, list[str]]:
             fetch_github(f"https://api.github.com/repos/{owner}/{rep}/contents/{path}?ref={ref}", stage)
         if not (stage / "SKILL.md").is_file():
             raise ValueError("no SKILL.md at the source root — point at the skill folder itself")
-        base = repo / ".aizen-work" / name / "baseline"
+        base = repo / ".aizen" / "cache" / "import" / name / "baseline"
         if base.exists():
             shutil.rmtree(base)  # our own scratch copy from an earlier run
         shutil.copytree(stage, base)
@@ -148,7 +148,7 @@ def main(argv=None) -> int:
     files = sum(1 for p in dest.rglob("*") if p.is_file())
     print(f"cloned {a.source} → {dest} ({files} files)")
     print("\n".join(f"  - {n}" for n in notes))
-    print(f"baseline: {repo / '.aizen-work' / a.name / 'baseline'}")
+    print(f"baseline: {repo / '.aizen' / 'cache' / 'import' / a.name / 'baseline'}")
     print("next: interview → customize → A/B test → docs rows → npm test → sync → commit")
     return 0
 
@@ -170,7 +170,7 @@ def _selfcheck() -> int:
         assert man["name"] == "pdf-reader" and man["source"]["license"] == "LICENSE.txt" and man["version"] == "1.0.0"
         assert man["kind"] == "entry" and not (dest / "rules").exists(), "no empty parts are added"
         assert not (dest / "scripts" / "__pycache__").exists()
-        assert "name: pdf\n" in (repo / ".aizen-work" / "pdf-reader" / "baseline" / "SKILL.md").read_text(encoding="utf-8")
+        assert "name: pdf\n" in (repo / ".aizen" / "cache" / "import" / "pdf-reader" / "baseline" / "SKILL.md").read_text(encoding="utf-8")
         for bad in ((str(src), "pdf-reader"), (str(Path(tmp) / "nope"), "x-y")):
             try:
                 clone(bad[0], bad[1], repo)

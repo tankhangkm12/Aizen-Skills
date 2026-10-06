@@ -86,6 +86,7 @@ for (const id of ids) {
     if (!docs.guide.includes(`\`${id}\``)) errors.push(`docs/huong-dan-su-dung.md: chưa nhắc tới \`${id}\``);
     if (!docs.prompts.includes(`/${id}`)) errors.push(`docs/prompt-mau.md: thiếu prompt mẫu /${id}`);
   }
+  if (m.kind === 'entry') checkContract(id, m.contract, errors);
   const major = String(m.version || '').split('.')[0];
 
   for (const f of walk(dir)) {
@@ -120,6 +121,36 @@ for (const id of ids) {
     if (!fs.existsSync(path.join(vdir, 'UPSTREAM.md'))) errors.push(`${vrel}: thiếu UPSTREAM.md`);
     if (!fs.readdirSync(vdir).some(n => /^LICEN[CS]E/i.test(n))) errors.push(`${vrel}: thiếu LICENSE của upstream`);
   }
+}
+
+// Hợp đồng chạy (docs/aizen-skill-standard.md §Contract): mọi entry skill khai báo, guard.py của aizen-core thi hành.
+function checkContract(id, c, errors) {
+  const where = `${id}/manifest.json: contract`;
+  if (!c || typeof c !== 'object') return errors.push(`${where} thiếu — entry skill phải khai báo (hoặc {"mode": "none"})`);
+  if (c.mode === 'none') return;
+  const EVIDENCE = ['file', 'cmd', 'sha', 'out', 'url'];
+  const RULES = ['count', 'per_block', 'labels', 'sections', 'regex', 'command', 'approved', 'evidence', 'report', 'scope', 'knowledge'];
+  const ids = new Set();
+  for (const st of c.steps || []) {
+    if (!st.id) errors.push(`${where}.steps: bước thiếu id`);
+    if (ids.has(st.id)) errors.push(`${where}: id trùng ${st.id}`);
+    ids.add(st.id);
+    for (const e of st.evidence || []) if (!EVIDENCE.includes(e)) errors.push(`${where}.steps.${st.id}: evidence "${e}" không hợp lệ`);
+  }
+  for (const r of c.rules || []) {
+    if (!r.id) errors.push(`${where}.rules: luật thiếu id`);
+    if (!RULES.includes(r.type)) errors.push(`${where}.rules.${r.id}: type "${r.type}" không hợp lệ`);
+    if (ids.has(r.id)) errors.push(`${where}: id trùng ${r.id}`);
+    ids.add(r.id);
+    if (r.type === 'command' && !r.run) errors.push(`${where}.rules.${r.id}: command thiếu run`);
+  }
+  const v = c.verifier || {};
+  if (v.required !== false) {
+    const ex = c.expectations || [];
+    if (!ex.length) errors.push(`${where}: verifier bắt buộc nhưng không có expectations`);
+    for (const e of ex) if (!e.id || !e.text) errors.push(`${where}.expectations: mỗi tiêu chí cần id + text`);
+  }
+  if (!Array.isArray(c.outputs)) errors.push(`${where}.outputs phải là mảng (có thể rỗng)`);
 }
 
 // vendor.lock.json khớp các thư mục vendor/ đang có.

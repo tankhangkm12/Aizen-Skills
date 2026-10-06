@@ -1,4 +1,4 @@
-# Running the owner on Claude Code (v24)
+# Running the owner on Claude Code (v25)
 
 ## Dispatch
 

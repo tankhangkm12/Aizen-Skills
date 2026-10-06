@@ -31,7 +31,7 @@ Used by `dev` with `KIND=be`.
 - **D5 Verify per id.** Happy path, each documented error case, the permission case: request → response →
   expected, in the report.
 - **D6 Hand off.** the quality-gate command from the brief; PR text from `assets/core/pr-draft-template.md` (with the
-  Rollback block) → `.aizen/reports/<TASK>/pr-body-<unit>.md`; report + push/PR commands for the owner.
+  Rollback block) → `.aizen/runs/<TASK>/reports/pr-body-<unit>.md`; report + push/PR commands for the owner.
 
 ## Guides (load only what the change touches)
 

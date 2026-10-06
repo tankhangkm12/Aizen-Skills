@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate for aizen-init: may step N start?
 
-Checks that every earlier step left its report in .aizen/init/reports/step-<k>.md with `Status: done` (or
+Checks that every earlier step left its report in .aizen/runs/init/reports/step-<k>.md with `Status: done` (or
 `Status: skipped` + `Skip-approved-by: user`), that checkpoint steps (1, 5, 9, 10) carry `Approved: yes`, and
 that the files each earlier step must produce exist. `gate.py 11` = everything is ready for handover.
 Exit code: 0 may start, 1 blocked (prints why), 2 usage error. Standard library only.
@@ -35,14 +35,14 @@ def _branch(p: Path, name: str) -> bool:
 ARTIFACTS = {
     0: [(".git/ exists", lambda p: (p / ".git").is_dir()),
         ("branch develop exists", lambda p: _branch(p, "develop"))],
-    1: [(".aizen/init/plans/plan.md", lambda p: (p / ".aizen/init/plans/plan.md").is_file())],
+    1: [(".aizen/runs/init/plans/plan.md", lambda p: (p / ".aizen/runs/init/plans/plan.md").is_file())],
     3: [("Dockerfile", lambda p: _any(p, "Dockerfile")),
         ("docker-compose.yml / compose.yaml", lambda p: _any(p, "docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"))],
     4: [(".env.example", lambda p: (p / ".env.example").is_file()),
         (".env", lambda p: (p / ".env").is_file()),
         (".env in .gitignore", lambda p: _ignored(p, ".env"))],
     8: [("README.md", lambda p: (p / "README.md").is_file())],
-    9: [(".aizen/init/graphify/ not empty", lambda p: any((p / ".aizen/init/graphify").glob("*")))],
+    9: [(".aizen/runs/init/graphify/ not empty", lambda p: any((p / ".aizen/runs/init/graphify").glob("*")))],
 }
 
 
@@ -53,12 +53,12 @@ def field(text: str, name: str) -> str:
 
 def blockers(project: Path, step: int) -> list[str]:
     out = []
-    if not (project / ".aizen/init/inputs.md").is_file():
+    if not (project / ".aizen/runs/init/inputs.md").is_file():
         out.append("inputs not checked: run check_inputs.py first")
     if not _ignored(project, ".aizen/"):
         out.append(".aizen/ not in .gitignore")
     for k in range(step):
-        rep = project / ".aizen/init/reports" / f"step-{k}.md"
+        rep = project / ".aizen/runs/init/reports" / f"step-{k}.md"
         if not rep.is_file():
             out.append(f"step {k}: report {rep.relative_to(project).as_posix()} missing")
             continue
@@ -82,23 +82,23 @@ def blockers(project: Path, step: int) -> list[str]:
 def selfcheck() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         p = Path(tmp)
-        (p / ".aizen/init/reports").mkdir(parents=True)
-        (p / ".aizen/init/plans").mkdir()
-        (p / ".aizen/init/graphify").mkdir()
+        (p / ".aizen/runs/init/reports").mkdir(parents=True)
+        (p / ".aizen/runs/init/plans").mkdir()
+        (p / ".aizen/runs/init/graphify").mkdir()
         assert len(blockers(p, 0)) == 2  # no inputs, no .gitignore
-        (p / ".aizen/init/inputs.md").write_text("x")
+        (p / ".aizen/runs/init/inputs.md").write_text("x")
         (p / ".gitignore").write_text(".aizen/\n.env\n")
         assert blockers(p, 0) == []
-        assert blockers(p, 1) == ["step 0: report .aizen/init/reports/step-0.md missing"]
+        assert blockers(p, 1) == ["step 0: report .aizen/runs/init/reports/step-0.md missing"]
         subprocess.run(["git", "init", "-q", "-b", "develop", str(p)], check=True)
         subprocess.run(["git", "-C", str(p), "-c", "user.email=a@b", "-c", "user.name=a",
                         "commit", "-q", "--allow-empty", "-m", "init"], check=True)
-        rep = lambda k, body: (p / f".aizen/init/reports/step-{k}.md").write_text(body)
+        rep = lambda k, body: (p / f".aizen/runs/init/reports/step-{k}.md").write_text(body)
         rep(0, "Status: done\n")
         assert blockers(p, 1) == []
         rep(1, "Status: done\nApproved: no\n")
         assert any("not approved" in b for b in blockers(p, 2))
-        (p / ".aizen/init/plans/plan.md").write_text("x")
+        (p / ".aizen/runs/init/plans/plan.md").write_text("x")
         rep(1, "Status: done\nApproved: yes\n")
         assert blockers(p, 2) == []
         rep(2, "Status: skipped\n")
@@ -110,7 +110,7 @@ def selfcheck() -> None:
         (p / "compose.yaml").write_text("x")
         for k in range(4, 11):
             rep(k, "Status: done\nApproved: yes\n")
-        for f in (".env.example", ".env", "README.md", ".aizen/init/graphify/GRAPH_REPORT.md"):
+        for f in (".env.example", ".env", "README.md", ".aizen/runs/init/graphify/GRAPH_REPORT.md"):
             (p / f).write_text("x")
         assert blockers(p, 11) == [], blockers(p, 11)
     print("gate selfcheck ok")

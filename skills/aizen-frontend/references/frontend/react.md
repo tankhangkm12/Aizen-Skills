@@ -1,7 +1,7 @@
 # Frontend — React / Next.js
 
 Read after `principles.md` (strict-type rules in §2 apply). Repo ESLint/Prettier/
-Tailwind config wins. State management, data fetching, UI kit, styling, router (Pages/App) from .aizen/docs/repo;
+Tailwind config wins. State management, data fetching, UI kit, styling, router (Pages/App) from .aizen/knowledge/repo;
 silent → ask (one question with researched options). Never add a library without approval.
 
 ## 1. Spec inputs

@@ -1,14 +1,26 @@
 ---
 name: aizen-skill-eval
-description: "Evaluate an agent skill against a baseline (v2) - trigger tests (explicit, implicit, guidance, negative controls), runs with and without the skill or old vs new version by independent runners, LLM-as-a-judge grading on Outcome, Process, Style and Efficiency, an A/B comparator for customizations, and benchmark aggregation. Use when validating, benchmarking or regression-testing a skill, building an eval set, or proving a change made a skill better (đánh giá skill, test skill, benchmark skill, so sánh skill cũ và mới). Not for: writing or changing a skill (aizen-skill-creator) or importing one (aizen-skill-importer) — those call this skill for their eval step."
+description: "Evaluate an agent skill against a baseline (v3) - trigger tests (explicit, implicit, guidance, negative controls), runs with and without the skill or old vs new version by independent runners, LLM-as-a-judge grading on Outcome, Process, Style and Efficiency, an A/B comparator for customizations, and benchmark aggregation. Use when validating, benchmarking or regression-testing a skill, building an eval set, or proving a change made a skill better (đánh giá skill, test skill, benchmark skill, so sánh skill cũ và mới). Not for: writing or changing a skill (aizen-skill-creator) or importing one (aizen-skill-importer) — those call this skill for their eval step."
 ---
 
-# aizen-skill-eval — prove a skill helps, with numbers (v2)
+# aizen-skill-eval — prove a skill helps, with numbers (v3)
 
 The one place for skill evaluation in Aizen. `aizen-skill-creator` and `aizen-skill-importer` use these roles
 and scripts for their eval / A/B steps; you can also run it alone on any skill.
 
 **Read first:** `references/core/rules.md` (aizen-core); the eval JSON formats in `references/eval/schemas.md`.
+
+
+## Run contract (enforced by the guard)
+
+`<CORE_DIR>` = the aizen-core folder next to this skill. Start: `python "<CORE_DIR>/scripts/core/guard.py" start --skill aizen-skill-eval --goal "evaluate <skill>"`; after the owner confirms the success criteria, `python "<CORE_DIR>/scripts/core/guard.py" go --run <RUN> --text "…"`. Graders follow `references/core/verifier.md` (aizen-core) — the same judge the guard uses.
+- Fill `.aizen/runs/<RUN>/sheet.md` as you go: tick a step only with evidence the guard can check —
+  `file:<path>` · `cmd:<the command you ran>` · `out:"<a line it printed>"` · `sha:<commit>` · `url:<source cited in the output>`.
+- The Stop hook runs the contract (`manifest.json` → `contract`): open items → you continue with the exact list.
+  `python "<CORE_DIR>/scripts/core/guard.py" check --run <RUN>` shows it any time. A step that truly does not apply:
+  `python "<CORE_DIR>/scripts/core/guard.py" waive --run <RUN> --step <id> --reason "…" --evidence <file | real output>`.
+- Never write `run.json`, the ledger, waivers or evidence yourself, and never say "done" — the guard marks the run
+  done and archives it.
 
 ## Workflow
 
@@ -19,7 +31,7 @@ and scripts for their eval / A/B steps; you can also run it alone on any skill.
    explicit trigger (names the skill), implicit trigger (describes the goal), guidance request, and a **negative
    control** that shares keywords but must not trigger it (name the skill that owns it). Each case: `id`,
    `prompt`, `should_trigger`, `expected_output`, checkable `expectations`.
-3. **Runs.** Workspace `<REPO>/.aizen-work/<name>/iteration-<N>/eval-<id>/{with_skill,baseline}/run-<k>/`. Dispatch
+3. **Runs.** Workspace `<REPO>/.aizen/cache/eval/<name>/iteration-<N>/eval-<id>/{with_skill,baseline}/run-<k>/`. Dispatch
    all runs in one message (Claude Code: Agent tool, `general-purpose`; Antigravity: `invoke_subagent`), each with
    `references/eval/runner.md` and its `mode`. No sub-agent tool → run them yourself in turn and label the
    result `[not independent]`.

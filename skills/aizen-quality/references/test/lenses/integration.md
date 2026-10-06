@@ -29,7 +29,7 @@ Own compose project `docker compose -p <TASK>-test-integration`, own DB `<db>_te
 ports from RUNTIME. Tear down containers and volumes you started before reporting.
 
 ## Report
-`.aizen/reports/<TASK>/test-integration.md`: contract version tested, dependencies and their versions,
+`.aizen/runs/<TASK>/reports/test-integration.md`: contract version tested, dependencies and their versions,
 the table `endpoint/event · cases · result`, and the BUG table (`BUG-integration-nn`).
 
 ## Never

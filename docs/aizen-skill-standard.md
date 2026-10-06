@@ -93,6 +93,41 @@ description: <xem §4>
 - `topics`: chỉ khi skill sở hữu kiến thức/template/script mà skill khác dùng. `requires`: các skill phải cài cạnh nó.
 - Skill chép nguyên từ nơi khác thêm `"source": {"url": "...", "ref": "<branch|commit>", "license": "<tên>"}`.
 
+## 5b. `contract` — hợp đồng chạy (bắt buộc với entry)
+
+Mọi entry skill khai báo `contract` trong `manifest.json`; `skills/aizen-core/scripts/core/guard.py` thi hành nó
+cho mọi agent (hook Stop/PreToolUse/PostToolUse + git pre-push). Luật mặc định nằm ở
+`skills/aizen-core/assets/core/contract.default.json` (nhãn claim, `claims-labelled`, verifier 80% / 2 vòng);
+skill chỉ ghi đè theo `id` hoặc khóa. Skill không xuất file: `"contract": {"mode": "none"}`.
+
+```json
+"contract": {
+  "outputs": ["tech-tree/*.md"],
+  "steps": [
+    {"id": "sources", "evidence": ["url", "file"], "hint": "…"},
+    {"id": "publish", "evidence": ["url"], "waivable": true}
+  ],
+  "rules": [
+    {"id": "tree", "type": "command", "run": "python3 \"{skill_dir}/scripts/check_tree.py\" \"{output}\""},
+    {"id": "diagram-size", "type": "per_block", "what": "mermaid_nodes", "max": 15}
+  ],
+  "expectations": [{"id": "E1", "text": "…"}],
+  "verifier": {"required": true, "threshold": 0.8}
+}
+```
+
+| Khóa | Ý nghĩa |
+|---|---|
+| `outputs` | glob file đầu ra (`{run}` = mã run); `guard.py start --output` ghi đè |
+| `steps` | hàng của `sheet.md` agent tích; `evidence` ⊂ `file` `cmd` `sha` `out` `url`; `waivable`, `hint`, `when: "finish"` |
+| `rules` | `count` (`what: mermaid` hoặc `pattern`, `min`/`max`) · `per_block` (`mermaid_nodes` / `caption_lines`, `max`) · `labels` · `sections` (`names`) · `regex` (`pattern`, `must`) · `command` (`run` với `{skill_dir}` `{core_dir}` `{ws}` `{run}` `{output}` `{output_dir}`, exit 0 = đạt) · aizen-build: `approved` `evidence` `report` `scope` `knowledge` |
+| `expectations` | tiêu chí verifier độc lập chấm, mỗi mục `id` + `text` |
+| `verifier` | `required`, `threshold`, `rounds` |
+
+SKILL.md của entry có mục "Run contract": bắt đầu bằng `guard.py start` (aizen-build: `state.py init`), cần owner thì
+`ask`/`go`, tích `sheet.md`, dispatch verifier (`references/core/verifier.md`), không bao giờ tự nói "xong".
+`npm test` từ chối entry skill thiếu `contract` hợp lệ.
+
 ## 6. Kiến thức vendored (đứng trên vai người khổng lồ)
 
 Best practice của đội làm ra công cụ được chép **nguyên văn** vào `references/<topic>/vendor/<nguồn>/` của pack phù hợp.
@@ -141,5 +176,5 @@ git commit -m "feat(<name>): <mô tả>"
 ```
 
 `git push` chỉ khi người dùng đồng ý rõ ràng cho lần push đó; nếu không, in sẵn lệnh để họ tự chạy.
-Thư mục làm việc tạm (baseline, kết quả eval) nằm ở `.aizen-work/` (đã git-ignore), không bao giờ trong `skills/`
+Thư mục làm việc tạm (baseline, kết quả eval) nằm ở `.aizen/cache/` (đã git-ignore), không bao giờ trong `skills/`
 — mọi thư mục trong `skills/` đều bị cài như một skill.

@@ -1,4 +1,4 @@
-# Project conventions page — `.aizen/conventions.md`
+# Project conventions page — `.aizen/config/conventions.md`
 
 One page (≤ 80 lines) every role reads before its first edit. It saves each role from re-surveying the repo and
 keeps new code looking like the old code. Derived from the code, never invented; each line cites where it was seen.

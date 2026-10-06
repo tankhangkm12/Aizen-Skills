@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""state.py — task state and briefs for the aizen-build coordinator (v24).
+"""state.py — task state and briefs for the aizen-build coordinator (v25).
 
     S=<SKILL_DIR>/scripts/flow/state.py
     python $S init    --task SHOP-42 --goal "add coupon to checkout"
@@ -10,8 +10,8 @@
     python $S round  --task SHOP-42          # exit 3 past the fix-loop limit
     python $S status --task SHOP-42 [--set done]
 
-Files: <workspace>/.aizen/tasks/<TASK>/state.md (human-readable; a `## Notes` section you add is kept)
-and run.json (machine state). Workspace = --workspace or the current directory. Standard library only.
+Files: <workspace>/.aizen/runs/<TASK>/state.md (human-readable; a `## Notes` section you add is kept), run.json
+(machine state) and plan.md; the guard (aizen-core scripts/core/guard.py) marks the run done. Workspace = --workspace or the current directory. Standard library only.
 """
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ def now() -> str:
 
 
 def task_dir(ws: Path, task: str) -> Path:
-    return ws / ".aizen" / "tasks" / task
+    return ws / ".aizen" / "runs" / task
 
 
 def load(ws: Path, task: str) -> dict:
@@ -74,7 +74,7 @@ def save(ws: Path, task: str, run: dict) -> None:
           f"## Log\n{log}\n{notes}")
 
 
-LOCAL_ONLY = (".aizen/", ".worktrees/")
+LOCAL_ONLY = (".aizen/",)
 
 
 def exclude_local(ws: Path) -> list[str]:
@@ -96,13 +96,34 @@ def exclude_local(ws: Path) -> list[str]:
 
 
 def cmd_init(ws: Path, a) -> str:
-    if (task_dir(ws, a.task) / "run.json").exists():
+    if (task_dir(ws, a.task) / "run.json").exists() or (ws / ".aizen" / "archive" / a.task).exists():
         raise SystemExit(f"{a.task} exists — use `status`")
-    save(ws, a.task, {"task": a.task, "goal": a.goal, "status": "planning", "round": 0,
-                      "agreed": {}, "decision": None, "log": [f"{now()} init"]})
+    core = backlog_mod() if a.backlog else None
+    if core:
+        why = core.can_start(ws, a.backlog)
+        if why:
+            raise SystemExit(why)
+    save(ws, a.task, {"run": a.task, "skill": "aizen-build", "task": a.task, "goal": a.goal, "status": "planning",
+                      "round": 0, "agreed": {}, "decision": None, "outputs": [], "backlog": a.backlog,
+                      "created": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "log": [f"{now()} init"]})
+    if core:
+        core.set_backlog(ws, a.backlog, "doing", a.task)
     added = exclude_local(ws)
     note = f" · .git/info/exclude += {', '.join(added)}" if added else ""
     return f"created {task_dir(ws, a.task) / 'state.md'}{note}"
+
+
+def backlog_mod():
+    """aizen-core's project.py (owns .aizen/backlog.md), found through the installed packs."""
+    import importlib.util
+    core = topic_dirs().get("core")
+    if not core:
+        raise SystemExit("aizen-core is not installed next to this skill — run `node bin/cli.js sync`")
+    sys.path.insert(0, str(core / "scripts" / "core"))
+    spec = importlib.util.spec_from_file_location("project", core / "scripts" / "core" / "project.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def cmd_answer(ws: Path, a) -> str:
@@ -117,8 +138,8 @@ MODULE = re.compile(r"^## Module\s+`?([A-Za-z0-9._-]+)`?", re.M)
 
 
 def plan_modules(ws: Path, task: str) -> list[str] | None:
-    """Module ids of .aizen/plans/<TASK>.md, retired ones (~~id~~) excluded; None when there is no plan file."""
-    p = ws / ".aizen" / "plans" / f"{task}.md"
+    """Module ids of .aizen/runs/<TASK>/plan.md, retired ones (~~id~~) excluded; None when there is no plan file."""
+    p = task_dir(ws, task) / "plan.md"
     if not p.is_file():
         return None
     return MODULE.findall(p.read_text(encoding="utf-8"))
@@ -131,7 +152,7 @@ def cmd_approve(ws: Path, a) -> str:
         raise SystemExit("nothing agreed yet — confirm each module with `answer --module` first")
     modules = plan_modules(ws, a.task)
     if modules is None:
-        raise SystemExit(f"no plan at .aizen/plans/{a.task}.md — the planner writes it before approval")
+        raise SystemExit(f"no plan at .aizen/runs/{a.task}/plan.md — the planner writes it before approval")
     missing = [m for m in ["scope", *modules, "delivery"] if m not in agreed]
     if missing:
         raise SystemExit("not confirmed with the owner yet: " + ", ".join(missing)
@@ -156,6 +177,9 @@ def cmd_round(ws: Path, a) -> str:
 
 def cmd_status(ws: Path, a) -> str:
     run = load(ws, a.task)
+    if a.set == "done":
+        raise SystemExit("the guard marks a run done when every check passes: "
+                         "python <CORE_DIR>/scripts/core/guard.py done --run " + a.task)
     if a.set and a.set != run["status"]:
         run["log"].append(f"{now()} status {run['status']} → {a.set}")
         run["status"] = a.set
@@ -230,17 +254,17 @@ def cmd_brief(ws: Path, a) -> str:
     unit = a.unit or "-"
     lens = a.lens or "-"
     writer = a.role in ("dev", "devops") and a.unit
-    worktree = a.worktree or (f".worktrees/{unit}" if writer else "")
+    worktree = a.worktree or (f".aizen/worktrees/{a.task}-{unit}" if writer else "")
     workdir = (root / worktree).as_posix() if worktree else "read-only (project root)"
     suffix = unit if a.unit else ("redteam" if "redteam" in lens else "")
     report = REPORT[a.role] + (f"-{suffix}" if suffix else "") + ".md"
     if a.role == "dev":
-        report += f" · PR body: .aizen/reports/{a.task}/pr-body-{unit}.md"
+        report += f" · PR body: .aizen/runs/{a.task}/reports/pr-body-{unit}.md"
     if a.role == "reviewer":
         report += " · READ-ONLY: no edits, commits or pushes"
     inputs = a.inputs or "-"
     if run["round"] and a.role in ("dev", "reviewer", "tester"):
-        inputs += f"\nRound {run['round']}: fix/re-check only the open finding ids in .aizen/reports/{a.task}/review*.md"
+        inputs += f"\nRound {run['round']}: fix/re-check only the open finding ids in .aizen/runs/{a.task}/reports/review*.md"
     fields = {
         "TASK": a.task, "ROLE": a.role, "KIND": a.kind, "UNIT": unit, "STAGE": a.stage, "LENS": lens,
         "ROUND": str(run["round"]), "GOAL": run["goal"],
@@ -253,7 +277,7 @@ def cmd_brief(ws: Path, a) -> str:
         "BRANCH": a.branch or (f"feature/{a.task}-{unit}" if writer else f"int/{a.task}" if a.role in ("tester", "reviewer")
                                else "(none)"),
         "SHA": a.sha or "(record the start SHA yourself: git rev-parse HEAD)",
-        "WRITE_SET": a.write_set or {"planner": ".aizen/plans/**, .aizen/docs/**, .aizen/reports/" + a.task + "/**",
+        "WRITE_SET": a.write_set or {"planner": f".aizen/runs/{a.task}/plan.md, .aizen/knowledge/**, .aizen/runs/{a.task}/reports/**",
                                      "reviewer": "none (read-only)"}.get(a.role, "the unit's paths in the plan — nothing outside"),
         "PORTS": a.ports or "pick a free range of 10 and record it in your report",
         "DB": re.sub(r"[^a-z0-9]+", "_", f"{a.task}_{unit}".lower()).strip("_"),
@@ -285,6 +309,7 @@ def main(argv=None) -> int:
         p.add_argument("--task", required=True)
         p.add_argument("--workspace", default=".")
     ps["init"].add_argument("--goal", required=True)
+    ps["init"].add_argument("--backlog", help="the approved backlog item this run implements (BL-nn)")
     b = ps["brief"]
     b.add_argument("--role", choices=ROLES, required=True)
     b.add_argument("--kind", choices=KINDS, default="-")
@@ -295,7 +320,7 @@ def main(argv=None) -> int:
     b.add_argument("--done", help="checkable done criterion")
     b.add_argument("--sha", help="start / pinned SHA")
     b.add_argument("--branch", help="default feature/<TASK>-<unit> for writers, int/<TASK> for tester/reviewer")
-    b.add_argument("--worktree", help="relative to the project root (default .worktrees/<unit> for writers)")
+    b.add_argument("--worktree", help="relative to the project root (default .aizen/worktrees/<TASK>-<unit> for writers)")
     b.add_argument("--write-set", dest="write_set", help="path globs this instance may write")
     b.add_argument("--ports", help="port range, e.g. 4100-4109")
     b.add_argument("--inputs", help="docs, contract version, finding ids, earlier reports")
@@ -340,7 +365,7 @@ def _selfcheck() -> None:
         expect_exit(["init", *w, "--goal", "g"], "exists")
         import subprocess
         if subprocess.run(["git", "init", "-q", tmp], capture_output=True).returncode == 0:
-            assert exclude_local(Path(tmp)) == [".aizen/", ".worktrees/"] and exclude_local(Path(tmp)) == []
+            assert exclude_local(Path(tmp)) == [".aizen/"] and exclude_local(Path(tmp)) == []
             assert ".aizen/" in Path(tmp, ".git", "info", "exclude").read_text(encoding="utf-8")
         expect_exit(["init", "--workspace", tmp, "--task", "../x", "--goal", "g"], "invalid id")
         expect_exit(["brief", *w, "--role", "dev", "--kind", "be", "--unit", "u1"], "not approved")
@@ -349,14 +374,13 @@ def _selfcheck() -> None:
         out = brief("--role", "planner", "--stage", "design")
         assert "STAGE=design" in out and "{{" not in out and "<" not in out.split("## Task")[1], out
         # roles' notes survive state.py rewrites
-        sm = Path(tmp, ".aizen", "tasks", "T-1", "state.md")
+        sm = Path(tmp, ".aizen", "runs", "T-1", "state.md")
         sm.write_text(sm.read_text(encoding="utf-8") + "- planner: keep v1 endpoint\n", encoding="utf-8")
         with contextlib.redirect_stdout(io.StringIO()):
             main(["answer", *w, "--module", "api", "--text", "B"])
         expect_exit(["brief", *w, "--role", "tester"], "not approved")
         expect_exit(["approve", *w], "no plan")
-        plan = Path(tmp, ".aizen", "plans", "T-1.md")
-        plan.parent.mkdir(parents=True)
+        plan = Path(tmp, ".aizen", "runs", "T-1", "plan.md")
         plan.write_text("# T-1\n## Scope\n## Module api — API\n## Module ~~old~~ replaced by api\n"
                         "## Module `ui` — screen\n## Delivery\n", encoding="utf-8")
         expect_exit(["approve", *w], "scope, ui, delivery")  # every part confirmed before approval
@@ -377,7 +401,7 @@ def _selfcheck() -> None:
         assert "/scripts/core/check.py" in d1 and "aizen-core" in d1, "quality gate must come from aizen-core"
         assert "Optional tools: archify" in d1, "brief names the optional community skills"
         assert "{eval}" not in d1 and "{authoring}" not in d1, "brief lists only the packs aizen-build requires"
-        assert "feature/T-1-u1" in d1 and ".worktrees/u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
+        assert "feature/T-1-u1" in d1 and ".aizen/worktrees/T-1-u1" in d1 and "dev-u2.md" in d2 and "\\" not in d1
         r2 = brief("--role", "reviewer", "--lens", "redteam")
         assert "review-redteam.md" in r2 and "READ-ONLY" in r2
         assert "Code map (ask before reading files): none" in r2

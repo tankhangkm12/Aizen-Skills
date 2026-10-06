@@ -6,6 +6,5 @@
 .windsurf/
 .gemini/
 .codex/
-.aizen-work/
 graphify-out/
 .env

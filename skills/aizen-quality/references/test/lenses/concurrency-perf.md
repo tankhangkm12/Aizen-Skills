@@ -30,7 +30,7 @@ Local and disposable only: own compose project `-p <TASK>-test-cperf`, own DB, o
 staging load run is A3 (the owner's yes, per run). Say the machine (cores, RAM) with every number.
 
 ## Report
-`.aizen/reports/<TASK>/test-concurrency-perf.md`: table `scenario · target · measured p95 · rps ·
+`.aizen/runs/<TASK>/reports/test-concurrency-perf.md`: table `scenario · target · measured p95 · rps ·
 errors · projected · verdict`, race table `operation · actors × runs · invariant held`, BUG table
 (`BUG-concurrency-perf-nn`).
 

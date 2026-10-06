@@ -24,7 +24,7 @@ Dev manual-verification notes and current behaviour are hints, never the oracle.
 
 Every error code in LLD/API has ≥ 1 case triggering it. Every endpoint has happy + invalid + forbidden.
 
-## 3. Test-case catalog `.aizen/reports/<TASK>/test-cases-<service>.md`
+## 3. Test-case catalog `.aizen/runs/<TASK>/reports/test-cases-<service>.md`
 ```markdown
 # Test cases — <TASK> — <service>
 > Sources: <doc paths + versions> · Updated: <date> · Levels: <unit|integration|api|e2e|perf|security|manual>

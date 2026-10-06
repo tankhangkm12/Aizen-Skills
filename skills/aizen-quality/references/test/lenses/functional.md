@@ -27,7 +27,7 @@ SRS `AC-nn` (Given/When/Then) · `BR-nn` · LLD flows, state machines and error-
 Unit level needs none. API level: own app port and own test DB from the brief's RUNTIME block.
 
 ## Report
-`.aizen/reports/<TASK>/test-functional.md` with the coverage table `ID · TCs · automated · result`,
+`.aizen/runs/<TASK>/reports/test-functional.md` with the coverage table `ID · TCs · automated · result`,
 uncovered IDs with the reason, and the BUG table (`BUG-functional-nn`).
 
 ## Never

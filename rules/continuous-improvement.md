@@ -4,7 +4,7 @@
 sửa có kiểm chứng (baseline + eval), không sửa vội theo một trường hợp.
 
 `FB` = `python "<aizen-skill-creator>/scripts/authoring/feedback.py"` (`<aizen-skill-creator>` = thư mục skill `aizen-skill-creator` đã cài,
-vd. `~/.claude/skills/aizen-skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen-work/feedback/<skill>.jsonl`.
+vd. `~/.claude/skills/aizen-skill-creator`). Sổ nằm ở `<repo Aizen-Skills>/.aizen/knowledge/feedback/<skill>.jsonl`.
 
 ## Khi nào kích hoạt — chỉ khi có tín hiệu
 

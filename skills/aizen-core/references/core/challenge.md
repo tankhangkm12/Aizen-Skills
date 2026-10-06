@@ -1,4 +1,4 @@
-# Challenge — where a second viewpoint pays (v24)
+# Challenge — where a second viewpoint pays (v25)
 
 A tool, not ceremony. Challenge only the uncertain or consequential parts. Risk modules (money/stock/quota,
 state machines, several actors on one record, races, external calls failing midway, irreversible actions, public

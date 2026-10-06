@@ -3,7 +3,7 @@
 
 # Style guide `redesign` — audit an existing UI for generic patterns and upgrade it without breaking behaviour
 
-Used only when the project's chosen style (`.aizen/conventions.md` → `ui.style`) is `redesign`.
+Used only when the project's chosen style (`.aizen/config/conventions.md` → `ui.style`) is `redesign`.
 
 > **The owner overrides win over everything below** — `references/frontend/method.md` §Style overrides.
 

@@ -1,4 +1,4 @@
-# Risk modules — exact enough to approve line by line (v24)
+# Risk modules — exact enough to approve line by line (v25)
 
 The module shape (`method.md`) plus the detail the owner needs to approve a high-risk module (auth, money/stock/quota,
 tenants, schema/data migration, concurrency, public contract, CI/CD/IaC, live systems, secrets, destructive,
@@ -9,7 +9,7 @@ Template: `assets/plan/plan-template.md`.
 
 | Field | Rule |
 |---|---|
-| Unit | `id · kind be|fe|db|ui` (dev) or `infra` (devops) · branch `feature/<TASK>-<unit>` · worktree `.worktrees/<unit>` |
+| Unit | `id · kind be|fe|db|ui` (dev) or `infra` (devops) · branch `feature/<TASK>-<unit>` · worktree `.aizen/worktrees/<TASK>-<unit>` |
 | Covers | requirement / finding ids, doc sections |
 | Write set | exact paths or `dir/**` — becomes `--write-set` in the brief; anything outside → stop (`BLOCKED`) |
 | Commands | every command the unit runs (tests, builds, local services); anything else is A3 |

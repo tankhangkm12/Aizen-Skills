@@ -1,4 +1,4 @@
-# Idea, feasibility, scope → `.aizen/docs/system/idea.md`
+# Idea, feasibility, scope → `.aizen/knowledge/system/idea.md`
 
 Goal: from a one-line idea, settle **what is built for whom, whether it is worth it, and exactly what
 version 1 contains**. The point is to avoid building the wrong thing.
@@ -61,7 +61,7 @@ out-of-scope row has a concrete reason and "revisit when".
 
 ## Step 4 — Write
 
-Template `assets/discover/idea.md`. Record decisions in `DECISIONS.md`.
+Template `assets/discover/idea.md`. Record decisions in `decisions.md`.
 
 ## Exit gate
 

@@ -1,8 +1,8 @@
 # Infrastructure — <system or service>
 
 > Task: <TASK> · Owner: `devops` · Updated: <YYYY-MM-DD> · Status: DRAFT | APPROVED
-> Sources: `.aizen/docs/system/architecture.md` §7 (infrastructure components), §10 (environments + delivery expectations),
-> §11 (NFR mechanisms) · `.aizen/plans/<TASK>.md` (infra unit)
+> Sources: `.aizen/knowledge/system/architecture.md` §7 (infrastructure components), §10 (environments + delivery expectations),
+> §11 (NFR mechanisms) · `.aizen/runs/<TASK>/plan.md` (infra unit)
 > Every resource, environment and alert below traces to one of: a flow in the HLD, an `NFR-nn`, an
 > `ENV-nn` the owner approved, or an `INC-nn` follow-up. Anything tracing to nothing is a question, not a row.
 > Confidence: `[verified]` = read from the live system this session · `[inferred]` · `[unverified]`
@@ -96,4 +96,4 @@ until it is resolved.
 
 ## 11. Decisions
 
-Recorded in `.aizen/docs/DECISIONS.md` as `D-nn`; listed here with dates and who decided.
+Recorded in `.aizen/knowledge/decisions.md` as `D-nn`; listed here with dates and who decided.
