@@ -13,6 +13,8 @@ npx skills add tankhangkm12/Aizen-Skills -a antigravity -s '*' -y   # chỉ dự
 uv run .agents/skills/aizen-core/scripts/core/guard.py install      # hook, pre-push, session rules, .aizen/
 ```
 
+Chỉ dùng Claude Code: `-a claude-code`, và bước setup dùng `.claude/skills/…/guard.py` thay cho `.agents/skills/…`.
+
 Mở **session mới** của agent. Kiểm tra: gõ `/aizen-build`, hoặc hỏi "liệt kê các skill bạn có", và xem
 `.agents/hooks.json` có lệnh `uv run --script …guard.py hook …`. Cập nhật: `npx skills update` rồi chạy lại `guard.py install`.
 

@@ -47,6 +47,8 @@ uv run .agents/skills/aizen-core/scripts/core/guard.py install         # hook, g
 
 - `-a antigravity` → `./.agents/skills/`; thêm agent khác bằng `-a antigravity claude-code` (Claude Code →
   `./.claude/skills/`). Không có `-g` nên **chỉ dự án này** thấy Aizen.
+- **Chỉ cài cho Claude Code** (`-a claude-code`): skill nằm ở `.claude/skills/`, nên bước setup là
+  `uv run .claude/skills/aizen-core/scripts/core/guard.py install`.
 - Bước `guard.py install` ghi hook dạng `uv run --script "<dự án>/.agents/skills/aizen-core/…/guard.py" hook …` vào
   `.agents/hooks.json` (Antigravity), `.claude/settings.local.json` (Claude Code) và `.git/hooks/pre-push`; chép luật
   phiên làm việc vào `.agents/rules/` (front-matter `trigger: always_on`) và `.claude/rules/`. Quên bước này cũng
