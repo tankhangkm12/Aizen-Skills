@@ -1,4 +1,4 @@
-# Code quality — small, clear, fast where it matters (v25)
+# Code quality — small, clear, fast where it matters (v26)
 
 Applies to every role that writes code, tests, migrations, pipelines or IaC. The repository's linter,
 formatter and conventions win on style; these rules win on substance unless the docs say otherwise.

@@ -1,4 +1,4 @@
-# Code style — what every language shares (v25)
+# Code style — what every language shares (v26)
 
 The language- and layer-independent part of how Aizen code reads. Backend and frontend principles
 (`references/backend/principles.md`, `references/frontend/principles.md`) add only what is specific to them.

@@ -138,7 +138,7 @@ function checkContract(id, c, errors) {
   if (!c || typeof c !== 'object') return errors.push(`${where} thiếu — entry skill phải khai báo (hoặc {"mode": "none"})`);
   if (c.mode === 'none') return;
   const EVIDENCE = ['file', 'cmd', 'sha', 'out', 'url'];
-  const RULES = ['count', 'per_block', 'labels', 'sections', 'regex', 'command', 'approved', 'evidence', 'report', 'scope', 'knowledge'];
+  const RULES = ['count', 'per_block', 'labels', 'sections', 'regex', 'command', 'approved', 'evidence', 'report', 'scope', 'knowledge', 'journal', 'acceptance'];
   const ids = new Set();
   for (const st of c.steps || []) {
     if (!st.id) errors.push(`${where}.steps: bước thiếu id`);

@@ -1,4 +1,4 @@
-# Numbers — measure, project, calculate (v25)
+# Numbers — measure, project, calculate (v26)
 
 The owner decides on numbers. A number is either **measured** (a tool read it) or **projected** (computed
 from stated inputs) — never guessed. Arithmetic is done by running code, not in the head.

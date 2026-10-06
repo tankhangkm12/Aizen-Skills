@@ -1,6 +1,6 @@
 # Draft PR — `devops`
 
-Title: `ci(<scope>): <summary> [<TASK>]` or `build(<scope>): …` / `chore(infra): …`
+Title: `ci(<scope>): <summary>` (a real ticket goes in `Refs:`, never the run id) or `build(<scope>): …` / `chore(infra): …`
 
 The owner reads this before anyone else. It must answer "what breaks if this is wrong" without the owner
 opening a single file. Secret **names** only — never a value.

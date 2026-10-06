@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 import guard as G
+import journal as J
 import project as P
 
 
@@ -130,6 +131,17 @@ def build_run() -> None:
         assert any("also wrote code" in i for i in G.evaluate(ws, T).open)
         report("rev", "review.md", f"@ {unit[:7]}: src/api/a.py:1\nVerdict: PASS\n")
         left = G.evaluate(ws, T).open
+        assert {i.split("]")[0] for i in left} == {"[journal", "[scope", "[knowledge", "[pr-body"}, left
+        # the journal: facts written by the hooks, thinking lines by the agents (named through `--as`)
+        facts = J.lines(ws, T)
+        assert any("✍" in ln and "review.md" in ln for ln in facts) and any("· rev ·" not in ln for ln in facts), facts
+        G.hook("post", "claude", claude(ws, "Bash", {"command": f"uv run journal.py note --run {T} --kind think --text x --as dev-api"},
+                                        agent="dev1"))
+        J.note(ws, T, "decide", "Tôi chọn giữ API cũ, thêm endpoint mới", "planner")
+        G.hook("post", "claude", claude(ws, "Edit", {"file_path": str(ws / f".aizen/worktrees/{T}-api/src/api/a.py")}, agent="dev1"))
+        assert J.lines(ws, T)[-1].split(" · ")[1] == "dev-api", J.lines(ws, T)[-1]
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(rd / "journal.md")}))[0]  # script-owned
+        left = G.evaluate(ws, T).open
         assert {i.split("]")[0] for i in left} == {"[scope", "[knowledge", "[pr-body"}, left
         # knowledge updated by the run; scope waived with evidence, accepted by the reviewer
         (ws / ".aizen/knowledge/decisions.md").write_text("D-01 coupon api\n")
@@ -188,7 +200,8 @@ def file_run() -> None:
                                         resp={"stdout": "check_tree: PASS", "stderr": ""}))
         res = G.evaluate(ws, "TL-1")
         ids = {i.split("]")[0][1:] for i in res.open}
-        assert {"sources", "write", "check", "publish", "diagram-size", "claims-labelled", "tree"} <= ids, res.open
+        assert {"sources", "write", "check", "publish", "diagram-size", "claims-labelled", "tree", "journal"} <= ids, res.open
+        J.note(ws, "TL-1", "think", "Tôi đang nghĩ nên so Redis với Memcached theo workload GET", "main")
         # fill the sheet: a tick without evidence fails, fake evidence fails, real evidence passes
         sheet = G.run_dir(ws, "TL-1") / "sheet.md"
 
@@ -242,6 +255,8 @@ def file_run() -> None:
         verdict("ver", 6)
         assert stop(ws)[0] is None and G.all_runs(ws)["TL-1"]["status"] == "done"
         assert (G.az(ws) / "archive" / "TL-1").is_dir()
+        latest = (G.az(ws) / "out" / "latest.md").read_text(encoding="utf-8")  # the hand-off file follows the run
+        assert latest.startswith("# TL-1 — done") and "Redis 7.2 cache" in latest and "so Redis với Memcached" in latest
 
 
 def escalation_and_backlog() -> None:
@@ -305,6 +320,81 @@ def migrate_and_install() -> None:
         rule = ws / ".agents" / "rules" / "aizen-working-principles.md"
         assert rule.read_text(encoding="utf-8").startswith("---\ntrigger: always_on\n---\n")
         assert ".aizen/" in (ws / ".git" / "info" / "exclude").read_text()
+        assert cs["attribution"] == {"commit": "", "pr": ""}, cs   # no AI trailer in the owner's commits
+
+
+def v26_run() -> None:
+    """Business branch names, frozen acceptance cases, tests owned by the tester, no AI traces pushed."""
+    with tempfile.TemporaryDirectory() as tmp:
+        ws = repo(tmp)
+        base = G.git(ws, "rev-parse", "HEAD")
+        T = "SHOP-7"
+        rd = G.az(ws) / "runs" / T
+        G.write_json(rd / "run.json", {"run": T, "skill": "aizen-build", "goal": "giữ ghế", "status": "building",
+                                       "round": 0, "agreed": {}, "decision": "ok", "outputs": [], "created": G.now(),
+                                       "log": [], "v": 26, "slug": "seat-hold", "branch_type": "feature"})
+        (rd / "plan.md").write_text(f"# {T}\n> Base: `main` @ `{base[:7]}`\n## Module api — API   kind be\n"
+                                    "Files (write set): `src/api/**`, `tests/api/**`\n## Module web — UI   kind fe\n"
+                                    "Files (write set): `web/**`\n")
+        units, final = G.branches(G.all_runs(ws)[T], T, G.plan(ws, T)[0])
+        assert units == {"api": "feature/seat-hold-api", "web": "feature/seat-hold-web"} and final == "feature/seat-hold"
+        acc = rd / "acceptance.md"
+        acc.write_text("Test location: `tests/acceptance/**`\n| TC-01 | AC-1 | hold a seat |\n| TC-02 | AC-2 | expired hold |\n")
+        run = G.read_json(rd / "run.json", {})
+        run["acceptance_sha"] = G.hashlib.sha256(acc.read_bytes()).hexdigest()
+        G.write_json(rd / "run.json", run)
+        # frozen after approve; the dev of a unit cannot write the acceptance tests, the tester can
+        assert G.hook("pre", "claude", claude(ws, "Edit", {"file_path": str(acc)}))[0]
+        assert G.hook("pre", "claude", claude(ws, "Bash", {"command": f"sed -i s/1/2/ {acc}"}))[0]
+        out, _ = G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / f".aizen/worktrees/{T}-api/tests/acceptance/t.py")}))
+        assert "the tester writes" in out["hookSpecificOutput"]["permissionDecisionReason"]
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / f".aizen/worktrees/{T}-api/tests/api/t.py")}))[0] is None
+        assert G.hook("pre", "claude", claude(ws, "Write", {"file_path": str(ws / ".aizen/worktrees/int/tests/acceptance/t.py")}))[0] is None
+        acc_rule = lambda: [i for i in G.evaluate(ws, T).open if i.startswith("[acceptance]")]  # noqa: E731
+        assert not acc_rule()
+        (rd / "reports").mkdir()
+        (rd / "reports" / "test.md").write_text("| TC-01 | pass |\n")
+        assert "TC-02" in acc_rule()[0], acc_rule()
+        (rd / "reports" / "test.md").write_text("| TC-01 | pass |\n| TC-02 | fail |\n")
+        assert not acc_rule()
+        acc.write_text(acc.read_text() + "| TC-03 | AC-2 | sneaked in |\n")
+        assert "changed after approve" in acc_rule()[0]
+        # pre-push: AI files and run ids never leave the machine; real tickets may
+        (ws / "CLAUDE.md").write_text("x")
+        sh(ws, "checkout", "-q", "-b", "feature/seat-hold")
+        sh(ws, "add", "-f", "CLAUDE.md")
+        sh(ws, "commit", "-q", "-m", f"feat(seat): hold [{T}]")
+        sha = G.git(ws, "rev-parse", "HEAD")
+        push = f"refs/heads/feature/seat-hold {sha} refs/heads/feature/seat-hold {'0' * 40}\n"
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            assert G.cmd_prepush(ws, push) == 1
+        assert "git rm -r --cached CLAUDE.md" in err.getvalue() and f"run id {T}" in err.getvalue(), err.getvalue()
+        G.write_json(G.az(ws) / "config" / "guard.json", {"hide_ai_files": False})
+        with contextlib.redirect_stderr(io.StringIO()):
+            G.cmd_prepush(ws, push)  # no trace check; the run's own checklist decides
+        G.write_json(G.az(ws) / "config" / "guard.json", {"hide_ai_files": True})
+        solo = rd.parent / "SHOP-8"   # a one-unit run in planning: its PR branch is still held to its checklist
+        G.write_json(solo / "run.json", {"run": "SHOP-8", "skill": "aizen-build", "goal": "refund", "status": "planning",
+                                         "round": 0, "decision": None, "created": G.now(), "log": [], "v": 26,
+                                         "slug": "refund", "branch_type": "feature"})
+        sh(ws, "checkout", "-q", "-b", "feature/refund", "main")
+        solo_push = f"refs/heads/feature/refund {G.git(ws, 'rev-parse', 'HEAD')} refs/heads/feature/refund {'0' * 40}\n"
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            assert G.cmd_prepush(ws, solo_push) == 1, "a run's PR branch must not push before the run is done"
+        assert "run SHOP-8" in err.getvalue() and "not done" in err.getvalue(), err.getvalue()
+        sh(ws, "checkout", "-q", "feature/seat-hold")
+        sh(ws, "rm", "-q", "--cached", "CLAUDE.md")
+        sh(ws, "commit", "-q", "-m", "chore: stop tracking local tool files\n\nCo-Authored-By: Claude <noreply@anthropic.com>")
+        sha = G.git(ws, "rev-parse", "HEAD")
+        probs = G.ai_traces(ws, sha, {T})
+        assert len(probs) == 2 and "Co-Authored-By" in probs[0] and "run id" in probs[1], probs
+        assert not any("AI files" in p for p in probs), probs
+        assert G.ai_traces(ws, sha, {"init"}) == [probs[0]]   # aizen-init's run id `init` never matches the word
+        G.exclude_local(ws)
+        exclude = (ws / ".git" / "info" / "exclude").read_text()
+        assert all(p in exclude for p in (".claude/", "AGENTS.md", ".agents/", "graphify-out/")), exclude
 
 
 def text_rules() -> None:
@@ -321,6 +411,7 @@ def text_rules() -> None:
 def run() -> None:
     text_rules()
     build_run()
+    v26_run()
     file_run()
     escalation_and_backlog()
     migrate_and_install()

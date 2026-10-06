@@ -61,9 +61,10 @@ knowledge pack — **không gọi trực tiếp**, `aizen-build` tự nạp đú
 ```
 Pha THỐNG NHẤT (bạn được hỏi kỹ)              Pha THỰC THI (không hỏi bạn nữa)
 S0 tiếp nhận + code map                      S3 dev song song, mỗi module một worktree, code tối thiểu
-S1 planner khảo sát, thiết kế, chia module   S4 tích hợp int/<TASK>
-S2 xác nhận từng phần:                       S5 tester   S6 reviewer (+ redteam nếu rủi ro)
-   phạm vi → module 1 → module 2 → …         S7 tự sửa ≤ 2 vòng
+S1 planner khảo sát, thiết kế, chia module,  S4 tích hợp vào nhánh PR (vd. feature/giu-ghe)
+   viết bộ test case nghiệm thu             S5 tester   S6 reviewer (+ redteam nếu rủi ro)
+S2 xác nhận từng phần:                       S7 tự sửa ≤ 2 vòng
+   phạm vi → test case → module 1 → …
    → triển khai (duyệt trước các việc A3)    S8 tổng kết + khối lệnh push/PR để bạn chạy
    → approve
 ```
@@ -74,6 +75,19 @@ S2 xác nhận từng phần:                       S5 tester   S6 reviewer (+ r
   giản nhất và liệt kê ở `Deviations:` trong báo cáo. Bạn chỉ bị gọi lại khi `BLOCKED`: cần việc A3 chưa duyệt,
   việc A4 (push, merge, production, secret…), nguy cơ mất dữ liệu, hoặc plan không làm được.
 - Agent **không bao giờ push**. Cuối task bạn nhận khối lệnh `git push` + `gh pr create --draft` để tự chạy.
+
+### Test case nghiệm thu — duyệt trước khi có code
+
+Planner viết `.aizen/runs/<TASK>/acceptance.md`: mỗi tiêu chí (AC) có các case `TC-nn` dạng Given / When / Then,
+luôn có ít nhất một case **đúng** và một case **sai** (bị từ chối, hết hạn, trùng…), thêm case biên khi đụng giới
+hạn, thời gian, tranh chấp, phân quyền, tiền. Bạn duyệt bảng này ở bước "test case" của S2. Khi `approve`:
+
+- file bị **băm và khoá** — agent không sửa được nữa, chỉ bạn sửa (rồi xác nhận lại `acceptance` và approve lại);
+- dev **không được viết** test nằm ở `Test location` của file (hook chặn) — chỉ tester viết;
+- tester làm đủ mọi `TC-nn` **trước khi đọc báo cáo của dev**, case tự thêm sau đó gắn `[tester-added]`;
+- báo cáo test có bảng *Acceptance matrix*; guard không cho run xong nếu thiếu một case nào.
+
+Nhờ vậy test kiểm thứ bạn đã đồng ý, không phải thứ dev tình cờ viết ra.
 
 ### Cho agent đủ thông tin ngay từ đầu
 
@@ -96,10 +110,42 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 
 ### Theo dõi và tiếp tục
 
-- Trạng thái task: `.aizen/runs/<TASK>/state.md` (phần `## Agreed` ghi từng câu bạn đã xác nhận).
-- Plan: `.aizen/runs/<TASK>/plan.md`; báo cáo từng role: `.aizen/runs/<TASK>/reports/`.
-- Tiếp tục task bị ngắt: "/aizen-build tiếp tục task <TASK>" — agent đọc `state.md`, không hỏi lại phần đã chốt.
-- `.aizen/`, `.aizen/worktrees/` và `graphify-out/` được tự thêm vào `.git/info/exclude` (không đụng file được git theo dõi).
+- **Báo cáo để đọc / dán cho AI web: `.aizen/out/latest.md`** — mục tiêu, trạng thái, câu hỏi chờ bạn, kiểm tra
+  còn mở, tóm tắt của agent, nhật ký gần nhất, đường dẫn file chi tiết. Tự cập nhật khi duyệt plan, sang vòng sửa,
+  bị chặn, chờ bạn, xong. Bản cũ giữ ở `.aizen/out/history/`. Terminal chỉ in đường dẫn, không in lại báo cáo
+  (tốn token hai lần). Tạo lại bất kỳ lúc nào: `uv run <CORE_DIR>/scripts/core/journal.py report`.
+- **Nhật ký suy nghĩ: `.aizen/runs/<TASK>/journal.md`** — mỗi dòng một câu:
+
+  ```
+  - 14:30 · planner · 🧠 Tôi đang nghĩ cách giữ ghế: khoá Redis hay cột held_until
+  - 14:31 · planner · 🔀 Tôi chọn cột held_until vì cần truy vấn ghế đang giữ
+  - 14:52 · dev-api · ✍ Đã ghi seat_hold.py, seat_hold_test.py
+  - 14:53 · dev-api · ▶ Đã chạy `npm test -- seat` → lỗi
+  - 14:55 · dev-api · 🔧 Tôi sẽ thử khoá dòng bằng SELECT … FOR UPDATE
+  ```
+
+  Dòng ✍/▶ do hook tự ghi (không quên, không bịa được); dòng 🧠 🔧 🔀 ✅ ❓ ⛔ do agent ghi ở **điểm quyết định**
+  bằng `journal.py note`. Run có sửa file mà không có dòng suy nghĩ nào thì guard không cho xong. Lưu ý: dòng
+  "nghĩ" là lời agent tự kể, dùng để theo dõi hướng đi — bằng chứng thật vẫn là dòng ✍/▶ và diff.
+- Trạng thái máy: `.aizen/runs/<TASK>/state.md` (phần `## Agreed` ghi từng câu bạn đã xác nhận). Plan:
+  `plan.md`; báo cáo từng role: `reports/`.
+- Tiếp tục task bị ngắt: "/aizen-build tiếp tục task <TASK>" — agent đọc `state.md` và `journal.md`, không hỏi lại phần đã chốt.
+- Ngôn ngữ của nhật ký và báo cáo: `"lang": "vi"` (mặc định) hoặc `"en"` trong `.aizen/config/guard.json`.
+
+### GitHub sạch: không file AI, nhánh theo nghiệp vụ
+
+- `guard.py install` thêm vào `.git/info/exclude` (chỉ ở máy bạn, không lộ cả trong `.gitignore`): `.aizen/`,
+  `.agents/`, `.claude/`, `.cursor/`, `.gemini/`, `.windsurf/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.mcp.json`,
+  `graphify-out/`… và tắt dòng `Co-Authored-By` / "Generated with" mà Claude Code tự thêm vào commit/PR.
+- Nhánh đặt theo **nghiệp vụ**, không theo mã task của agent: `feature/giu-ghe`, `bugfix/thanh-toan-timeout`
+  (nhiều module: `feature/giu-ghe-api`, `feature/giu-ghe-web` gộp vào `feature/giu-ghe`). Agent đặt tên khi
+  `state.py init --slug giu-ghe`; xem tên bằng `state.py branch --task <TASK>`.
+- Commit: `feat(seat): giữ ghế 5 phút khi đặt vé` — không `[T-12]`. Có ticket Jira/issue thật thì truyền
+  `--ticket SHOP-42`, commit thêm dòng `Refs: SHOP-42`.
+- `git push` bị chặn nếu nhánh còn chứa file AI, hoặc commit chưa push có mã run / dòng đồng tác giả AI — hook in
+  sẵn lệnh sửa. Repo **đã lỡ commit** `CLAUDE.md`, `.claude/`…: exclude không gỡ được file đã theo dõi, bạn chạy
+  một lần lệnh `git rm -r --cached …` hook in ra (lịch sử cũ vẫn còn).
+- Team cố ý chia sẻ các file này: `"hide_ai_files": false` trong `.aizen/config/guard.json`.
 
 ### Điều khiển dự án: `.aizen/PROJECT.md` và backlog
 

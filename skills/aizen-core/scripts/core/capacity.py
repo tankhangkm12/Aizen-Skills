@@ -3,7 +3,7 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""Capacity calculator for Aizen roles — numbers computed, not guessed (v25).
+"""Capacity calculator for Aizen roles — numbers computed, not guessed (v26).
 
 Every command prints the formula, the inputs (with which ones are assumptions), a low / expected / high
 table and a sensitivity ranking (which input moves the result most). Results are PROJECTIONS: label them

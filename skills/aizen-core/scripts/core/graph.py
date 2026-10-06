@@ -3,7 +3,7 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""graph.py — keep a graphify code map of the project for every Aizen role (v25).
+"""graph.py — keep a graphify code map of the project for every Aizen role (v26).
 
     uv run <CORE_DIR>/scripts/core/graph.py --project .            # build or refresh (code only, no LLM, no network)
     uv run <CORE_DIR>/scripts/core/graph.py --project . --check    # status only

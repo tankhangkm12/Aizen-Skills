@@ -44,7 +44,7 @@ comments: public docstrings, doc references (`Per LLD §x (FR-nn)`), numbered st
 flows, why-comments; no commented-out code, no TODO without task id; async style consistent, parallel
 independent calls, timeouts everywhere.
 
-**Git/PR:** the repo's own convention, else `feature/<TASK>-<unit>` and the `references/core/git.md` types (`bugfix/` `refactor/` `test/` `ci/` `infra/`); Conventional
+**Git/PR:** the repo's own convention, else `<type>/<slug>` named after the business change (never the run id) and the `references/core/git.md` types (`bugfix/` `refactor/` `test/` `ci/` `infra/`); Conventional
 Commits with `[TASK]`; one logical change per commit; Draft PR with full description (context, flow, per-file
 changes, doc checklist, decisions, checks, rebase notes, impact, out-of-scope proposals); no unapproved
 dependency changes.

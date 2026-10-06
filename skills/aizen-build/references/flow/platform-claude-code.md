@@ -1,4 +1,4 @@
-# Running the owner on Claude Code (v25)
+# Running the owner on Claude Code (v26)
 
 ## Dispatch
 
@@ -9,7 +9,9 @@
   brief already says READ-ONLY. Never `Plan`/`Explore`: they cannot write their report.
 - A wave = all Agent calls of that wave **in one message** so they run in parallel.
 - Code writers get their own worktree. Either create it yourself (`git worktree add`) and name it in the brief,
-  or pass `isolation: "worktree"` and let the harness create it — then read the branch name from the result.
+  or pass `isolation: "worktree"` and let the harness create it — then read the branch name from the result and
+  rename it to `state.py branch --task <TASK> --unit <unit>` (`git branch -m`): branches carry the business name,
+  never a run id or a harness id (`references/core/git.md` §1).
 
 ## Models
 

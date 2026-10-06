@@ -1,4 +1,4 @@
-# Workspace — where things live (v25)
+# Workspace — where things live (v26)
 
 Everything an Aizen agent writes to do its work lives under `.aizen/` at the workspace root (the project root
 unless `CLAUDE.md`/`AGENTS.md` names another). The product itself (code, the notes a skill produces) lives where
@@ -11,8 +11,9 @@ the owner wants it. `.aizen/` is local-only (`.git/info/exclude`, never staged) 
 .aizen/
 ├── PROJECT.md              👁 the project map — the one file the owner reads (compiled by scripts/core/project.py)
 ├── backlog.md              ✍ work to come: BL-nn · skill · status · after · run (agents propose, the owner approves)
+├── out/                    👁 hand-off for the owner: latest.md (newest run report, paste-ready) · history/<date>-<RUN>.md
 ├── config/
-│   ├── guard.json          require_task · share_knowledge
+│   ├── guard.json          require_task · share_knowledge · hide_ai_files (default true) · lang (vi | en)
 │   └── conventions.md      one page: naming, patterns, commands — read before the first edit
 ├── knowledge/              understanding the project — outlives every run
 │   ├── system/             overview · requirements · architecture · flows · data · infrastructure · security · test-plan
@@ -24,11 +25,13 @@ the owner wants it. `.aizen/` is local-only (`.git/info/exclude`, never staged) 
 │   ├── run.json        🔒  skill, goal, status, backlog item, outputs, owner's decision, log
 │   ├── state.md            the human view (aizen-build: written by scripts/flow/state.py)
 │   ├── plan.md             the plan (aizen-build planner; any skill that plans)
+│   ├── acceptance.md   🧊  the test cases TC-nn the owner approved with the plan (frozen at approve; tester implements)
+│   ├── journal.md      🔒  one line per decision (`journal.py note`) and per write/command (hooks) — the owner's view
 │   ├── sheet.md        ✍  steps the agent ticks with checkable evidence + the guard's checks
 │   ├── ledger.jsonl    🔒  every file write and command, with who did it (hooks)
 │   ├── waivers.json    🔒  steps waived, with reason and hashed evidence
 │   ├── evidence/       🔒  check.py results (<unit|main|int>.json) and rule results
-│   ├── reports/            role reports: dev-<unit>.md · test[-<lens>].md · review[-redteam].md · pr-body[-<unit>].md
+│   ├── reports/            role reports: dev-<unit>.md · test[-<lens>].md · review[-redteam].md · pr-body[-<unit>].md · summary.md
 │   ├── verdict.json        the independent verifier's judgement
 │   └── work/               intermediate files of the run
 ├── worktrees/<RUN>-<unit>/ git worktrees of parallel units
@@ -38,7 +41,7 @@ the owner wants it. `.aizen/` is local-only (`.git/info/exclude`, never staged) 
 ```
 
 🔒 written only by the Aizen scripts and hooks (an agent edit is denied) · ✍ filled by the agent, checked by the
-guard · 👁 read-only, compiled. `<RUN>` = the task id for aizen-build (`SHOP-42`), `<skill>-<yyyymmdd>-<slug>`
+guard · 👁 read-only, compiled · 🧊 written before approve, frozen after (only the owner edits it). `<RUN>` = the task id for aizen-build (`SHOP-42`), `<skill>-<yyyymmdd>-<slug>`
 for the others. The graphify code map stays in `graphify-out/` at the root (the tool decides that path).
 
 ## Contract — how every run ends
@@ -95,7 +98,8 @@ vendored rule that conflicts with a pack guide on substance → follow the pack 
 | `FR` `NFR` `BR` `AC` | requirements, rules, acceptance criteria | planner (discover) |
 | `SCR` `CMP` | screen, frontend component | planner (design) or dev (ui), whoever first |
 | `EP` · `THR` `CTL` | endpoint/event · threat, control | planner (design) |
-| `TC` `BUG` | test case, bug | tester |
+| `TC` | acceptance test case (owner-approved, frozen) | planner, in `acceptance.md`; tester-added ones are marked `[tester-added]` |
+| `BUG` | bug | tester |
 | `F` | review finding | reviewer |
 | `D` | decision | whoever records it in `decisions.md` |
 | `U` `X` `R` | unknown, contradiction, risk in as-built docs | planner (discover) |

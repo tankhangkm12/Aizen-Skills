@@ -1,4 +1,4 @@
-# Build flow — one flow for every task (v25)
+# Build flow — one flow for every task (v26)
 
 You are the main session. You run this flow, dispatch roles, merge branches and talk to the owner. Roles do the
 specialist work. State lives in `.aizen/runs/<TASK>/`. Below, `state.py` means
@@ -13,8 +13,10 @@ build that module yourself); tester and reviewer still run.
 
 ## S0 — Intake (you)
 
-1. `state.py init --task <TASK> --goal "<the owner's prompt>"` (resuming → `state.py status --task <TASK>`, read
-   `state.md`; never re-ask what `## Agreed` already holds).
+1. `state.py init --task <TASK> --goal "<the owner's prompt>" --slug <business-name> [--type bugfix|refactor|…]
+   [--ticket <real ticket>]` — the slug names the git branch (`references/core/git.md` §1: `seat-hold`, never the
+   run id). Resuming → `state.py status --task <TASK>`, read `state.md` and `journal.md`; never re-ask what
+   `## Agreed` already holds.
 2. Code map: `graph.py --project <ROOT>` (`references/core/code-map.md`). Exit 3 = graphify missing → its
    install command goes to S2 as an A3 item; use grep meanwhile.
 3. Read `CLAUDE.md`/`AGENTS.md`, `.aizen/{conventions,lessons}.md`, then ask the map (`graphify query`) or skim
@@ -23,7 +25,8 @@ build that module yourself); tester and reviewer still run.
 ## S1 — Plan and design (1 × planner)
 
 Dispatch `planner` with `state.py brief --task <TASK> --role planner [--stage discover|design]`. It measures
-facts itself and writes `.aizen/runs/<TASK>/plan.md` in the module shape (`references/plan/method.md`): scope,
+facts itself and writes `.aizen/runs/<TASK>/plan.md` and `.aizen/runs/<TASK>/acceptance.md` (the test cases,
+`assets/plan/acceptance-template.md`) in the module shape (`references/plan/method.md`): scope,
 then one block per **module** (= unit: behaviour, interface/contract, data, files/write set, tests, risk,
 options, open questions), then delivery (order, A3 actions, rollback). Risk modules (auth, money/stock/quota,
 tenants, schema/data migration, concurrency, public contract, CI/CD/IaC, live systems, secrets, destructive,
@@ -38,6 +41,9 @@ Walk the plan in this order; each step is one question round (Claude Code: AskUs
 recommended option first; Antigravity: `ask_question`; otherwise one numbered message):
 
 1. **Scope** — goal, in / out of scope, acceptance criteria. → `state.py answer --task <TASK> --module scope --text "<the owner's answer>"`
+1b. **Acceptance cases** — show the `TC-nn` table of `acceptance.md` (positive and negative cases per AC). These are
+   the owner's tests, written before any code, so nobody grades their own work later. →
+   `state.py answer --task <TASK> --module acceptance --text "…"`
 2. **Each module, in plan order** — its design in ≤ 15 lines (behaviour, interface, data, files, tests, risk)
    plus its options and questions. → `state.py answer --task <TASK> --module <unit> --text "…"`
 3. **Delivery** — build order/waves, the A3 actions to pre-approve (installs incl. graphify, local DB,
@@ -45,15 +51,17 @@ recommended option first; Antigravity: `ask_question`; otherwise one numbered me
 4. Every change the owner asks for goes into the plan (small: edit it yourself; structural: re-dispatch the planner
    with the owner's words as `--inputs`), then re-confirm **only that module**.
 5. **Approve** — "approve plan <TASK> (vN)?" → `state.py approve --task <TASK> --text "<the owner's words>"`.
-   It refuses while `scope`, `delivery` or any `## Module <id>` of `.aizen/runs/<TASK>/plan.md` has no recorded answer
-   — the rule "never skip a module" is enforced, not remembered.
+   It refuses while `scope`, `acceptance`, `delivery` or any `## Module <id>` of `.aizen/runs/<TASK>/plan.md` has no
+   recorded answer, or `acceptance.md` has no `TC-nn` — the rule "never skip a module" is enforced, not remembered.
+   Approval freezes `acceptance.md` (hashed; the guard refuses every edit); only the owner changes it.
 
 Never batch everything into one card, never skip a module, never start a writer before `approve`
 (`state.py` refuses the brief).
 
 ## S3 — Build (N × dev, one message per wave)
 
-- Per unit: `git worktree add .aizen/worktrees/<TASK>-<unit> -b feature/<TASK>-<unit> <base>`, its own ports and DB name.
+- Per unit: `git worktree add .aizen/worktrees/<TASK>-<unit> -b "$(state.py branch --task <TASK> --unit <unit>)" <base>`,
+  its own ports and DB name (one-unit change: the branch is the PR branch, `state.py branch --task <TASK>`).
 - `state.py brief --task <TASK> --role dev --kind <be|fe|db|ui> --unit <unit> --sha <start SHA>
   --write-set "<globs>" --a3 "<approved A3 actions>"` → dispatch **all units of a wave in one message**. Infra
   units: `--role devops --unit <unit>`.
@@ -63,15 +71,18 @@ Never batch everything into one card, never skip a module, never start a writer 
 
 ## S4 — Integrate (you, git only)
 
-More than one unit → integration worktree, `int/<TASK>` from the base, `git merge --no-ff` each unit branch in
-plan order. Clean merge is yours. Conflict → `git merge --abort` and dispatch a `dev` with `UNIT=int` naming
-both branches and the agreed behaviour. Never resolve a conflict by hand. Then, in the `int/<TASK>` worktree:
+More than one unit → integration worktree `.aizen/worktrees/<TASK>-int` on the PR branch (`state.py branch --task
+<TASK>`, from the base), `git merge --no-ff` each unit branch in plan order. Clean merge is yours. Conflict →
+`git merge --abort` and dispatch a `dev` with `UNIT=int` naming both branches and the agreed behaviour. Never
+resolve a conflict by hand. Then, in that worktree:
 `check.py --task <TASK> --unit int` → `evidence/int.json` (the guard requires it PASS at the int tip).
 
 ## S5 — Test (1 × tester)
 
-`state.py brief --task <TASK> --role tester --lens <a,b,…> --sha <SHA>` on `int/<TASK>` (or the single unit
-branch). Lenses from the diff: always `functional`; add `integration` (several units/services), `ui` (screens),
+`state.py brief --task <TASK> --role tester --lens <a,b,…> --sha <SHA>` on the PR branch. The tester works from
+`acceptance.md` and the docs **before** it reads any dev report, implements every `TC-nn` (in the test location
+`acceptance.md` names — the guard refuses dev writes there) and reports an Acceptance matrix; the guard checks
+every case is in it. Lenses from the diff: always `functional`; add `integration` (several units/services), `ui` (screens),
 `database` (migrations, queries), `security` (auth, input, secrets), `concurrency-perf` (locks, money, load).
 Two testers only when a heavy lens would dominate (`--unit <lens>` each).
 
@@ -98,9 +109,12 @@ the simplest way to do an agreed thing — the roles decide and list under `Devi
 
 ## S8 — Finish (you)
 
-Merge the units' `pr-body-<unit>.md` into `.aizen/runs/<TASK>/reports/pr-body.md`. Risk module that ships →
+Merge the units' `pr-body-<unit>.md` into `.aizen/runs/<TASK>/reports/pr-body.md` — business words only: no run
+id, no agent names, no `.aizen/` paths (it becomes the public PR text). Risk module that ships →
 add the release/rollback packet (`assets/infra/release-packet.md`). One summary: what changed per module, checks with
-numbers, verdict, open risks, `Deviations:`, and one copy-paste block:
+numbers, verdict, open risks, `Deviations:` — written to `.aizen/runs/<TASK>/reports/summary.md`, then
+`journal.py report --run <TASK>` (→ `.aizen/out/latest.md`). In the chat: ≤ 3 lines + that path, and one
+copy-paste block:
 
 ```bash
 git push -u origin <branch>

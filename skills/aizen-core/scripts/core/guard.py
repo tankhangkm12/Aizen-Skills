@@ -3,7 +3,7 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""guard.py — one engine that holds every Aizen skill to its contract (v25).
+"""guard.py — one engine that holds every Aizen skill to its contract (v26).
 
 The agent does not decide when its work is finished; this script does, from artifacts someone else can check.
 
@@ -22,15 +22,16 @@ The agent does not decide when its work is finished; this script does, from arti
                                         # this project only; after `npx skills add` this is the one setup step
     uv run $G migrate                   # move an older .aizen/ layout into this one
     uv run $G hook pre|post|stop --agent claude|agy   # called by the harness, JSON payload on stdin
-    uv run $G prepush                   # git pre-push: a run's branches push only when its checklist passes
+    uv run $G prepush                   # git pre-push: a run's branches push only when its checklist passes; no
+                                        # branch pushes AI files (.claude/, AGENTS.md, …) or run ids in commits
 
 Contract = assets/core/contract.default.json merged with the `contract` of the skill's manifest.json:
   steps         rows of runs/<RUN>/sheet.md the agent fills — `| id | [x] | file:… cmd:… sha:… out:… url:… |`;
                 each evidence token is checked (file exists and is new, the command is in the ledger and passed,
                 the commit exists, the output line was really printed, the URL is cited in the output).
   outputs       globs of the files the run produces ({run} is the run id); `start --output` overrides.
-  rules         deterministic checks: count · per_block · labels · sections · regex · command — and for
-                aizen-build approved · evidence · report · scope · knowledge.
+  rules         deterministic checks: count · per_block · labels · sections · regex · command · journal — and for
+                aizen-build approved · acceptance · evidence · report · scope · knowledge.
   expectations  what the independent verifier judges, one id each; verdict.json from a session that did not
                 write the outputs, every pass citing `path:line`, pass rate ≥ verifier.threshold.
 Anything open at a stop → the agent continues with the exact list; three stops in a row without new work, or
@@ -66,11 +67,20 @@ CLAUDE_WRITE = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
 AGY_WRITE = re.compile(r"write|edit|replace|create|delete|remove|move|rename", re.I)
 SHELL_TOOLS = {"Bash", "run_command", "run_terminal_command", "shell", "execute_command"}
 PROTECTED = re.compile(r"(^|/)\.aizen/(PROJECT\.md$|(runs|archive)/[^/]+/(run\.json|ledger\.jsonl|guard\.json"
-                       r"|waivers\.json|evidence/.*)$)")
-PROTECTED_NAMES = ("run.json", "ledger.jsonl", "guard.json", "waivers.json", "/evidence/", "PROJECT.md")
+                       r"|waivers\.json|journal\.md|evidence/.*)$)")
+PROTECTED_NAMES = ("run.json", "ledger.jsonl", "guard.json", "waivers.json", "journal.md", "/evidence/", "PROJECT.md")
 MUTATES = re.compile(r">|\btee\b|\bsed\s+-i|\brm\b|\bmv\b|\bcp\b|\btruncate\b|\bdd\b|write_text|open\(|Set-Content"
                      r"|Out-File|Remove-Item|Move-Item|Copy-Item")
-OWN_SCRIPTS = re.compile(r"(guard|state|check|project)\.py")
+OWN_SCRIPTS = re.compile(r"(guard|state|check|project|journal)\.py")
+NOTE_AS = re.compile(r"journal\.py[\"']?\s+note\b.*?--as[ =][\"']?([A-Za-z0-9._-]+)")
+ACC_TESTS = re.compile(r"^\s*Test location\s*:\s*(.+)$", re.M | re.I)
+TC = re.compile(r"\bTC-\d+\b")
+# Paths that only make sense to the agents, never to the product (references/core/git.md §1): hidden from git
+# when guard.json `hide_ai_files` is on (the default) — excluded locally, refused at pre-push.
+AI_PATHS = (".aizen/", ".agents/", ".claude/", ".cursor/", ".gemini/", ".windsurf/", ".codeium/", ".kiro/",
+            "AGENTS.md", "CLAUDE.md", "GEMINI.md", ".cursorrules", ".windsurfrules", ".mcp.json", "graphify-out/")
+AI_TRAILER = re.compile(r"^(Co-Authored-By:.*(claude|anthropic|gemini|copilot|cursor|openai|chatgpt)"
+                        r"|.*Generated with \[?(Claude|Gemini|Cursor|Copilot)).*$", re.I | re.M)
 APPROVED = re.compile(r"\|\s*(approved|đã duyệt)\s*\|", re.I)
 
 
@@ -167,6 +177,42 @@ def watched(ws: Path) -> dict[str, dict]:
 
 def config(ws: Path) -> dict:
     return read_json(az(ws) / "config" / "guard.json", {})
+
+
+def hide_ai(ws: Path) -> bool:
+    return config(ws).get("hide_ai_files", True) is not False
+
+
+def journal_mod():
+    sys.path.insert(0, str(HERE))
+    import journal  # noqa: PLC0415
+    return journal
+
+
+def state_mod():
+    """aizen-build's state.py — the one place branch names are made (`branch_name`)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("aizen_state", STATE_PY)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def branch_namer():
+    try:
+        return state_mod().branch_name
+    except Exception:  # noqa: BLE001 — aizen-build not installed: the v25 names
+        return lambda r, t, u=None, writers=None: f"feature/{t}-{u}" if u else f"int/{t}"
+
+
+def branches(run: dict, rid: str, modules: dict) -> tuple[dict[str, str], str | None]:
+    """{unit: its branch} and the integration branch — None when one unit carries the whole change (its branch is
+    then the PR branch itself)."""
+    writers = [u for u, g in modules.items() if g]
+    name = branch_namer()
+    units = {u: name(run, rid, u, len(writers)) for u in modules}
+    final = name(run, rid)
+    return units, (final if run.get("v", 0) < 26 or len(writers) > 1 else None)
 
 
 def is_code(path: str) -> bool:
@@ -521,8 +567,9 @@ def evaluate(ws: Path, run_id: str, finishing: bool = True) -> Result:
     coordinator = guard_state(ws, run_id).get("coordinator")
     last_writer, code_writers = writers(ws, run_id)
     modules, base, _ = plan(ws, run_id)
-    unit_tip = {u: tip(ws, f"feature/{run_id}-{u}") for u in modules}
-    int_tip = tip(ws, f"int/{run_id}")
+    unit_branch, int_branch = branches(run, run_id, modules)
+    unit_tip = {u: tip(ws, b) for u, b in unit_branch.items()}
+    int_tip = tip(ws, int_branch) if int_branch else ""
     built = [t for t in unit_tip.values() if t]
     final_tip = int_tip or (built[0] if len(built) == 1 else "")
     reports = rd / "reports"
@@ -581,7 +628,7 @@ def evaluate(ws: Path, run_id: str, finishing: bool = True) -> Result:
         elif kind == "evidence" and r.get("final"):
             if int_tip:
                 evidence(rid, waivable, rd / r["path"], int_tip,
-                         (f"check.py --task {run_id} --unit int", f"in the int/{run_id} worktree"), f"int/{run_id}")
+                         (f"check.py --task {run_id} --unit int", f"in the {int_branch} worktree"), int_branch)
         elif kind == "evidence":
             for u, globs in modules.items():
                 if globs:
@@ -651,6 +698,33 @@ def evaluate(ws: Path, run_id: str, finishing: bool = True) -> Result:
             add(not shown, f"changed outside the approved write sets: {', '.join(shown[:8])}"
                 f"{' …' if len(shown) > 8 else ''} — revert, or re-confirm the module with the owner"
                 if shown else "every change inside its write set")
+        elif kind == "journal":
+            worked = any(e.get("files") for e in entries)
+            n = journal_mod().thinking(ws, run_id) if worked else 0
+            add(not worked or n >= r.get("min", 1),
+                f"{n} thinking line(s) in journal.md" if worked and n else "nothing written yet" if not worked else
+                "files changed but journal.md has no thinking line — at each decision point write one short sentence: "
+                "`journal.py note --run " + run_id + " --kind think|try|decide --text \"Tôi …\" --as <role>`")
+        elif kind == "acceptance":
+            if run.get("v", 0) < 26:
+                continue
+            acc = rd / "acceptance.md"
+            cases = sorted(set(TC.findall(re.sub(r"~~[^~]*~~", "", acc.read_text(encoding="utf-8"))))) if acc.is_file() else []
+            if not cases:
+                add(False, "no acceptance.md with TC-nn cases — the planner writes them, the owner approves them with the plan")
+                continue
+            if run.get("acceptance_sha") and hashlib.sha256(acc.read_bytes()).hexdigest() != run["acceptance_sha"]:
+                add(False, "acceptance.md changed after approve — restore the approved cases; a change is the owner's "
+                    "(re-confirm `--module acceptance`, then approve again)")
+                continue
+            tests = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in sorted(reports.glob("test*.md")))
+            if not tests:
+                add(True, f"{len(cases)} cases frozen — the tester's report must cover them")
+                continue
+            miss = [c for c in cases if not re.search(rf"\b{c}\b", tests)]
+            add(not miss, f"test report covers {len(cases)}/{len(cases)} acceptance cases" if not miss else
+                f"test report does not cover {', '.join(miss[:10])} — every TC-nn of acceptance.md gets a row in the "
+                "Acceptance matrix (pass / fail / blocked + why)")
         elif kind == "knowledge":
             changed = bool(code_writers) or any(unit_tip.values())
             wrote = any(f.startswith(".aizen/knowledge/") for e in entries for f in e.get("files", []))
@@ -922,6 +996,7 @@ def set_status(ws: Path, rid: str, status: str, text: str, **extra) -> int:
     log(run, text)
     save_run(ws, run)
     refresh(ws)
+    journal_mod().report_quiet(ws, rid)
     return 0
 
 
@@ -953,8 +1028,9 @@ def cmd_done(ws: Path, rid: str, quiet: bool = False) -> tuple[bool, Result]:
         if not dst.exists():
             shutil.move(str(src), str(dst))
     refresh(ws)
+    journal_mod().report_quiet(ws, rid)
     if not quiet:
-        print(f"{rid}: done · archived")
+        print(f"{rid}: done · archived · hand-off: .aizen/out/latest.md")
     return True, res
 
 
@@ -1069,14 +1145,16 @@ def parse(agent: str, payload: dict) -> dict:
 
 def deny_reason(ws: Path, ev: dict, files: list[str]) -> str | None:
     if ev["writes"] and any(PROTECTED.search(f) for f in files):
-        return ("guard-owned file (run.json, ledger, waivers, evidence, PROJECT.md): only the Aizen scripts write it "
-                "— run the script instead")
+        return ("guard-owned file (run.json, ledger, waivers, evidence, journal.md, PROJECT.md): only the Aizen scripts "
+                "write it — run the script instead (journal: `journal.py note`)")
     cmd = ev["cmd"]
     if cmd and re.search(r"\bbacklog\s+approve\b", cmd):
         return "only the owner approves backlog items (`aizen backlog approve` in their own terminal)"
     if cmd and not OWN_SCRIPTS.search(cmd) and ".aizen" in cmd and any(n in cmd for n in PROTECTED_NAMES) \
             and MUTATES.search(cmd):
         return "this command would change a guard-owned file under .aizen/ — use the Aizen scripts"
+    if cmd and "acceptance.md" in cmd and MUTATES.search(cmd) and any(r.get("acceptance_sha") for r in live(ws).values()):
+        return "acceptance.md is frozen since approve — only the owner changes it"
     if not ev["writes"]:
         return None
     if any(f == ".aizen/backlog.md" for f in files) and APPROVED.search(ev["new_text"] or ""):
@@ -1084,6 +1162,9 @@ def deny_reason(ws: Path, ev: dict, files: list[str]) -> str | None:
     runs = live(ws)
     code = [f for f in files if is_code(f)]
     for rid, run in runs.items():
+        if run.get("acceptance_sha") and any(f == f".aizen/runs/{rid}/acceptance.md" for f in files):
+            return (f"run {rid}: acceptance.md was approved with the plan and is frozen — the owner changes it; "
+                    "a case you think is wrong goes under Deviations: / Q-n in your report")
         outs = [g.replace("{run}", rid) for g in run.get("outputs", [])]
         if run["status"] in ("planning", "waiting") and not run.get("decision"):
             if run["skill"] == "aizen-build":
@@ -1098,9 +1179,15 @@ def deny_reason(ws: Path, ev: dict, files: list[str]) -> str | None:
                 return f"run {rid} is still {run['status']} — confirm with the owner, then `guard.py go --run {rid}`"
         if run["skill"] == "aizen-build":
             modules, _, _ = plan(ws, rid)
+            acc = run_dir(ws, rid) / "acceptance.md"
+            loc = ACC_TESTS.search(acc.read_text(encoding="utf-8")) if acc.is_file() else None
+            acc_globs = [g.strip().lstrip("./") for g in re.findall(r"`([^`]+)`", loc.group(1))] if loc else []
             for f in code:
                 m = WT.match(f)
                 u = unit_of(rid, m.group(1), modules) if m else None
+                if u and acc_globs and in_set(m.group(2), acc_globs):
+                    return (f"{m.group(2)} is an acceptance test (acceptance.md → Test location) — the tester writes "
+                            "those, not the dev of the code under test; write your unit tests elsewhere")
                 if u and modules[u] and not in_set(m.group(2), modules[u]):
                     return (f"{m.group(2)} is outside the write set of module {u} ({', '.join(modules[u])}) — "
                             "list it under HANDOFF: in your report, or return BLOCKED")
@@ -1136,6 +1223,7 @@ def hook(event: str, agent: str, payload: dict) -> tuple[dict | None, str]:
         if not (ev["writes"] or ev["cmd"]):
             return None, "skip"
         starting = re.search(r"(guard\.py[\"']?\s+start|state\.py[\"']?\s+init)\b", ev["cmd"])
+        named = NOTE_AS.search(ev["cmd"])
         for rid, run in live(ws).items():
             append(ws, rid, {"ts": now(), "agent": agent, "writer": ev["writer"], "tool": ev["tool"],
                              "files": files if ev["writes"] else [], "cmd": ev["cmd"][:400], "out": ev["out"],
@@ -1147,6 +1235,15 @@ def hook(event: str, agent: str, payload: dict) -> tuple[dict | None, str]:
                 if fresh:
                     g["coordinator"] = ev["writer"]
                     save_guard(ws, rid, g)
+            if named and ev["writer"] != g.get("coordinator") and g.get("names", {}).get(ev["writer"]) != named.group(1):
+                g.setdefault("names", {})[ev["writer"]] = named.group(1)
+                save_guard(ws, rid, g)
+            who = g.get("names", {}).get(ev["writer"]) or ("main" if ev["writer"] == g.get("coordinator") else
+                                                             "sub-" + (ev["writer"].rsplit("/", 1)[-1][-6:] or "?"))
+            try:
+                journal_mod().auto(ws, rid, who, files if ev["writes"] else [], ev["cmd"], ev["failed"])
+            except Exception:  # noqa: BLE001 — the journal never blocks work
+                pass
         if OWN_SCRIPTS.search(ev["cmd"]):
             refresh(ws)
         return None, "recorded"
@@ -1192,22 +1289,53 @@ def message(rid: str, open_items: list[str]) -> str:
 
 # ── git pre-push ─────────────────────────────────────────────────────────────────────────────────────────
 
+def ai_traces(ws: Path, sha: str, names: set[str]) -> list[str]:
+    """AI files in the pushed tree, run ids or AI trailers in the commits that are not on any remote yet."""
+    probs = []
+    tracked = git(ws, "ls-tree", "-r", "--name-only", sha).splitlines()
+    hits = sorted({p.rstrip("/") for f in tracked for p in AI_PATHS if f == p.rstrip("/") or f.startswith(p)})
+    if hits:
+        probs.append(f"AI files in the branch: {', '.join(hits)} — keep them local: "
+                     f"git rm -r --cached {' '.join(hits)} && git commit -m \"chore: stop tracking local tool files\"")
+    for c in git(ws, "rev-list", sha, "--not", "--remotes").splitlines()[:200]:
+        msg = git(ws, "log", "-1", "--format=%B", c)
+        ids = [n for n in names if re.search(r"\d", n)   # run ids carry a number; `init` is just a word
+               and re.search(rf"\[{re.escape(n)}\]|\b{re.escape(n)}\b", msg)]
+        trailer = AI_TRAILER.search(msg)
+        if ids or trailer:
+            why = f"run id {ids[0]}" if ids else f"“{trailer.group(0).strip()[:60]}”"
+            probs.append(f"commit {c[:7]} carries {why} — reword it (git rebase -i, `reword`): commits describe the "
+                         "business change; the run id stays in .aizen/")
+    return probs
+
+
 def cmd_prepush(ws: Path, stdin: str) -> int:
-    names = set(all_runs(ws))
+    runs = all_runs(ws)
+    names = set(runs)
+    tickets = {r.get("ticket") for r in runs.values() if r.get("ticket")}
+    owner_of = {}
+    for rid, run in runs.items():
+        units, final = branches(run, rid, plan(ws, rid)[0])
+        for b in [*units.values(), final, branch_namer()(run, rid), f"int/{rid}"]:
+            if b:
+                owner_of.setdefault(b, rid)
     failed = 0
     for line in stdin.splitlines():
         parts = line.split()
         if len(parts) < 2 or set(parts[1]) == {"0"}:
             continue
         ref = parts[0].replace("refs/heads/", "")
-        rid = None
-        if ref.startswith("int/") and ref[4:] in names:
-            rid = ref[4:]
-        elif ref.startswith("feature/"):
-            rid = max((n for n in names if ref[8:].startswith(n + "-")), key=len, default=None)
+        if hide_ai(ws):
+            probs = ai_traces(ws, parts[1], names - tickets)
+            if probs:
+                failed += 1
+                print(f"Aizen guard: {ref} not pushed — it carries agent traces:\n" + "\n".join(f"  - {i}" for i in probs)
+                      + "\n  (pushing them on purpose: set \"hide_ai_files\": false in .aizen/config/guard.json)", file=sys.stderr)
+                continue
+        rid = owner_of.get(ref) or max((n for n in names if ref.startswith(f"feature/{n}-")), key=len, default=None)
         if not rid:
             continue
-        run = all_runs(ws)[rid]
+        run = runs[rid]
         res = evaluate(ws, rid)
         if run["status"] != "done":
             res.open.insert(0, f"[status] run is {run['status']}, not done")
@@ -1226,7 +1354,7 @@ def exclude_local(ws: Path) -> list[str]:
         return []
     share = config(ws).get("share_knowledge")
     want = ([".aizen/*", "!.aizen/knowledge/", "!.aizen/PROJECT.md"] if share else [".aizen/"]) + \
-        [".claude/settings.local.json", ".agents/hooks.json"]
+        [".claude/settings.local.json", ".agents/hooks.json"] + [p for p in AI_PATHS[1:] if hide_ai(ws)]
     exclude = Path(common) / "info" / "exclude"
     have = exclude.read_text(encoding="utf-8").splitlines() if exclude.is_file() else []
     if share and ".aizen/" in have:
@@ -1294,13 +1422,15 @@ def cmd_migrate(ws: Path) -> list[str]:
 
 def scaffold(ws: Path) -> None:
     a = az(ws)
-    for d in ("config", "knowledge/system", "knowledge/modules", "runs", "archive", "worktrees", "cache", "backups"):
+    for d in ("config", "knowledge/system", "knowledge/modules", "runs", "archive", "worktrees", "cache", "backups",
+              "out/history"):
         (a / d).mkdir(parents=True, exist_ok=True)
     sys.path.insert(0, str(HERE))
     import project  # noqa: PLC0415
     project.ensure_backlog(ws)
     if not (a / "config" / "guard.json").exists():
-        write_json(a / "config" / "guard.json", {"require_task": False, "share_knowledge": False})
+        write_json(a / "config" / "guard.json", {"require_task": False, "share_knowledge": False,
+                                                 "hide_ai_files": True, "lang": "vi"})
 
 
 UV_HINT = ("uv not found on PATH. Aizen runs its scripts with uv (it fetches Python by itself):\n"
@@ -1357,6 +1487,8 @@ def cmd_install(ws: Path) -> int:
                                                           for x in h.get("hooks", []))]
         entry = {"hooks": [{"type": "command", "command": call(ev, "claude"), "timeout": 120}]}
         hooks[event] = keep + [{"matcher": matcher, **entry} if matcher else entry]
+    if hide_ai(ws) and "attribution" not in cs:
+        cs["attribution"] = {"commit": "", "pr": ""}   # no Co-Authored-By / "Generated with" lines (git.md §3)
     write_json(cp, cs)
     ap_ = ws / ".agents" / "hooks.json"
     ag = read_json(ap_, {})

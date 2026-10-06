@@ -1,4 +1,4 @@
-# Planning — a plan the owner can confirm module by module (v25)
+# Planning — a plan the owner can confirm module by module (v26)
 
 The plan is what the owner confirms part by part and what every role then follows without asking. Write it so
 each module can be read, judged and approved on its own, and so a dev can build it without thinking twice.

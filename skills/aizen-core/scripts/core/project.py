@@ -3,7 +3,7 @@
 # requires-python = ">=3.9"
 # dependencies = []
 # ///
-"""project.py — compile .aizen/PROJECT.md, the one file the owner reads to understand and steer the project (v25).
+"""project.py — compile .aizen/PROJECT.md, the one file the owner reads to understand and steer the project (v26).
 
     uv run <CORE_DIR>/scripts/core/project.py [--workspace .]     # rebuild now (the guard also does it on every change)
     uv run <CORE_DIR>/scripts/core/project.py --selfcheck

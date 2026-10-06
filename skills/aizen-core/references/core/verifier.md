@@ -1,4 +1,4 @@
-# Verifier — independent judge of a run (v25)
+# Verifier — independent judge of a run (v26)
 
 Used by the guard (`scripts/core/guard.py`) for every skill whose contract has `verifier.required`, and by
 `aizen-skill-eval` as its grader. The coordinator dispatches a **fresh** sub-agent (Claude Code: Agent tool;

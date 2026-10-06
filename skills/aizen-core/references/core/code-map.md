@@ -1,4 +1,4 @@
-# Code map — graphify knowledge graph of the project (v25)
+# Code map — graphify knowledge graph of the project (v26)
 
 A graph of the project's code (files, classes, functions, imports, calls) built by
 [graphify](https://github.com/Graphify-Labs/graphify) from the AST: offline, no LLM, incremental. It answers
