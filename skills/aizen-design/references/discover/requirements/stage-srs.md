@@ -1,6 +1,6 @@
-# SRS → `.aizen/knowledge/system/requirements.md`
+# SRS → `requirements` (`docs.py where requirements`)
 
-Input: `.aizen/knowledge/system/idea.md`. Format: IEEE 29148-lite skeleton, with requirements expressed as use cases
+Input: `idea` (`docs.py where idea`). Format: IEEE 29148-lite skeleton, with requirements expressed as use cases
 and/or user stories carrying Given/When/Then acceptance criteria. This is the contract every later
 role cites by ID.
 

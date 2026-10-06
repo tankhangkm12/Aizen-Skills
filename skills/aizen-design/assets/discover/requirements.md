@@ -1,6 +1,6 @@
 # Requirements (SRS) — <project>
 
-> Version <x.y> · Updated: <YYYY-MM-DD> · Input: `.aizen/knowledge/system/idea.md`
+> Version <x.y> · Updated: <YYYY-MM-DD> · Input: the idea doc (`docs.py where idea`)
 
 ## 1. Introduction
 ### 1.1 Purpose

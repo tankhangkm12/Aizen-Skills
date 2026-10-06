@@ -8,8 +8,8 @@
     uv run <CORE_DIR>/scripts/core/project.py [--workspace .]     # rebuild now (the guard also does it on every change)
     uv run <CORE_DIR>/scripts/core/project.py --selfcheck
 
-PROJECT.md is compiled, never edited: the content comes from .aizen/knowledge/ (system, modules, decisions,
-lessons), .aizen/config/conventions.md, .aizen/backlog.md and .aizen/runs|archive/. Change the source, the map
+PROJECT.md is compiled, never edited: the content comes from the design docs (docs/ or .aizen/knowledge/, as
+docs.py resolves them), decisions and lessons, .aizen/config/conventions.md, .aizen/backlog.md and .aizen/runs|archive/. Change the source, the map
 follows. Also owns .aizen/backlog.md: `guard.py backlog add|approve|drop|list`.
 Python ≥ 3.9, standard library only.
 """
@@ -39,6 +39,12 @@ def g():
     sys.path.insert(0, str(HERE))
     import guard  # noqa: PLC0415
     return guard
+
+
+def d():
+    sys.path.insert(0, str(HERE))
+    import docs  # noqa: PLC0415
+    return docs
 
 
 # ── backlog ──────────────────────────────────────────────────────────────────────────────────────────────
@@ -141,14 +147,15 @@ def demote(text: str, by: int = 2) -> str:
 
 
 def inline(ws: Path, rel: str, missing: str) -> tuple[str, bool]:
-    p = ws / ".aizen" / rel
+    """`rel` is relative to the project root (`docs/…` or `.aizen/…` — docs.py decides, from the project's setting)."""
+    p = ws / rel
     if p.is_file() and p.read_text(encoding="utf-8").strip():
-        return demote(p.read_text(encoding="utf-8")) + f"\n\n<sub>Nguồn: `.aizen/{rel}`</sub>", True
-    return f"_Chưa có — {missing}. Nguồn sẽ là `.aizen/{rel}`._", False
+        return demote(p.read_text(encoding="utf-8")) + f"\n\n<sub>Nguồn: `{rel}`</sub>", True
+    return f"_Chưa có — {missing}. Nguồn sẽ là `{rel}`._", False
 
 
 def first(ws: Path, *rels: str) -> str:
-    return next((r for r in rels if (ws / ".aizen" / r).is_file()), rels[0])
+    return next((r for r in rels if (ws / r).is_file()), rels[0])
 
 
 def sheet_summary(ws: Path, run: str) -> tuple[int, int, list[str]]:
@@ -198,18 +205,20 @@ def build(ws: Path) -> Path:
     out += (["| Việc | Cần gì | Xem / làm |", "|---|---|---|", *need] if need else ["Không có gì cần bạn lúc này."])
 
     # 1–9 — understanding the project
+    D = d()
+    w = lambda key: D.where(ws, key)  # noqa: E731
     sec = [
-        ("1. Tổng quan", [(first(ws, "knowledge/system/overview.md", "knowledge/system/system-map.md", "knowledge/system/idea.md"),
+        ("1. Tổng quan", [(first(ws, w("overview"), w("system-map"), w("idea")),
                            "mục tiêu, phạm vi, người dùng, stack"),
-                          ("knowledge/system/requirements.md", "yêu cầu")]),
-        ("2. Kiến trúc", [("knowledge/system/architecture.md", "sơ đồ C4, thành phần, luồng dữ liệu"),
-                          ("knowledge/system/security.md", "mô hình bảo mật")]),
-        ("3. Luồng nghiệp vụ", [("knowledge/system/flows.md", "sequence diagram từng luồng chính")]),
-        ("5. Dữ liệu", [("knowledge/system/data.md", "ERD, bảng chính, migration")]),
-        ("6. Hạ tầng", [("knowledge/system/infrastructure.md", "môi trường, CI/CD, deploy, rollback")]),
-        ("7. Quy ước", [("config/conventions.md", "quy ước code, đặt tên, git, lệnh build/test/lint")]),
-        ("8. Quyết định", [("knowledge/decisions.md", "D-nn: quyết định, lý do, ngày")]),
-        ("9. Bài học", [("knowledge/lessons.md", "L-nn sau mỗi run")]),
+                          (w("requirements"), "yêu cầu")]),
+        ("2. Kiến trúc", [(w("architecture"), "sơ đồ C4, thành phần, luồng dữ liệu"),
+                          (w("security"), "mô hình bảo mật")]),
+        ("3. Luồng nghiệp vụ", [(w("flows"), "sequence diagram từng luồng chính")]),
+        ("5. Dữ liệu", [(w("data"), "ERD, bảng chính, migration")]),
+        ("6. Hạ tầng", [(w("infrastructure"), "môi trường, CI/CD, deploy, rollback")]),
+        ("7. Quy ước", [(".aizen/config/conventions.md", "quy ước code, đặt tên, git, lệnh build/test/lint")]),
+        ("8. Quyết định", [(w("decisions"), "D-nn: quyết định, lý do, ngày")]),
+        ("9. Bài học", [(w("lessons"), "L-nn sau mỗi run")]),
     ]
     used = set()
     for title, parts in sec[:3]:
@@ -221,22 +230,20 @@ def build(ws: Path) -> Path:
             if ok or rel.endswith(("overview.md", "architecture.md", "flows.md", "system-map.md", "idea.md")):
                 out += [body, ""]
         if title.startswith("2."):
-            extra = [p for p in sorted((a / "knowledge" / "system").glob("*.md"))
-                     if f"knowledge/system/{p.name}" not in {r for _, ps in sec for r, _ in ps} | used
-                     and p.name not in ("overview.md", "system-map.md", "idea.md")]
-            for p in extra:
-                rel = f"knowledge/system/{p.name}"
+            for rel in D.system_extras(ws, {r for _, ps in sec for r, _ in ps} | used):
+                p = ws / rel
                 out += [f"### {p.stem}", "", demote(p.read_text(encoding="utf-8"), 3), ""]
                 sources.append((title, rel, True))
     out += ["", "## 4. Module", ""]
-    mods = sorted(d for d in (a / "knowledge" / "modules").glob("*") if d.is_dir()) if (a / "knowledge" / "modules").is_dir() else []
+    mods = D.modules(ws)
     if not mods:
-        out.append("_Chưa có module nào được ghi — nguồn: `.aizen/knowledge/modules/<module>/`._")
-    for d in mods:
-        out += [f"### {d.name}", ""]
-        for f in sorted(d.glob("*.md")):
-            out += [demote(f.read_text(encoding="utf-8"), 3), f"\n<sub>Nguồn: `.aizen/knowledge/modules/{d.name}/{f.name}`</sub>", ""]
-            sources.append(("4. Module", f"knowledge/modules/{d.name}/{f.name}", True))
+        where_mod = "docs/architecture/modules/, docs/api/, docs/data/" if D.mode(ws) == "docs" else ".aizen/knowledge/modules/<module>/"
+        out.append(f"_Chưa có module nào được ghi — nguồn: `{where_mod}`._")
+    for name, files in mods.items():
+        out += [f"### {name}", ""]
+        for rel in files:
+            out += [demote((ws / rel).read_text(encoding="utf-8"), 3), f"\n<sub>Nguồn: `{rel}`</sub>", ""]
+            sources.append(("4. Module", rel, True))
     for title, parts in sec[3:]:
         out += ["", f"## {title}", ""]
         for rel, miss in parts:
@@ -310,11 +317,12 @@ def build(ws: Path) -> Path:
             "| Bỏ qua một bước có lý do | agent: `guard.py waive … --evidence …`; chỉ tính khi giám khảo chấp nhận |",
             "| Sửa nội dung bản đồ này | sửa file nguồn ở mục 13, rồi `aizen project` |",
             "| Bắt buộc mọi sửa code phải có run | `\"require_task\": true` trong `.aizen/config/guard.json` |",
-            "| Chia sẻ knowledge + bản đồ với team | `\"share_knowledge\": true` trong `.aizen/config/guard.json`, chạy lại `aizen guard install` |"]
+            "| Chia sẻ knowledge + bản đồ với team | `\"share_knowledge\": true` trong `.aizen/config/guard.json`, chạy lại `aizen guard install` |",
+            "| Đưa tài liệu thiết kế ra `docs/` cho cả team đọc | `uv run <CORE_DIR>/scripts/core/docs.py migrate --apply` (đặt `\"docs\": \"docs\"`) |"]
 
     # 13 — sources
     out += ["", "## 13. Nguồn", "", "| Mục | File nguồn | Có? |", "|---|---|---|"]
-    out += [f"| {t} | `.aizen/{r}` | {'✅' if ok else '—'} |" for t, r, ok in sources]
+    out += [f"| {t} | `{r}` | {'✅' if ok else '—'} |" for t, r, ok in sources]
     out += ["| 11 | `.aizen/backlog.md`, `.aizen/runs/`, `.aizen/archive/` | ✅ |", ""]
     p = a / "PROJECT.md"
     G.write_text(p, "\n".join(out))

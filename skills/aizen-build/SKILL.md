@@ -59,7 +59,8 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
    first, `state.py answer --module <part>`. The owner's changes go into the plan; re-confirm only that part.
    Facts are measured, never asked.
 2. **No writer before `state.py approve`**; after it, **no more questions** — relay a `BLOCKED` only.
-3. **Whole waves in one message**; units with overlapping write sets run in sequence (`references/flow/parallel.md`).
+3. **Whole waves in one message**, exactly the waves `state.py waves --task <TASK>` prints (write sets + `after:`, at most
+   `parallel.max` units, default 2); `journal.py stats` shows afterwards whether parallel work paid off (`references/flow/parallel.md`).
 4. **Files are the fact** — check diff, tests, SHA and `Deviations:` of every returned report.
 5. **Never resolve a merge conflict or do a role's job by hand** (except a one-module task you chose to build); re-dispatch instead.
 6. **Fix loop ≤ 2 rounds** without asking, then options for the owner.
@@ -75,7 +76,7 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
     — never write or rewrite a role's report for it; the ledger shows who wrote each file. A step that truly does
     not apply: `guard.py waive --run <TASK> --step <id> --reason "…" --evidence <file | one line of real output>`;
     it counts once the reviewer writes `waiver <id>: accepted`, and goes under `## Waived` in `pr-body.md`
-    (`plan`, `check-int`, `review` cannot be waived). Code changed → record what changed in `.aizen/knowledge/`
+    (`plan`, `check-int`, `review` cannot be waived). Code changed → record what changed in the design docs (`docs.py where …`: `docs/` or `.aizen/knowledge/`)
     (decisions, module design/API/data, lessons) — the `knowledge` check. Blocked on the owner: `state.py status
     --set blocked`, then one question. `guard.py check --run <TASK>` shows the list any time; when it passes the
     guard marks the run done and archives it (`state.py status --set done` is refused).

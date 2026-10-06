@@ -10,6 +10,7 @@
     uv run $J note   --run R --kind try   --text "Tôi sẽ thử SET NX PX thay vì bảng lock"
     uv run $J show   --run R [--tail 30]
     uv run $J report [--run R]            # → .aizen/out/latest.md (+ history/), prints only the path
+    uv run $J stats  --run R              # who worked when; parallel factor of the sub-agents
 
 Journal = .aizen/runs/<RUN>/journal.md, one short line per entry:
     - 14:32 · dev-seat · 🧠 Tôi đang nghĩ cách giữ ghế bằng khoá Redis 5 phút
@@ -44,13 +45,17 @@ TEXT = {
            "open": "Kiểm tra còn mở", "summary": "Agent tóm tắt", "recent": "Nhật ký gần nhất",
            "files": "File chi tiết", "none": "—", "paste": "Dán nguyên file này cho AI web hoặc người review.",
            "updated": "Cập nhật", "approved": "đã duyệt plan", "not_approved": "chưa duyệt plan",
-           "round": "vòng sửa", "no_summary": "(chưa có — agent ghi reports/summary.md khi xong một chặng)"},
+           "round": "vòng sửa", "no_summary": "(chưa có — agent ghi reports/summary.md khi xong một chặng)",
+           "time": "Thời gian", "wall": "Cả run", "ops": "thao tác",
+           "par": "Song song: sub-agent làm tổng {busy} trong {union} → hệ số {f:.1f}×"},
     "en": {"wrote": "Wrote {files}", "ran_ok": "Ran `{cmd}` → ok", "ran_bad": "Ran `{cmd}` → failed",
            "title": "Journal", "goal": "Goal", "status": "Status", "owner": "Needs you",
            "open": "Open checks", "summary": "Agent summary", "recent": "Latest journal",
            "files": "Detail files", "none": "—", "paste": "Paste this file as-is into a web AI or give it to a reviewer.",
            "updated": "Updated", "approved": "plan approved", "not_approved": "plan not approved",
-           "round": "fix round", "no_summary": "(none yet — the agent writes reports/summary.md at the end of a stage)"},
+           "round": "fix round", "no_summary": "(none yet — the agent writes reports/summary.md at the end of a stage)",
+           "time": "Time", "wall": "Whole run", "ops": "actions",
+           "par": "Parallel: sub-agents worked {busy} in total within {union} → factor {f:.1f}×"},
 }
 
 
@@ -183,6 +188,70 @@ def open_checks(rd: Path) -> list[str]:
             if len(c) > 4 and "❌" in c[2]]
 
 
+# ── timing: who worked when, and how much parallel work paid off ─────────────────────────────────────────
+
+def _ts(v: str):
+    try:
+        return dt.datetime.fromisoformat(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def dur(sec: float) -> str:
+    m = int(round(sec / 60))
+    return f"{m // 60}h{m % 60:02d}m" if m >= 60 else f"{m}m"
+
+
+def timing(ws: Path, run: str) -> dict:
+    """From the hook ledger: each worker's first and last action, the whole run, and for sub-agents the summed
+    working time against the time any of them was working (factor > 1 = they really ran side by side)."""
+    rd = run_dir(ws, run)
+    g = read_json(rd / "guard.json", {})
+    names, coord = g.get("names", {}), g.get("coordinator")
+    spans: dict[str, list] = {}
+    p = rd / "ledger.jsonl"
+    for line in p.read_text(encoding="utf-8").splitlines() if p.is_file() else []:
+        try:
+            e = json.loads(line)
+        except ValueError:
+            continue
+        t = _ts(e.get("ts"))
+        if not t:
+            continue
+        w = e.get("writer") or ""
+        who = names.get(w) or ("main" if not w or w == coord else "sub-" + (w.rsplit("/", 1)[-1][-6:] or "?"))
+        s_ = spans.setdefault(who, [t, t, 0])
+        s_[0], s_[1], s_[2] = min(s_[0], t), max(s_[1], t), s_[2] + 1
+    if not spans:
+        return {"workers": [], "wall": 0, "busy": 0, "union": 0}
+    allt = [x for s_ in spans.values() for x in s_[:2]]
+    subs = sorted((s_[0], s_[1]) for who, s_ in spans.items() if who != "main")
+    busy = sum((b - a).total_seconds() for a, b in subs)
+    union, cur = 0.0, None
+    for a, b in subs:
+        if cur and a <= cur[1]:
+            cur[1] = max(cur[1], b)
+        else:
+            union += (cur[1] - cur[0]).total_seconds() if cur else 0
+            cur = [a, b]
+    union += (cur[1] - cur[0]).total_seconds() if cur else 0
+    workers = sorted(((who, s_[0], s_[1], s_[2]) for who, s_ in spans.items()), key=lambda x: x[1])
+    return {"workers": workers, "wall": (max(allt) - min(allt)).total_seconds(), "busy": busy, "union": union}
+
+
+def timing_lines(ws: Path, run: str) -> list[str]:
+    t, T = timing(ws, run), TEXT[lang(ws)]
+    subs = [w for w in t["workers"] if w[0] != "main"]
+    if len(subs) < 2:
+        return []
+    loc = lambda x: x.astimezone().strftime("%H:%M")  # noqa: E731
+    out = [f"- {T['wall']}: {dur(t['wall'])}"]
+    out += [f"- {who}: {loc(a)}–{loc(b)} ({dur((b - a).total_seconds())}, {n} {T['ops']})" for who, a, b, n in t["workers"]]
+    if t["union"] > 0:
+        out.append("- " + T["par"].format(busy=dur(t["busy"]), union=dur(t["union"]), f=t["busy"] / t["union"]))
+    return out
+
+
 def report(ws: Path, run: str | None = None) -> Path:
     """Write .aizen/out/latest.md and a dated copy in .aizen/out/history/; return the path of latest.md."""
     run = run or latest_run(ws)
@@ -209,6 +278,7 @@ def report(ws: Path, run: str | None = None) -> Path:
            f"## {t['summary']}",
            summary.read_text(encoding="utf-8", errors="replace").strip() if summary.is_file() else t["no_summary"], "",
            f"## {t['recent']}", *(lines(ws, run)[-20:] or [t["none"]]), "",
+           *([f"## {t['time']}", *timing_lines(ws, run), ""] if timing_lines(ws, run) else []),
            f"## {t['files']}", *[f"- `{rel(f)}`" for f in files]]
     text = "\n".join(out).rstrip() + "\n"
     d = ws / ".aizen" / "out"
@@ -246,7 +316,9 @@ def main(argv=None) -> int:
     s.add_argument("--tail", type=int, default=30)
     r = sub.add_parser("report")
     r.add_argument("--run", "--task", dest="run")
-    for q in (n, s, r):
+    st = sub.add_parser("stats", help="who worked when; how much parallel work paid off")
+    st.add_argument("--run", "--task", dest="run", required=True)
+    for q in (n, s, r, st):
         q.add_argument("--workspace", default=".")
     a = ap.parse_args(argv)
     ws = find_ws(Path(a.workspace))
@@ -256,6 +328,10 @@ def main(argv=None) -> int:
     try:
         if a.cmd == "note":
             print(note(ws, a.run, a.kind, a.text, a.who))
+        elif a.cmd == "stats":
+            t = timing(ws, a.run)
+            print("\n".join(timing_lines(ws, a.run)) or
+                  "\n".join(f"- {who}: {dur((b - x).total_seconds())}, {k} actions" for who, x, b, k in t["workers"]) or "(no ledger yet)")
         elif a.cmd == "show":
             print("\n".join(lines(ws, a.run)[-a.tail:]) or "(empty)")
         else:
@@ -301,6 +377,19 @@ def _selfcheck() -> None:
         (ws / ".aizen" / "config" / "guard.json").write_text('{"lang": "en"}', encoding="utf-8")
         assert "Agent summary" in report(ws, "T-1").read_text(encoding="utf-8")
         assert find_ws(rd) == ws.resolve()
+        # timing: two sub-agents overlapping 10 of their 20 + 20 minutes → factor 40/30
+        (rd / "guard.json").write_text(json.dumps({"coordinator": "S0", "names": {"S1": "dev-api", "S2": "dev-web"}}),
+                                       encoding="utf-8")
+        led = [("S0", "10:00"), ("S1", "10:05"), ("S1", "10:25"), ("S2", "10:15"), ("S2", "10:35"), ("S0", "10:50")]
+        (rd / "ledger.jsonl").write_text("".join(json.dumps({"ts": f"2026-10-07T{t}:00+00:00", "writer": w}) + "\n"
+                                                 for w, t in led) + "not json\n", encoding="utf-8")
+        t = timing(ws, "T-1")
+        assert t["wall"] == 3000 and t["busy"] == 2400 and t["union"] == 1800, t
+        assert [w[0] for w in t["workers"]] == ["main", "dev-api", "dev-web"] and t["workers"][1][3] == 2
+        tl = timing_lines(ws, "T-1")
+        assert tl[0] == "- Whole run: 50m" and "factor 1.3×" in tl[-1] and "dev-web" in tl[3], tl
+        assert "## Time" in report(ws, "T-1").read_text(encoding="utf-8")
+        assert dur(3900) == "1h05m"
     print("journal.py self-check OK")
 
 

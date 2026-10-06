@@ -6,6 +6,7 @@
 """state.py — task state and briefs for the aizen-build coordinator (v26).
 
     S=<SKILL_DIR>/scripts/flow/state.py
+    uv run $S waves   --task SHOP-42 [--max 3]          # which units may run together, from the plan's write sets + after
     uv run $S init    --task SHOP-42 --goal "add coupon to checkout" [--slug checkout-coupon] [--type feature] [--ticket SHOP-42]
     uv run $S branch  --task SHOP-42 [--unit coupon-api]   # the git branch name: <type>/<slug>[-<unit>], never the run id
     uv run $S brief   --task SHOP-42 --role planner --stage design
@@ -216,6 +217,98 @@ def cmd_answer(ws: Path, a) -> str:
 MODULE = re.compile(r"^## Module\s+`?([A-Za-z0-9._-]+)`?", re.M)
 
 
+# ── waves: which units may run at the same time (references/flow/parallel.md) ────────────────────────────
+
+UNIT_HEAD = re.compile(r"^## Module\s+`?([A-Za-z0-9._-]+)`?(.*)$", re.M)
+AFTER = re.compile(r"\bafter\s*:\s*([^·|\n]+)", re.I)
+WILD = re.compile(r"[*?\[{]")
+PARALLEL_MAX = 2
+
+
+def parallel_max(ws: Path) -> int:
+    """`.aizen/config/guard.json` → "parallel": {"max": n}; default 2 — each unit costs a worktree, a dispatch,
+    its own ports, containers and database on one machine."""
+    try:
+        cfg = json.loads((ws / ".aizen" / "config" / "guard.json").read_text(encoding="utf-8"))
+        return max(1, int((cfg.get("parallel") or {}).get("max", PARALLEL_MAX)))
+    except (OSError, ValueError, TypeError, AttributeError):
+        return PARALLEL_MAX
+
+
+def plan_units(ws: Path, task: str) -> list[dict]:
+    """[{id, write: [globs], after: [ids]}] in plan order; retired ~~ids~~ are not modules."""
+    p = task_dir(ws, task) / "plan.md"
+    if not p.is_file():
+        raise SystemExit(f"no plan at .aizen/runs/{task}/plan.md")
+    text = p.read_text(encoding="utf-8")
+    heads = list(UNIT_HEAD.finditer(text))
+    units = []
+    for i, m in enumerate(heads):
+        body = text[m.end():heads[i + 1].start() if i + 1 < len(heads) else len(text)].split("\n## ", 1)[0]
+        line = WRITE_SET.search(body)
+        raw = line.group(1) if line else ""
+        globs = re.findall(r"`([^`]+)`", raw) or [g for g in re.split(r"[,\s]+", raw) if g]
+        found = AFTER.search(m.group(2)) or AFTER.search(body)
+        after = [x.strip("`") for x in re.split(r"[,\s]+", found.group(1)) if x.strip("`")] if found else []
+        units.append({"id": m.group(1),
+                      "write": [g.strip().lstrip("./") for g in globs if g.strip().lower() not in NO_FILES],
+                      "after": [x for x in after if x.lower() not in NO_FILES | {"parallel", "and"}]})
+    return units
+
+
+def overlaps(a: str, b: str) -> bool:
+    """Conservative: two globs may touch the same file when one's fixed prefix starts the other's."""
+    pa, pb = WILD.split(a, 1)[0], WILD.split(b, 1)[0]
+    if not WILD.search(a) and not WILD.search(b):
+        return a == b
+    return pa.startswith(pb) or pb.startswith(pa)
+
+
+def shared(u: dict, v: dict) -> list[str]:
+    return [f"`{a}` ~ `{b}`" if a != b else f"`{a}`" for a in u["write"] for b in v["write"] if overlaps(a, b)]
+
+
+def plan_waves(units: list[dict], limit: int) -> tuple[list[list[str]], list[str]]:
+    """Waves in plan order: a unit joins the first wave after all of its `after` units, unless it shares files
+    with a member or the wave is full — then it moves to the next wave (and says why)."""
+    ids = {u["id"] for u in units}
+    bad = [f"{u['id']} waits for unknown unit {x}" for u in units for x in u["after"] if x not in ids]
+    if bad:
+        raise SystemExit("plan: " + "; ".join(bad))
+    done, waves, notes, left = set(), [], [], list(units)
+    while left:
+        ready = [u for u in left if all(x in done for x in u["after"])]
+        if not ready:
+            raise SystemExit("plan: the `after` lines form a cycle: " + ", ".join(u["id"] for u in left))
+        wave = []
+        for u in ready:
+            clash = next(((w, shared(u, w)) for w in wave if shared(u, w)), None)
+            if clash:
+                notes.append(f"{u['id']} after {clash[0]['id']}: both write {', '.join(clash[1][:3])}")
+            elif len(wave) >= limit:
+                notes.append(f"{u['id']} waits: parallel.max = {limit}")
+            else:
+                wave.append(u)
+        waves.append([u["id"] for u in wave])
+        done |= {u["id"] for u in wave}
+        left = [u for u in left if u["id"] not in done]
+    return waves, notes
+
+
+def cmd_waves(ws: Path, a) -> str:
+    limit = a.max or parallel_max(ws)
+    units = plan_units(ws, a.task)
+    if not units:
+        raise SystemExit(f"no modules in .aizen/runs/{a.task}/plan.md")
+    waves, notes = plan_waves(units, limit)
+    out = [f"Waves for {a.task} (parallel.max = {limit}, `.aizen/config/guard.json` → parallel.max):"]
+    out += [f"  {i}: {' ‖ '.join(w)}" for i, w in enumerate(waves, 1)]
+    if notes:
+        out += ["Sequenced:", *[f"  - {n}" for n in notes]]
+    out.append("Launch every unit of a wave in one message; the next wave starts when the wave is clean.")
+    return "\n".join(out)
+
+
 def plan_modules(ws: Path, task: str) -> list[str] | None:
     """Module ids of .aizen/runs/<TASK>/plan.md, retired ones (~~id~~) excluded; None when there is no plan file."""
     p = task_dir(ws, task) / "plan.md"
@@ -368,7 +461,8 @@ def cmd_brief(ws: Path, a) -> str:
         "BRANCH": a.branch or (branch_name(run, a.task, unit, len(writer_units(ws, a.task))) if writer
                                else branch_name(run, a.task) if a.role in ("tester", "reviewer") else "(none)"),
         "SHA": a.sha or "(record the start SHA yourself: git rev-parse HEAD)",
-        "WRITE_SET": a.write_set or {"planner": f".aizen/runs/{a.task}/plan.md, .aizen/knowledge/**, .aizen/runs/{a.task}/reports/**",
+        "WRITE_SET": a.write_set or {"planner": f".aizen/runs/{a.task}/plan.md, .aizen/runs/{a.task}/acceptance.md, docs/** (design docs, "
+                                                f"when the project publishes them), .aizen/knowledge/**, .aizen/runs/{a.task}/reports/**",
                                      "reviewer": "none (read-only)"}.get(a.role, "the unit's paths in the plan — nothing outside"),
         "PORTS": a.ports or "pick a free range of 10 and record it in your report",
         "DB": re.sub(r"[^a-z0-9]+", "_", f"{a.task}_{unit}".lower()).strip("_"),
@@ -395,7 +489,7 @@ def main(argv=None) -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "approve", "round", "status", "branch")}
+    ps = {n: sub.add_parser(n) for n in ("init", "brief", "answer", "approve", "round", "status", "branch", "waves")}
     for p in ps.values():
         p.add_argument("--task", required=True)
         p.add_argument("--workspace", default=".")
@@ -405,6 +499,7 @@ def main(argv=None) -> int:
     ps["init"].add_argument("--type", choices=BRANCH_TYPES, default="feature", help="branch type (git.md §1)")
     ps["init"].add_argument("--ticket", help="a real ticket id (Jira, GitHub issue) for `Refs:` in commits — not the run id")
     ps["branch"].add_argument("--unit")
+    ps["waves"].add_argument("--max", type=int, help="override parallel.max for this print")
     b = ps["brief"]
     b.add_argument("--role", choices=ROLES, required=True)
     b.add_argument("--kind", choices=KINDS, default="-")
@@ -429,7 +524,7 @@ def main(argv=None) -> int:
         if v and not ID.match(v):
             raise SystemExit(f"invalid id {v!r} — use letters, digits, . _ -")
     fn = {"init": cmd_init, "brief": cmd_brief, "answer": cmd_answer, "approve": cmd_approve, "round": cmd_round,
-          "status": cmd_status, "branch": cmd_branch}
+          "status": cmd_status, "branch": cmd_branch, "waves": cmd_waves}
     print(fn[a.cmd](Path(a.workspace), a))
     return 0
 
@@ -483,6 +578,25 @@ def _selfcheck() -> None:
                         "## Module `ui` — screen\nFiles (write set): `web/**`\n## Module measure\nFiles (write set): —\n"
                         "## Delivery\n", encoding="utf-8")
         assert writer_units(Path(tmp), "T-1") == ["api", "ui"]
+        U = lambda i, w, after=(): {"id": i, "write": list(w), "after": list(after)}  # noqa: E731
+        wv, nt = plan_waves([U("measure", []), U("api", ["src/api/**", "src/app.module.ts"], ["measure"]),
+                             U("web", ["web/**"], ["measure"]), U("auth", ["src/app.module.ts"], ["measure"]),
+                             U("deploy", ["deploy/**"], ["api"])], 2)
+        assert wv == [["measure"], ["api", "web"], ["auth", "deploy"]], (wv, nt)
+        assert any("auth after api" in n and "src/app.module.ts" in n for n in nt), nt
+        assert plan_waves([U("a", ["x/**"]), U("b", ["y/**"]), U("c", ["z/**"])], 2)[0] == [["a", "b"], ["c"]]
+        assert overlaps("src/**", "src/api/x.ts") and not overlaps("web/**", "src/**")
+        assert overlaps("a.ts", "a.ts") and not overlaps("a.ts", "b.ts")
+        for bad, needle in (([U("a", [], ["zz"])], "unknown unit zz"), ([U("a", [], ["b"]), U("b", [], ["a"])], "cycle")):
+            try:
+                plan_waves(bad, 2)
+                raise AssertionError(needle)
+            except SystemExit as e:
+                assert needle in str(e.code), e.code
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            main(["waves", *w])
+        assert "1: api ‖ ui" in out.getvalue() and "2: measure" in out.getvalue() and "parallel.max = 2" in out.getvalue(), out.getvalue()
         expect_exit(["approve", *w], "no acceptance cases")  # tests are agreed before the code exists
         acc = Path(tmp, ".aizen", "runs", "T-1", "acceptance.md")
         acc.write_text("| TC | AC |\n|---|---|\n| TC-01 | AC-1 |\n| TC-02 | AC-1 |\n", encoding="utf-8")

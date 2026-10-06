@@ -1,4 +1,4 @@
-# HLD → `.aizen/knowledge/system/architecture.md`
+# HLD → `architecture` (`docs.py where architecture`)
 
 Input: `idea.md`, `requirements.md`. The most expensive forks live here; everything later builds on them.
 

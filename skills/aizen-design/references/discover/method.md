@@ -31,7 +31,7 @@ multi-service — unsure = true) · questions (preferences/risk only, with choic
   with a **Not found** table. Show it before going deep.
 - **K2 Deep read** per service (`references/discover/onboard/as-built.md`): validation, permission checks,
   transaction boundaries, retries, idempotency, uniqueness by constraint vs by code.
-- **K3 Write as-built docs** into `.aizen/knowledge/` with labels; decisions found in code marked
+- **K3 Write as-built docs** at the paths `docs.py where` prints (aizen-core), with labels; decisions found in code marked
   `[reconstructed — never approved]`.
 - **K4 Contradictions and unknowns**, each naming who could answer.
 - **K5 Risk map** (`references/discover/onboard/risk-map.md`) ranked by impact × how quietly it fails.

@@ -82,7 +82,7 @@ playwright-cli -s=$S close                     # then stop the dev server you st
    `uv run $UIKIT contrast "#6b7280" "#ffffff"` (AA: 4.5 text, 3 large text and UI parts).
 6. **Guidelines.** Check the changed files against `references/frontend/web-interface-guidelines.md`.
 7. **dev (fe):** fix, re-capture, re-measure — at most 3 polish rounds per screen, then report what remains
-   (a failing build or command still follows `references/flow/parallel.md` §6). **`tester`:** never fix — each defect
+   (a failing build or command still follows `references/flow/parallel.md` §7). **`tester`:** never fix — each defect
    is a `BUG-nn` with the screenshot as evidence.
 
 ## 4. States from the contract

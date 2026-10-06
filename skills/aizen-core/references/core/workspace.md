@@ -13,9 +13,10 @@ the owner wants it. `.aizen/` is local-only (`.git/info/exclude`, never staged) 
 ├── backlog.md              ✍ work to come: BL-nn · skill · status · after · run (agents propose, the owner approves)
 ├── out/                    👁 hand-off for the owner: latest.md (newest run report, paste-ready) · history/<date>-<RUN>.md
 ├── config/
-│   ├── guard.json          require_task · share_knowledge · hide_ai_files (default true) · lang (vi | en)
+│   ├── guard.json          require_task · share_knowledge · hide_ai_files (default true) · lang (vi | en) ·
+│   │                       docs (docs | knowledge — where design docs live) · parallel.max (default 2)
 │   └── conventions.md      one page: naming, patterns, commands — read before the first edit
-├── knowledge/              understanding the project — outlives every run
+├── knowledge/              understanding the project — outlives every run (design docs move to docs/ when "docs": "docs")
 │   ├── system/             overview · requirements · architecture · flows · data · infrastructure · security · test-plan
 │   ├── modules/<module>/   <module>-design.md (LLD) · <module>-database.md · <module>-api.md + .yaml
 │   ├── apps/<app>/         <app>-frontend.md · <app>-ui.md · design-tokens.json · ui-exports/
@@ -55,7 +56,11 @@ Start: `guard.py start --skill <skill> --goal "…"` (aizen-build: `state.py ini
 Microservices: `knowledge/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api.md` + `.yaml`, `<svc>-database.md`,
 `<svc>-infrastructure.md` and `modules/<module>/<module>-design.md`. Names are lower-kebab-case.
 
-## 2. Logical names → paths (under `.aizen/knowledge/`)
+## 2. Logical names → paths
+
+Guides name design docs by their logical name or by the `.aizen/knowledge/…` path below; either way the real
+path is what `uv run "<CORE_DIR>/scripts/core/docs.py" where <name> [--name <m>]` prints. With `"docs": "docs"`
+(new projects) it is under `docs/` in the team layout of `references/core/docs.md`; otherwise under `.aizen/knowledge/`:
 
 | Logical name | Monolith | Microservices |
 |---|---|---|
@@ -66,7 +71,8 @@ Microservices: `knowledge/services/<svc>/` holds `<svc>-overview.md`, `<svc>-api
 | frontend architecture · UI design | `apps/<app>/<app>-frontend.md` · `<app>-ui.md` | same |
 | infrastructure doc | `system/infrastructure.md` | `services/<svc>/<svc>-infrastructure.md` |
 
-An existing repo with its own docs folder keeps it; record the mapping in `.aizen/config/conventions.md`.
+An existing repo with its own `docs/` folder: `docs.py migrate` shows how it maps onto the layout; the owner decides
+(`--apply`). Until then record the mapping in `.aizen/config/conventions.md`.
 
 ## 3. Priority when sources conflict
 

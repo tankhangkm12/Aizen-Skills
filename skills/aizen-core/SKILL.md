@@ -27,6 +27,7 @@ and knowledge packs point here instead of restating them.
 | code map: who calls what, blast radius | `references/core/code-map.md` → `scripts/core/graph.py` |
 | quality gate: lint, types, build, tests, secrets, deps → evidence JSON | `scripts/core/check.py` |
 | run contract: sheet, rules, verifier, hooks, backlog — the gate that decides done | `scripts/core/guard.py` · `references/core/verifier.md` · `assets/core/contract.default.json` |
+| team docs in `docs/` (one layout, readable on GitHub), where each design doc lives, index, check, migrate | `references/core/docs.md` · `scripts/core/docs.py` |
 | the project map `.aizen/PROJECT.md` (one file, table of contents) | `scripts/core/project.py` · `references/core/workspace.md` |
 | the run's journal in plain words, the owner's hand-off file `.aizen/out/latest.md` | `scripts/core/journal.py` · `references/core/rules.md` → Journal, Output |
 | capacity, growth, contention projections | `scripts/core/capacity.py` |

@@ -277,8 +277,34 @@ máy (`.git/info/exclude`); nhánh mang tên nghiệp vụ (`feature/giu-ghe`, k
 gắn mã run hay dòng đồng tác giả AI — pre-push chặn và in lệnh sửa. Tắt: `"hide_ai_files": false` trong
 `.aizen/config/guard.json`. Chi tiết: [docs/huong-dan-su-dung.md](docs/huong-dan-su-dung.md).
 
+**Song song có đo đạc.** `state.py waves --task <TASK>` xếp các module thành đợt từ write set và `after:` của plan:
+module chung file thì chạy sau, mỗi đợt tối đa `parallel.max` (mặc định 2 — mỗi unit cần worktree, port, container,
+DB riêng trên một máy). Sau run, `journal.py stats --run <TASK>` (và mục "Thời gian" trong `.aizen/out/latest.md`)
+cho biết từng sub-agent làm lúc nào và hệ số song song: gần 1.0× là đang chờ nhau → lần sau gộp module; cao hơn rõ
+và merge sạch → có thể tăng `"parallel": {"max": 3}` trong `.aizen/config/guard.json`.
+
 Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
 `skills/aizen-build/references/flow/platform-*.md`.
+
+### Tài liệu cho team: `docs/`
+
+Tài liệu thiết kế (SRS, kiến trúc, module, API, dữ liệu, hạ tầng) nằm trong `docs/` theo một bố cục cố định, được
+commit và đọc được trên GitHub; việc riêng của agent (plan, run, nhật ký, `decisions.md`, `lessons.md`) vẫn ở
+`.aizen/`. Dự án mới mặc định như vậy (`"docs": "docs"` trong `.aizen/config/guard.json`).
+
+```
+docs/README.md   mục lục (phần trên viết tay, bảng dưới do docs.py sinh)
+docs/product/    ý tưởng, SRS, user story, kế hoạch kiểm thử
+docs/architecture/   kiến trúc, luồng, bảo mật · modules/<m>.md · adr/NNNN-<slug>.md
+docs/api/        <m>.md + <m>.yaml       docs/data/   ERD, bảng, ddl.sql
+docs/ui/         frontend, màn hình      docs/ops/    hạ tầng, biến môi trường, runbook
+docs/guides/     onboarding, cách chạy   docs/services/<svc>/   microservice
+```
+
+`aizen-core/scripts/core/docs.py`: `where <tên>` (đường dẫn đúng của một tài liệu) · `index` (dựng lại mục lục) ·
+`check` (bố cục, tiêu đề, dòng tóm tắt, link hỏng, nhắc tới `.aizen/` hay mã run) · `migrate [--apply]` (dự án cũ:
+chuyển `.aizen/knowledge/` và file rời trong `docs/` vào bố cục bằng `git mv`). Quy tắc viết:
+`skills/aizen-core/references/core/docs.md`.
 
 ## Hợp đồng chung — agent làm đủ, không làm thừa, có bằng chứng
 
@@ -314,7 +340,7 @@ Bước thật sự không áp dụng → `guard.py waive --run <RUN> --step <id
 ├── out/            👁 latest.md — báo cáo mới nhất, dán thẳng cho AI web · history/
 ├── backlog.md      ✍ việc sắp làm BL-nn (agent đề xuất, chỉ bạn duyệt)
 ├── config/         guard.json · conventions.md
-├── knowledge/      system/ · modules/ · decisions.md · lessons.md — hiểu dự án
+├── knowledge/      decisions.md · lessons.md (+ system/ · modules/ khi tài liệu thiết kế chưa chuyển ra docs/)
 ├── runs/<RUN>/     run.json · state.md · plan.md · acceptance.md · journal.md · sheet.md · ledger.jsonl · waivers.json · evidence/ · reports/ · verdict.json · work/
 ├── worktrees/ · cache/ · backups/ · archive/
 ```

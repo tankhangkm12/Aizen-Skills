@@ -1,4 +1,4 @@
-# Idea, feasibility, scope → `.aizen/knowledge/system/idea.md`
+# Idea, feasibility, scope → `idea` (`docs.py where idea`)
 
 Goal: from a one-line idea, settle **what is built for whom, whether it is worth it, and exactly what
 version 1 contains**. The point is to avoid building the wrong thing.

@@ -190,6 +190,12 @@ def journal_mod():
     return journal
 
 
+def docs_mod():
+    sys.path.insert(0, str(HERE))
+    import docs  # noqa: PLC0415
+    return docs
+
+
 def state_mod():
     """aizen-build's state.py — the one place branch names are made (`branch_name`)."""
     import importlib.util
@@ -728,10 +734,13 @@ def evaluate(ws: Path, run_id: str, finishing: bool = True) -> Result:
                 "Acceptance matrix (pass / fail / blocked + why)")
         elif kind == "knowledge":
             changed = bool(code_writers) or any(unit_tip.values())
-            wrote = any(f.startswith(".aizen/knowledge/") for e in entries for f in e.get("files", []))
-            add(not changed or wrote, "knowledge/ updated" if wrote or not changed else
-                "code changed but .aizen/knowledge/ was not updated — record new decisions (decisions.md), module "
-                "design/API/data changes (modules/<m>/) and lessons; or waive with evidence that nothing changed")
+            D = docs_mod()
+            wrote = any(D.is_doc_path(ws, f) for e in entries for f in e.get("files", []))
+            home = "docs/ or .aizen/knowledge/" if D.mode(ws) == "docs" else ".aizen/knowledge/"
+            add(not changed or wrote, "design docs / knowledge updated" if wrote or not changed else
+                f"code changed but {home} was not updated — record new decisions (decisions.md), module "
+                "design/API/data changes (`docs.py where module-design|module-api|module-database --name <m>`) and "
+                "lessons; or waive with evidence that nothing changed")
         elif kind == "command":
             cmd = r["run"]
             out_list = [p for p in outputs] or [None]
@@ -1430,8 +1439,13 @@ def scaffold(ws: Path) -> None:
     import project  # noqa: PLC0415
     project.ensure_backlog(ws)
     if not (a / "config" / "guard.json").exists():
+        # design docs go to docs/ for a new project; one that already keeps them in knowledge/ stays there until
+        # the owner runs `docs.py migrate --apply`
+        had = any(p.suffix == ".md" for d in ("system", "modules", "apps", "services")
+                  for p in (a / "knowledge" / d).rglob("*") if (a / "knowledge" / d).is_dir())
         write_json(a / "config" / "guard.json", {"require_task": False, "share_knowledge": False,
-                                                 "hide_ai_files": True, "lang": "vi"})
+                                                 "hide_ai_files": True, "lang": "vi",
+                                                 "docs": "knowledge" if had else "docs", "parallel": {"max": 2}})
 
 
 UV_HINT = ("uv not found on PATH. Aizen runs its scripts with uv (it fetches Python by itself):\n"
