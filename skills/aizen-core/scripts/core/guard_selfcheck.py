@@ -394,7 +394,7 @@ def v26_run() -> None:
         assert G.ai_traces(ws, sha, {"init"}) == [probs[0]]   # aizen-init's run id `init` never matches the word
         G.exclude_local(ws)
         exclude = (ws / ".git" / "info" / "exclude").read_text()
-        assert all(p in exclude for p in (".claude/", "AGENTS.md", ".agents/", "graphify-out/")), exclude
+        assert all(p in exclude for p in (".claude/", "AGENTS.md", ".agents/", "graphify-out/", "skills-lock.json")), exclude
 
 
 def text_rules() -> None:

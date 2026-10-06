@@ -136,7 +136,7 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 
 - `guard.py install` thêm vào `.git/info/exclude` (chỉ ở máy bạn, không lộ cả trong `.gitignore`): `.aizen/`,
   `.agents/`, `.claude/`, `.cursor/`, `.gemini/`, `.windsurf/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.mcp.json`,
-  `graphify-out/`… và tắt dòng `Co-Authored-By` / "Generated with" mà Claude Code tự thêm vào commit/PR.
+  `skills-lock.json`, `graphify-out/`… và tắt dòng `Co-Authored-By` / "Generated with" mà Claude Code tự thêm vào commit/PR.
 - Nhánh đặt theo **nghiệp vụ**, không theo mã task của agent: `feature/giu-ghe`, `bugfix/thanh-toan-timeout`
   (nhiều module: `feature/giu-ghe-api`, `feature/giu-ghe-web` gộp vào `feature/giu-ghe`). Agent đặt tên khi
   `state.py init --slug giu-ghe`; xem tên bằng `state.py branch --task <TASK>`.
