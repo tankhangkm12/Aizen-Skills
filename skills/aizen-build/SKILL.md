@@ -44,7 +44,8 @@ yourself; tester and reviewer still run. Bug: `references/dev/bugfix.md`.
 ## Tools
 
 `state.py` = `python "<SKILL_DIR>/scripts/flow/state.py"` (`<SKILL_DIR>` = this skill's folder): `init`, `brief`,
-`answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`. A brief carries
+`answer`, `approve` (refuses while a `## Module` of the plan is unconfirmed), `round`, `status`. `guard.py` (same
+folder): `check`, `waive`, `install` — the done checklist (`manifest.json` → `checklist`) the hooks enforce. A brief carries
 every absolute path, the quality-gate command (`scripts/core/check.py`) and the code-map command
 (`scripts/core/graph.py`, `references/core/code-map.md`). Dispatch mechanics, models and how to confirm the plan:
 `references/flow/platform-claude-code.md` · `references/flow/platform-antigravity.md`.
@@ -63,6 +64,12 @@ every absolute path, the quality-gate command (`scripts/core/check.py`) and the 
 8. **State on disk** — `.aizen/tasks/<TASK>/state.md`; on resume run `state.py status` first.
 9. Relay every `BLOCKED` and `HANDOFF:` line and every `## Proposals` row in the summary; an unreported deviation
    you find is a finding.
+10. **The guard decides "done", not you.** When the project has the guard hooks (`scripts/flow/guard.py`, installed
+    by `aizen sync --project`), a stop is refused until the checklist passes and the hook prints what is open. Do
+    exactly those items, nothing more. A step that truly does not apply: `guard.py waive --task <TASK> --step <id>
+    --reason "…"` and list it under `## Waived` in `pr-body.md` (`plan` and `review` cannot be waived). Blocked on
+    the owner: `state.py status --set blocked`, then one question. `guard.py check --task <TASK>` shows the list
+    any time — run it before you report the task finished.
 
 ## Knowledge — by topic, from the packs installed next to this skill
 

@@ -282,7 +282,34 @@ ${fs.readFileSync(skillMd, 'utf8')}
 
   // Cập nhật bảng chỉ dẫn AGENTS.md
   updateAgentsMd(skills, projectDir, verbose);
+  // Hook ép quy trình aizen-build (Claude Code + Antigravity + git pre-push) cho riêng dự án này
+  installGuard(projectDir, verbose);
   return results;
+}
+
+// guard.py của aizen-build: Stop/PreToolUse/PostToolUse hook + pre-push, ghi vào dự án (không đụng cấu hình global)
+const guardScript = path.join(skillsDir, 'aizen-build', 'scripts', 'flow', 'guard.py');
+function findPython() {
+  const { spawnSync } = require('child_process');
+  return ['python3', 'python', 'py'].find(p => {
+    const r = spawnSync(p, ['--version'], { encoding: 'utf8' });
+    return r.status === 0 && /Python 3/.test((r.stdout || '') + (r.stderr || ''));
+  });
+}
+function runGuard(args, options = {}) {
+  const { spawnSync } = require('child_process');
+  const python = findPython();
+  if (!python) {
+    console.warn('  ! [Aizen Guard] Không tìm thấy Python 3 — bỏ qua hook ép quy trình.');
+    return 1;
+  }
+  const r = spawnSync(python, [guardScript, ...args], { stdio: options.stdio || 'inherit', encoding: 'utf8' });
+  return r.status === null ? 1 : r.status;
+}
+function installGuard(projectDir = process.cwd(), verbose = true) {
+  if (!fs.existsSync(guardScript)) return;
+  if (verbose) console.log('  [Aizen Guard] Cài hook ép quy trình cho dự án:');
+  runGuard(['install', '--workspace', projectDir], { stdio: verbose ? 'inherit' : 'ignore' });
 }
 
 // Cập nhật AGENTS.md
@@ -404,6 +431,8 @@ module.exports = {
   installProject,
   installGlobalRules,
   updateAgentsMd,
+  installGuard,
+  runGuard,
   createLink,
   safeRemoveLink,
   pruneStaleLinks,
