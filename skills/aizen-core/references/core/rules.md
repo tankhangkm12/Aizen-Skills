@@ -88,6 +88,9 @@ uv run "<CORE_DIR>/scripts/core/journal.py" note --run <TASK> --as <role[-unit]>
 | `did` | a stage is finished | Tôi đã xong API giữ ghế, 12/12 test xanh |
 | `ask` · `stop` | you need the owner · you stop and why | Tôi dừng vì migration cần xoá dữ liệu (A3 chưa duyệt) |
 
+A `decide` line names the option taken **and** the one rejected, with the reason ("chọn A thay vì B vì …"); how to
+get there is `references/core/reasoning.md`.
+
 The hooks already write the facts (`✍ Đã ghi …`, `▶ Đã chạy …`) — never repeat them. Write what the files cannot
 show: the options you saw, the one you took, why. A run whose files changed with no thinking line is not done
 (guard rule `journal`). The file is script-owned: write only through `journal.py note`.

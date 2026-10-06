@@ -36,6 +36,7 @@ cần (`uv tool install graphifyy`) — bạn duyệt một lần. Cài cả b�
 | thiết kế bảng, API, kiến trúc (chưa code) | `aizen-build` (route design) | "thiết kế bảng", "thiết kế API", "DDL" |
 | CI/CD bảo mật, Docker, Kubernetes, deploy | `aizen-build` (module infra) | "pipeline CI/CD", "DevSecOps", "Dockerfile", "k8s" |
 | khởi tạo dự án backend mới cho team (khung, Docker, infra, health check) | `aizen-init` | "khởi tạo dự án backend", "dựng khung backend", "init backend" |
+| nhờ phỏng vấn rồi viết prompt cho aizen-build / aizen-init | `aizen-prompt-architect` | "viết prompt cho aizen", "phỏng vấn tôi rồi soạn task" |
 | tạo skill mới / cải thiện skill trong repo | `aizen-skill-creator` | "tạo skill", "cải thiện skill <tên>" |
 | chép skill từ GitHub/thư mục khác, hoặc vendor best practice của upstream vào pack | `aizen-skill-importer` | "clone skill" + link, "học theo skill" |
 | đánh giá một skill | `aizen-skill-eval` | "test skill", "benchmark skill" |
@@ -101,6 +102,17 @@ Prompt càng đủ, pha thống nhất càng ít vòng. Một prompt tốt có 6
 6. **Quyền cho trước** — việc A3 bạn cho phép sẵn (cài graphify, chạy DB local bằng Docker, tải package…).
 
 Không cần ghi những gì agent tự đo được (version, cấu trúc thư mục, cách code hiện tại chạy) — nó sẽ tự đọc.
+
+### Soạn prompt với AI web (ChatGPT, Gemini, Claude chat, DeepSeek)
+
+Chưa rõ nên viết prompt thế nào? Dán toàn bộ [aizen-web-kit.md](aizen-web-kit.md) vào AI web làm tin nhắn đầu,
+rồi kể ý tưởng bằng lời thường. AI web hỏi bạn một vòng ≤ 5 câu (có sẵn đáp án mặc định), rồi trả về **một** prompt
+đúng mẫu Aizen — có tên nghiệp vụ (thành tên nhánh), tiêu chí xong kiểm chứng được và gợi ý case kiểm thử — để bạn
+dán vào Claude Code hoặc Antigravity. Trong Claude Code / Antigravity: gọi `/aizen-prompt-architect`, prompt được
+lưu thêm ở `.aizen/out/prompts/<tên-nghiệp-vụ>.md`.
+
+Chiều ngược lại: dán `.aizen/out/latest.md` (hoặc `journal.md`, `acceptance.md`) vào cùng cuộc trò chuyện đó để hỏi
+AI web về tiến độ, rồi nhờ nó soạn câu trả lời gửi lại agent.
 
 ### Trả lời câu hỏi xác nhận
 
@@ -192,6 +204,7 @@ sách cụ thể; đủ thì guard tự đánh dấu `done` và chuyển run và
 | `aizen-build` — design | engine + version, các thực thể và quan hệ, quy mô dữ liệu, truy vấn chính, quy ước team nếu có |
 | `aizen-build` — pipeline | repo, nền tảng CI, nơi deploy, registry, branch nào deploy đi đâu, secret đã có (chỉ tên) |
 | `aizen-init` | **URL repo GitHub/GitLab** + **tài liệu chi tiết dự án** (bắt buộc, thiếu thì skill dừng hỏi); nếu có: stack, infra, kiểu auth |
+| `aizen-prompt-architect` | ý tưởng / lỗi / thay đổi bằng lời của bạn; trả lời một vòng ≤ 5 câu hỏi (gõ "theo mặc định" để nhận hết đề xuất) |
 | `aizen-skill-creator` | skill làm gì, 3 prompt phải kích hoạt + vài prompt không được kích hoạt, đầu ra mong muốn, việc nào cần hỏi bạn |
 | `aizen-skill-importer` | link thư mục skill (`…/tree/<branch>/<path>`) hoặc đường dẫn local, tên skill đích, muốn đổi gì, một task mẫu để A/B test |
 | `aizen-skill-eval` | tên skill, tiêu chí đạt, vài prompt nên/không nên kích hoạt |

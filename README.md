@@ -17,6 +17,7 @@ bộ (hoặc ít nhất skill cần dùng cùng các skill trong `requires` củ
 - [Kiến trúc bộ skill (SOLID)](#kiến-trúc-bộ-skill-solid)
 - [aizen-build — điều phối production](#aizen-build--điều-phối-production)
 - [Hợp đồng chung và bản đồ dự án](#hợp-đồng-chung--agent-làm-đủ-không-làm-thừa-có-bằng-chứng)
+- [Nâng cấp dự án đang chạy](#nâng-cấp-dự-án-đang-chạy)
 - [Nâng cấp từ bản trước](#nâng-cấp-từ-bản-trước-đổi-tên)
 - [Cấu trúc repo](#cấu-trúc-repo)
 - [CLI](#cli)
@@ -41,7 +42,7 @@ Cài xong uv, mở terminal mới (và khởi động lại Antigravity / Claude
 Chạy trong thư mục gốc của dự án (đã `git init`):
 
 ```bash
-npx skills add tankhangkm12/Aizen-Skills -a antigravity -s '*' -y      # chép 14 skill vào ./.agents/skills
+npx skills add tankhangkm12/Aizen-Skills -a antigravity -s '*' -y      # chép 15 skill vào ./.agents/skills
 uv run .agents/skills/aizen-core/scripts/core/guard.py install         # hook, git pre-push, session rules, .aizen/
 ```
 
@@ -108,6 +109,7 @@ Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
 |---|---|
 | [`aizen-build`](skills/aizen-build) | Mọi việc kỹ thuật trên dự án đang có: tính năng, sửa bug, refactor, từ ý tưởng tới PR; **review** PR/diff; **chỉ thiết kế** (schema, API, kiến trúc); **chỉ dựng** CI/CD, Docker, Kubernetes. Xem [bên dưới](#aizen-build--điều-phối-production). |
 | [`aizen-init`](skills/aizen-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint: Git Flow, plan trong `.aizen/runs/init/`, khung code + health check, Docker/compose kèm infra, config tập trung, kết nối infra fail-fast, adapter, AOP + request-id + auth, README, rà lại bằng graphify. |
+| [`aizen-prompt-architect`](skills/aizen-prompt-architect) | Phỏng vấn bạn vài câu rồi viết prompt Aizen đủ trường (task, tên nghiệp vụ, mục tiêu, tiêu chí xong, phạm vi, quyền, điểm dừng, gợi ý case kiểm thử). Có bản một file [`docs/aizen-web-kit.md`](docs/aizen-web-kit.md) để dán vào ChatGPT, Gemini, Claude chat, DeepSeek. |
 | [`aizen-skill-creator`](skills/aizen-skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn theo chuẩn Aizen, đặt đúng chỗ (entry hay topic của pack), viết docs, đánh giá, `npm test`, commit. |
 | [`aizen-skill-importer`](skills/aizen-skill-importer) | Đưa tri thức bên ngoài vào Aizen: chép cả skill (ghi nguồn/giấy phép, tuỳ biến, A/B test) hoặc **vendor** best practice của upstream vào một pack, ghim commit. |
 | [`aizen-skill-eval`](skills/aizen-skill-eval) | Đánh giá một skill so với baseline: bộ eval (gồm negative control), chạy độc lập, chấm điểm, A/B, tổng hợp benchmark. |
@@ -141,6 +143,11 @@ code, ở hai mức:
 | Đơn giản trước | thang tái sử dụng, không trừu tượng cho code dùng một lần, không phòng thủ trạng thái không thể xảy ra, câu hỏi "200 → 50" |
 | Sửa như phẫu thuật | mọi dòng đổi phải truy về yêu cầu; chỉ dọn rác của chính mình, code chết có sẵn thì ghi vào `## Proposals` |
 | Thực thi theo mục tiêu | Done của module thành check chạy được trước khi code, test fail trước, `step → verify` |
+
+**Cách suy luận** — `skills/aizen-core/rules/reasoning.md` cũng được cài như session rule (cả Antigravity lẫn Claude
+Code): nêu lại vấn đề, tách sự thật khỏi phỏng đoán, ≥ 2 phương án cho quyết định khó đảo ngược, hỏi "hỏng thế
+nào?", bước nhỏ nhất rồi kiểm, ghi quyết định vào nhật ký. Bản đầy đủ kèm playbook (bug, thiết kế, công cụ lạ, hiệu
+năng, dữ liệu/tiền/đồng thời, bị kẹt): `skills/aizen-core/references/core/reasoning.md`.
 
 ## Kiến trúc bộ skill (SOLID)
 
@@ -335,6 +342,7 @@ Kiểm `path:line` chứng minh dòng có thật, không chứng minh nhận xé
 │   ├── assets/<topic>/        #   template
 │   └── scripts/<topic>/       #   mã chạy được (Python stdlib)
 ├── bin/                       # cli.js, install.js, updater.js, agents-config.js, vendor.js
+├── tools/upgrade/            # aizen-upgrade.bat / .sh — nâng cấp Aizen trong một dự án đang chạy
 ├── tests/                     # check-skills.js (lint + sổ topic), check-scripts.js (smoke test Python), test-installer.js
 ├── vendor.lock.json           # nguồn, commit, giấy phép của kiến thức vendored (chép, ghim commit)
 ├── externals.json             # skill cộng đồng dùng trực tiếp (không chép, theo bản mới)
@@ -346,6 +354,32 @@ Kiểm `path:line` chứng minh dòng có thật, không chứng minh nhận xé
 `description` ≤ 1024 ký tự và có "Not for:" (entry), mọi đường dẫn `` `references|assets|scripts/<topic>/…` `` resolve
 qua sổ topic, link markdown tương đối tồn tại, `(vNN)` khớp `manifest.version`, mỗi `vendor/<nguồn>/` có
 `UPSTREAM.md` + `LICENSE`, không còn tên cũ.
+
+## Nâng cấp dự án đang chạy
+
+Dự án đã cài Aizen bằng skills.sh và muốn lên bản mới, không mất `.aizen/`, không mất task đang dở. Script nằm ở
+[`tools/upgrade/`](tools/upgrade): `aizen-upgrade.bat` (Windows cmd / PowerShell) và `aizen-upgrade.sh` (Linux,
+macOS, Git Bash, WSL). Đặt script **ngoài** thư mục dự án, chạy từ trong dự án:
+
+```powershell
+D:\tools\aizen-upgrade.bat check develop        # chỉ kiểm tra, không đổi gì
+D:\tools\aizen-upgrade.bat upgrade develop      # sao lưu → nhánh chore/untrack-agent-files → skills update → guard install
+# merge PR chore/untrack-agent-files vào develop trên GitHub, rồi:
+D:\tools\aizen-upgrade.bat after-merge develop  # về develop, pull, khôi phục skill vừa cài
+```
+
+| Lệnh | Làm gì |
+|---|---|
+| `check` | nhánh, phiên bản Aizen, cây sạch chưa, file AI nào đang bị git theo dõi, commit chưa push có mã task / dòng đồng tác giả AI, run đang dở |
+| `upgrade` | sao lưu `.agents`, `.claude`, `.aizen`, `skills-lock.json` vào `~/aizen-backups/<repo>-<giờ>/before`; gỡ file AI khỏi git trên nhánh `chore/untrack-agent-files` (file vẫn còn trên máy); `npx skills update -p`; `guard.py install`; lưu bản đã cài; hỏi trước khi push / mở PR |
+| `finish` | chạy tiếp bước 4–6 nếu `upgrade` dừng sau bước cập nhật skill (không sao lưu lại) |
+| `after-merge` | sau khi PR được merge: về nhánh gốc, pull, xoá nhánh chore ở máy, chép lại skill vừa cài |
+| `restore` | checkout một nhánh cũ còn theo dõi `.agents`/`.claude` đã ghi đè skill → chép lại bản mới |
+| `rollback` | trả skill, rules và `.aizen` về đúng như trước khi nâng cấp |
+
+Không force-push, không viết lại lịch sử: commit cũ trên GitHub vẫn còn file AI. Máy khác cùng clone repo: chạy
+`upgrade` (đừng `git pull` trước) — pull commit gỡ file AI sẽ xoá skill đang bị theo dõi khỏi ổ đĩa, `upgrade` sao
+lưu trước rồi cài lại.
 
 ## Nâng cấp từ bản trước (đổi tên)
 

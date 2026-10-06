@@ -1,0 +1,16 @@
+{
+  "name": "aizen-prompt-architect",
+  "version": "1.0.0",
+  "description": "Interview the owner and turn a rough idea into a ready Aizen task prompt (task, business name, goal, acceptance criteria, scope, permissions, stop point, acceptance seeds); also exported as a single-file kit for web chat AIs",
+  "framework": "Aizen",
+  "kind": "entry",
+  "topics": [
+    "prompt"
+  ],
+  "requires": [
+    "aizen-core"
+  ],
+  "contract": {
+    "mode": "none"
+  }
+}
