@@ -20,6 +20,7 @@ const run = (args, expect = 0) => {
 };
 const S = {
   'state.py': skill('aizen-build', 'scripts', 'flow', 'state.py'),
+  'guard.py': skill('aizen-build', 'scripts', 'flow', 'guard.py'),
   'check.py': skill('aizen-core', 'scripts', 'core', 'check.py'),
   'graph.py': skill('aizen-core', 'scripts', 'core', 'graph.py'),
   'capacity.py': skill('aizen-core', 'scripts', 'core', 'capacity.py'),
@@ -28,6 +29,8 @@ const S = {
 };
 const cases = [
   ['state.py self-check', [S['state.py'], '--selfcheck']],
+  ['guard.py self-check', [S['guard.py'], '--selfcheck']],
+  ['guard.py hook without .aizen → allow', [S['guard.py'], 'hook', 'stop', '--agent', 'claude']],
   ['feedback.py self-check', [skill('aizen-skill-creator', 'scripts', 'authoring', 'feedback.py'), '--selfcheck']],
   ['new_skill.py self-check', [skill('aizen-skill-creator', 'scripts', 'authoring', 'new_skill.py'), '--selfcheck']],
   ['fetch_skill.py self-check', [skill('aizen-skill-importer', 'scripts', 'fetch_skill.py'), '--selfcheck']],

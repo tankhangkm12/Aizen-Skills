@@ -237,6 +237,30 @@ python $C/capacity.py --help                          # dự phóng tải/dung l
 Hỗ trợ Claude Code (Agent tool, worktree) và Antigravity (`define_subagent`/`invoke_subagent`) — chi tiết trong
 `skills/aizen-build/references/flow/platform-*.md`.
 
+### Guard — ép agent làm đủ, không làm thừa
+
+Luật trong SKILL.md agent có thể "quên" hoặc tự cho là không cần (Claude hay bỏ bước, Antigravity hay dừng sớm).
+`guard.py` chuyển quyền nói "xong" từ agent sang hook do Claude Code / Antigravity chạy — agent không bỏ qua được.
+Cài **theo từng dự án**: `node bin/cli.js sync --project` (hoặc `aizen guard install`) trong thư mục dự án.
+
+| Hook | Việc |
+|---|---|
+| PreToolUse | chặn sửa code khi plan chưa `approve`; chặn ghi ngoài write set của module trong `.worktrees/<unit>/`; chặn sửa file của guard (run.json, ledger, waivers, evidence) |
+| PostToolUse | chấm công: ghi mọi lần ghi file / lệnh shell vào `.aizen/tasks/<TASK>/ledger.jsonl` |
+| Stop | chạy checklist (`checklist` trong `aizen-build/manifest.json`); còn thiếu → agent phải làm tiếp, kèm đúng danh sách thiếu |
+| git pre-push | cùng checklist cho nhánh `int/<TASK>` và `feature/<TASK>-*` |
+
+Checklist chỉ đòi **đủ những gì plan đã chốt**: plan đã duyệt · evidence `check.py` PASS ở đúng tip của từng module
+· báo cáo test · review **PASS** ghi đúng SHA hiện tại · không file nào đổi ngoài write set đã duyệt (chống
+over-engineering) · `pr-body.md` khi xong. Bước thật sự không áp dụng → `aizen guard waive --task <ID> --step <id>
+--reason "..."` (ghi lại, phải liệt kê trong `pr-body.md`); `plan` và `review` không miễn được. Ba lần định dừng
+liền mà không làm gì thêm (hoặc 10 lần tổng) → task chuyển `blocked`, agent được dừng, bạn quyết định.
+
+Giới hạn: hook lỗi thì cho qua (không làm kẹt agent); `--dangerously-skip-permissions` hoặc hook không chạy (đã có
+báo cáo với Antigravity trên Windows) thì chỉ còn pre-push chặn. `.aizen/` là local-only nên CI không chạy được
+checklist — pre-push là chốt cuối. Bật chế độ chặt (`{"require_task": true}` trong `.aizen/guard.json`) để cấm sửa
+code khi chưa có task được duyệt.
+
 ## Cấu trúc repo
 
 ```text
@@ -292,6 +316,7 @@ Chạy bằng `node bin/cli.js <lệnh>` (hoặc `aizen <lệnh>` nếu đã `np
 | `update` | kéo bản mới (git) rồi sync |
 | `auto-update enable\|disable` | bật/tắt cập nhật ngầm hằng ngày (Task Scheduler / cron) — chỉ repo Aizen, không đụng skill cộng đồng |
 | `external list\|install\|update\|remove <tên>` | skill cộng đồng trong `externals.json` |
+| `guard install\|check\|waive` | hook ép quy trình aizen-build cho dự án hiện tại ([Guard](#guard--ép-agent-làm-đủ-không-làm-thừa)) |
 | `help` | trợ giúp |
 
 ## Phát triển skill

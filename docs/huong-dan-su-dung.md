@@ -97,6 +97,21 @@ Không cần ghi những gì agent tự đo được (version, cấu trúc thư 
 - Tiếp tục task bị ngắt: "/aizen-build tiếp tục task <TASK>" — agent đọc `state.md`, không hỏi lại phần đã chốt.
 - `.aizen/`, `.worktrees/` và `graphify-out/` được tự thêm vào `.git/info/exclude` (không đụng file được git theo dõi).
 
+### Guard — khi agent đòi dừng mà chưa xong
+
+Sau `node bin/cli.js sync --project` trong thư mục dự án, Claude Code và Antigravity gọi `guard.py` mỗi khi agent
+định dừng. Chưa đủ checklist thì agent bị đẩy lại làm tiếp với danh sách cụ thể. Bạn cũng xem được:
+
+```bash
+aizen guard check --task T-12        # còn thiếu gì (exit 0 = đủ)
+aizen guard waive --task T-12 --step check-docs --reason "module chỉ sửa tài liệu, không có test"
+```
+
+- Task chuyển `blocked` do guard → đọc dòng `guard:` cuối `## Log` trong `state.md`, chọn: làm tiếp, miễn bước
+  (waive), sửa plan, hoặc dừng.
+- `git push` nhánh của task bị chặn khi checklist chưa đủ — đúng ý đồ; `--no-verify` nếu bạn chủ động bỏ qua.
+- Task cũ bỏ dở chặn sửa code: `state.py status --task <ID> --set stopped`.
+
 ### Mẹo để agent làm tốt nhất
 
 - Một task = một mục tiêu. Nhiều việc không liên quan → nhiều task.
