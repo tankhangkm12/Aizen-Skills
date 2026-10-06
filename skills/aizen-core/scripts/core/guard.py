@@ -78,7 +78,8 @@ TC = re.compile(r"\bTC-\d+\b")
 # Paths that only make sense to the agents, never to the product (references/core/git.md §1): hidden from git
 # when guard.json `hide_ai_files` is on (the default) — excluded locally, refused at pre-push.
 AI_PATHS = (".aizen/", ".agents/", ".claude/", ".cursor/", ".gemini/", ".windsurf/", ".codeium/", ".kiro/",
-            "AGENTS.md", "CLAUDE.md", "GEMINI.md", ".cursorrules", ".windsurfrules", ".mcp.json", "graphify-out/")
+            ".codex/", "AGENTS.md", "CLAUDE.md", "GEMINI.md", ".cursorrules", ".windsurfrules", ".mcp.json",
+            "skills-lock.json", "graphify-out/")
 AI_TRAILER = re.compile(r"^(Co-Authored-By:.*(claude|anthropic|gemini|copilot|cursor|openai|chatgpt)"
                         r"|.*Generated with \[?(Claude|Gemini|Cursor|Copilot)).*$", re.I | re.M)
 APPROVED = re.compile(r"\|\s*(approved|đã duyệt)\s*\|", re.I)

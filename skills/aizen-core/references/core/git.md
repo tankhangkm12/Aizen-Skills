@@ -40,7 +40,7 @@ issue) is business data and may appear — pass it as `--ticket`, the guard then
 
 **Agent files stay on the machine** (`hide_ai_files`, default on, in `.aizen/config/guard.json`): `guard.py
 install` lists `.aizen/ .agents/ .claude/ .cursor/ .gemini/ .windsurf/ AGENTS.md CLAUDE.md GEMINI.md .mcp.json
-graphify-out/ …` in `.git/info/exclude` (local, so even `.gitignore` shows no trace) and turns off Claude Code's
+skills-lock.json graphify-out/ …` in `.git/info/exclude` (local, so even `.gitignore` shows no trace) and turns off Claude Code's
 commit/PR attribution. The pre-push hook refuses a branch whose tree holds such a file, or whose unpushed commits
 carry a run id or an AI co-author/“Generated with” line, and prints the fix. A file the repository already tracks
 is not hidden by the exclude list: the owner runs the printed `git rm -r --cached …` once (A4 — it is a commit
