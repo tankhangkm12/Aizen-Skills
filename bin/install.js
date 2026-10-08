@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const agentsConfig = require('./agents-config');
 const { installedExternals, externalRoot } = require('./external');
 const { discoverPlugins, getPlugin, validatePlugin, createPluginScaffold } = require('./plugins');
 
@@ -253,6 +254,28 @@ function installProject(skills, projectDir = process.cwd(), plugin, verbose = tr
   return results;
 }
 
+// Cung cấp hàm installGlobal để tương thích với test-external.js khi dọn dẹp link
+function installGlobal(skills = [], verbose = false) {
+  const results = [];
+  const globalAgents = (agentsConfig && agentsConfig.global) ? agentsConfig.global : [];
+  for (const agent of globalAgents) {
+    try {
+      fs.mkdirSync(agent.targetDir, { recursive: true });
+      pruneStaleLinks(agent.targetDir, skills);
+      let count = 0;
+      for (const skill of skills) {
+        const dest = path.join(agent.targetDir, skill.id);
+        const res = createLink(skill.path, dest);
+        if (res.status === 'linked' || res.status === 'already-linked' || res.status === 'copied-fallback') count++;
+      }
+      results.push({ agent: agent.name, path: agent.targetDir, installed: count, ok: true });
+    } catch (err) {
+      results.push({ agent: agent.name, path: agent.targetDir, installed: 0, ok: false, error: err.message });
+    }
+  }
+  return results;
+}
+
 const coreScripts = path.join(skillsDir, 'aizen-core', 'scripts', 'core');
 const guardScript = path.join(coreScripts, 'guard.py');
 
@@ -281,7 +304,7 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
     let existingContent = fs.existsSync(agentsMdFile) ? fs.readFileSync(agentsMdFile, 'utf8') : '';
     if (existingContent.includes(sectionHeader)) {
       const escaped = sectionHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`${escaped}[\\s\\S]*?(?=\n## |$)`);
+      const regex = new RegExp(`${escaped}[\\s\\S]*?(?=\\n## |$)`);
       existingContent = existingContent.replace(regex, () => `${sectionHeader}\n\n${block}\n`);
     } else {
       existingContent = existingContent ? `${existingContent.trim()}\n\n${sectionHeader}\n\n${block}\n` : `# Project Instructions\n\n${sectionHeader}\n\n${block}\n`;
@@ -377,6 +400,7 @@ if (require.main === module) {
 module.exports = {
   discoverSkills,
   installProject,
+  installGlobal,
   installGlobalRules,
   updateAgentsMd,
   installGuard,
