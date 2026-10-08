@@ -157,7 +157,6 @@ function pruneStaleLinks(targetDir, skills) {
   }
 }
 
-// Thiết lập MCP Server cấu hình cho dự án từ Plugin template
 function setupProjectMcp(projectDir, plugin, verbose = true) {
   const mcpConfigFile = path.join(projectDir, '.mcp.json');
   let currentConfig = { mcpServers: {} };
@@ -184,13 +183,10 @@ function setupProjectMcp(projectDir, plugin, verbose = true) {
   }
 }
 
-// Sinh các Slash Commands (/aizen-skills:<tên>) cho Claude Code và Antigravity
 function generateSlashCommands(projectDir, plugin, verbose = true) {
   const claudeCommandsDir = path.join(projectDir, '.claude', 'commands');
   try {
     fs.mkdirSync(claudeCommandsDir, { recursive: true });
-    
-    // Command chính của plugin
     const pluginCmdFile = path.join(claudeCommandsDir, `aizen-skills:${plugin.id.replace(/^aizen-/, '')}.md`);
     const workflowContent = fs.existsSync(path.join(plugin.path, 'workflow.md'))
       ? fs.readFileSync(path.join(plugin.path, 'workflow.md'), 'utf8')
@@ -206,7 +202,6 @@ ${workflowContent}
 `;
     fs.writeFileSync(pluginCmdFile, cmdBody, 'utf8');
 
-    // Thêm các lệnh nhanh cho công cụ chuyên biệt
     const shortcuts = [
       ['penpot', 'Thiết kế giao diện Canvas trực tiếp trên Penpot qua MCP.'],
       ['playwright', 'Kiểm thử trình duyệt thật, chụp ảnh màn hình và visual regression qua Playwright MCP.'],
@@ -224,7 +219,6 @@ ${workflowContent}
   }
 }
 
-// Cài đặt chuyên biệt cấp độ dự án (Project-level isolated)
 function installProject(skills, projectDir = process.cwd(), plugin, verbose = true) {
   const results = [];
   const targets = [
@@ -249,7 +243,6 @@ function installProject(skills, projectDir = process.cwd(), plugin, verbose = tr
     }
   }
 
-  // Cấu hình MCP & Slash Commands cho plugin
   if (plugin) {
     setupProjectMcp(projectDir, plugin, verbose);
     generateSlashCommands(projectDir, plugin, verbose);
@@ -305,6 +298,24 @@ function repoRules() {
   return fs.existsSync(rulesDir) ? fs.readdirSync(rulesDir).filter(f => f.endsWith('.md')).map(f => path.join(rulesDir, f)) : [];
 }
 
+function installGlobalRules(verbose = true, homedir = os.homedir()) {
+  const rules = repoRules();
+  if (!rules.length) return;
+  const targets = [
+    ['Antigravity Rules', path.join(homedir, '.gemini', 'config', 'rules'), '---\ntrigger: always_on\n---\n'],
+    ['Claude Code Rules', path.join(homedir, '.claude', 'rules'), ''],
+  ];
+  for (const [name, dir, head] of targets) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      for (const src of rules) fs.writeFileSync(path.join(dir, path.basename(src)), head + fs.readFileSync(src, 'utf8'), 'utf8');
+      if (verbose) console.log(`  ✓ [${name}] Đã sao chép ${rules.length} system rules -> ${dir}`);
+    } catch (err) {
+      if (verbose) console.warn(`  ! [${name}] Lỗi: ${err.message}`);
+    }
+  }
+}
+
 // Entrypoint chính: Chuyên biệt hóa cho dự án cục bộ (Project-Level Only)
 function runInstall(options = {}) {
   const argv = options.argv || process.argv;
@@ -316,7 +327,6 @@ function runInstall(options = {}) {
     return;
   }
 
-  // Xác định plugin muốn cài (mặc định là aizen-full)
   let pluginArg = options.plugin;
   if (!pluginArg) {
     const pIdx = argv.indexOf('--plugin');
@@ -338,7 +348,7 @@ function runInstall(options = {}) {
 
   if (targetPlugin && targetPlugin.manifest && Array.isArray(targetPlugin.manifest.skills) && targetPlugin.manifest.skills.length > 0) {
     const wanted = new Set(targetPlugin.manifest.skills);
-    wanted.add('aizen-core'); // aizen-core luôn được kèm theo
+    wanted.add('aizen-core');
     selectedSkills = allSkills.filter(s => wanted.has(s.id));
   }
   const skills = selectedSkills.concat(ext.filter(e => !selectedSkills.some(s => s.id === e.id)));
@@ -367,6 +377,7 @@ if (require.main === module) {
 module.exports = {
   discoverSkills,
   installProject,
+  installGlobalRules,
   updateAgentsMd,
   installGuard,
   runGuard,
