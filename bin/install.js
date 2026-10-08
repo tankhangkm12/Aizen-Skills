@@ -249,9 +249,73 @@ function installProject(skills, projectDir = process.cwd(), plugin, verbose = tr
     generateSlashCommands(projectDir, plugin, verbose);
   }
 
+  setupKnowledgeEngine(projectDir, verbose);
   updateAgentsMd(skills, projectDir, verbose);
   installGuard(projectDir, verbose);
   return results;
+}
+
+function setupKnowledgeEngine(projectDir, verbose = true) {
+  const aizenDir = path.join(projectDir, '.aizen');
+  const sourcesDir = path.join(aizenDir, 'sources');
+  const decisionsDir = path.join(aizenDir, 'decisions');
+  const proposalsDir = path.join(aizenDir, 'proposals');
+
+  [sourcesDir, decisionsDir, proposalsDir].forEach(d => {
+    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+  });
+
+  const trustedArchitects = path.join(sourcesDir, 'trusted-architects.md');
+  if (!fs.existsSync(trustedArchitects)) {
+    fs.writeFileSync(trustedArchitects, `# Trusted Sources: System Architecture & Solutions
+
+## Priority 1: Hàng đầu (Must Search First)
+- site:bytebytego.com (System Design Architecture)
+- site:martinfowler.com (Microservices, Design Patterns)
+- youtube.com/c/ByteByteGo (Kênh YouTube trực quan về System Design)
+
+## Priority 2: Uy tín cao (Fallback 1)
+- site:blog.cleancoder.com (Robert C. Martin - Clean Code/Architecture)
+- site:infoq.com/architecture-design/
+- youtube.com/c/HusseinNasser (Kênh YouTube chuyên sâu về Backend & Database)
+
+## Priority 3: Nguồn tin cậy khác (Fallback 2)
+- site:stackoverflow.com/questions/tagged/system-architecture
+- site:medium.com/netflix-techblog
+`, 'utf8');
+  }
+
+  const gitHooksDir = path.join(projectDir, '.git', 'hooks');
+  if (fs.existsSync(gitHooksDir)) {
+    const preCommitHook = path.join(gitHooksDir, 'pre-commit');
+    const hookScript = `#!/bin/sh
+# Aizen Guard: Protect base skills on main branch
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  if git diff --cached --name-only | grep -E "^(\\.agents/skills/|\\.claude/skills/|skills/)"; then
+    echo "============================================================"
+    echo "❌ ERROR: Aizen Guard Blocked Commit"
+    echo "Trực tiếp ghi đè/sửa base skills trên nhánh main bị cấm."
+    echo "Sử dụng quy trình: node bin/evolve.js propose <base_skill> <new_skill>"
+    echo "để fork skill sang nhánh evolve/* hợp lệ."
+    echo "============================================================"
+    exit 1
+  fi
+fi
+`;
+    // Only write if not exists or if it doesn't contain Aizen Guard
+    let writeHook = true;
+    if (fs.existsSync(preCommitHook)) {
+      const current = fs.readFileSync(preCommitHook, 'utf8');
+      if (current.includes('Aizen Guard Blocked Commit')) writeHook = false;
+    }
+    if (writeHook) {
+      fs.appendFileSync(preCommitHook, '\\n' + hookScript);
+      try { fs.chmodSync(preCommitHook, 0o755); } catch(e){}
+    }
+  }
+
+  if (verbose) console.log('  ✓ [Knowledge Engine] Đã tạo .aizen/sources, decisions, và Git Pre-commit Hook (Hard Hooks).');
 }
 
 // Cung cấp hàm installGlobal để tương thích với test-external.js khi dọn dẹp link
