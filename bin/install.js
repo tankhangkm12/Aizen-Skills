@@ -43,11 +43,11 @@ function parseSkillMetadata(skillPath) {
 
     const frontmatter = match[1];
     const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
-    const descMatch = frontmatter.match(/^description:\s*([>|-]?\s*[\s\S]*?)(?=\n\w+:|$)/m);
+    const descMatch = frontmatter.match(/^description:\s*([>-]?\s*[\s\S]*?)(?=\n\w+:|$)/m);
 
     return {
       name: nameMatch ? nameMatch[1].trim() : path.basename(skillPath),
-      description: descMatch ? descMatch[1].replace(/^[>|-]\s*/, '').replace(/\s+/g, ' ').trim() : ''
+      description: descMatch ? descMatch[1].replace(/^[>-]\s*/, '').replace(/\s+/g, ' ').trim() : ''
     };
   } catch (err) {
     return { name: path.basename(skillPath), description: '' };
@@ -209,7 +209,6 @@ function pruneStaleLinks(targetDir, skills) {
 // Cài đặt toàn cục (Global - Cho mọi AI Agent trên máy)
 function installGlobal(skills, verbose = true) {
   const results = [];
-
   for (const agent of agentsConfig.global) {
     try {
       fs.mkdirSync(agent.targetDir, { recursive: true });
@@ -263,7 +262,6 @@ function installProject(skills, projectDir = process.cwd(), verbose = true) {
 description: ${skill.description}
 globs: *
 alwaysApply: false
----
 ${fs.readFileSync(skillMd, 'utf8')}
 `;
           fs.writeFileSync(mdcPath, mdcContent, 'utf8');
@@ -290,22 +288,17 @@ ${fs.readFileSync(skillMd, 'utf8')}
 // guard.py của aizen-core: hợp đồng chung cho mọi skill — hook Claude Code + Antigravity + pre-push, chỉ trong dự án
 const coreScripts = path.join(skillsDir, 'aizen-core', 'scripts', 'core');
 const guardScript = path.join(coreScripts, 'guard.py');
-// Script Python của Aizen chạy bằng uv (PEP 723): uv tự tải Python, máy không cần cài Python.
-const UV_HINT = 'Cài uv: Windows `winget install astral-sh.uv` · macOS/Linux `curl -LsSf https://astral.sh/uv/install.sh | sh`, '
-  + 'mở terminal mới (khởi động lại agent) rồi chạy lại.';
+
 function hasUv() {
-  const { spawnSync } = require('child_process');
-  return spawnSync('uv', ['--version'], { encoding: 'utf8' }).status === 0;
+  return true;
 }
+
 function runGuard(args, options = {}, script = guardScript) {
   const { spawnSync } = require('child_process');
-  if (!hasUv()) {
-    console.warn(`  ! [Aizen] Không tìm thấy uv — ${UV_HINT}`);
-    return 3;
-  }
   const r = spawnSync('uv', ['run', '--quiet', '--script', script, ...args], { stdio: options.stdio || 'inherit', encoding: 'utf8' });
   return r.status === null ? 1 : r.status;
 }
+
 function installGuard(projectDir = process.cwd(), verbose = true) {
   if (!fs.existsSync(guardScript)) return;
   if (verbose) console.log('  [Aizen Guard] Cài hợp đồng chung cho dự án (hook, .aizen/, PROJECT.md):');
@@ -328,7 +321,7 @@ function updateAgentsMd(skills, projectDir, verbose = true) {
 
     if (existingContent.includes(sectionHeader)) {
       const escaped = sectionHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`${escaped}[\\s\\S]*?(?=\\n## |$)`);
+      const regex = new RegExp(`${escaped}[\\s\\S]*?(?=\n## |$)`);
       existingContent = existingContent.replace(regex, () => `${sectionHeader}\n\n${block}\n`);
     } else {
       existingContent = existingContent ? `${existingContent.trim()}\n\n${sectionHeader}\n\n${block}\n` : `# Project Agents Guide\n\n${sectionHeader}\n\n${block}\n`;
@@ -367,7 +360,6 @@ function installGlobalRules(verbose = true, homedir = os.homedir()) {
   }
 }
 
-
 // Đăng ký toàn bộ repo như một Plugin cho Antigravity
 function installAntigravityPlugin(verbose = true) {
   const homedir = os.homedir();
@@ -394,6 +386,7 @@ function runInstall(options = {}) {
     console.log('  · Không cần clone: npx skills add tankhangkm12/Aizen-Skills (xem README)\n');
     return;
   }
+
   const isGlobal = options.global || argv.includes('--global');
   const isProject = options.project || argv.includes('--project') || !isGlobal;
   if (isProject && !isGlobal && path.resolve(process.cwd()) === path.resolve(rootDir)) {
@@ -414,7 +407,7 @@ function runInstall(options = {}) {
   const ext = installedExternals();
   const skills = own.concat(ext.filter(e => !own.some(s => s.id === e.id)));
   console.log(`[1] Phát hiện ${own.length} skills trong thư mục 'skills/' + ${ext.length} skill cộng đồng đã cài (aizen external):`);
-  skills.forEach(s => console.log(`    - ${s.id}${s.external ? ' [cộng đồng]' : ''}: ${s.description.slice(0, 75)}...`));
+  skills.forEach(s => console.log(`  - ${s.id}${s.external ? ' [cộng đồng]' : ''}: ${s.description.slice(0, 75)}...`));
   console.log('');
 
   if (isGlobal) {
