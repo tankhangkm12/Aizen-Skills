@@ -43,7 +43,7 @@ function installedExternals() {
     const dir = skillDir(e);
     const md = path.join(dir, 'SKILL.md');
     if (!fs.existsSync(md)) continue;
-    const fm = (fs.readFileSync(md, 'utf8').match(/^---\n([\s\S]*?)\n---/) || [])[1] || '';
+    const fm = (fs.readFileSync(md, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/) || [])[1] || '';
     const desc = ((fm.match(/^description:\s*(.*)$/m) || [])[1] || '').replace(/^["']|["']$/g, '');
     out.push({ id: path.basename(dir) === '.' ? e.name : path.basename(dir), name: e.name, description: desc, path: dir, external: true });
   }

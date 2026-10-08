@@ -26,7 +26,7 @@ def main():
         print("FAIL: SKILL.md not found")
         sys.exit(1)
     text = open(skill, encoding="utf-8").read()
-    m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
+    m = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", text, re.S)
     if not m:
         print("FAIL: missing YAML frontmatter (--- ... ---)")
         sys.exit(1)
