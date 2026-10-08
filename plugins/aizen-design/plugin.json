@@ -1,0 +1,54 @@
+{
+  "id": "aizen-design",
+  "name": "Aizen Design Plugin",
+  "version": "1.0.0",
+  "description": "Chuyên biệt cho Khảo sát yêu cầu (SRS), Thiết kế kiến trúc trực quan (Archify), Thiết kế CSDL (3NF/DDL) và Thiết kế UI/UX trực tiếp trên Canvas (Penpot / Taste skills).",
+  "domain": "design",
+  "workflow": "./workflow.md",
+  "skills": [
+    "aizen-design",
+    "aizen-database",
+    "aizen-prompt-architect"
+  ],
+  "agents": [
+    {
+      "id": "system-architect",
+      "name": "System Architect",
+      "responsibility": "Thiết kế kiến trúc hệ thống tổng thể (HLD/LLD), microservices, và trực quan hóa sơ đồ qua Archify.",
+      "file": "./agents/system-architect.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7", "archify"]
+    },
+    {
+      "id": "uiux-designer",
+      "name": "UI/UX Designer",
+      "responsibility": "Thiết kế giao diện, layout, design tokens và components trực tiếp trên Canvas Penpot/Figma theo chuẩn taste-skills.",
+      "file": "./agents/uiux-designer.md",
+      "tools": ["mcp:sequentialthinking", "mcp:penpot", "taste-skills"]
+    },
+    {
+      "id": "database-architect",
+      "name": "Database Architect",
+      "responsibility": "Chuẩn hóa mô hình CSDL quan hệ 3NF, phân tích đánh index, thiết kế migration và sinh DDL sạch.",
+      "file": "./agents/database-architect.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7"]
+    },
+    {
+      "id": "api-ux-designer",
+      "name": "API UX Designer",
+      "responsibility": "Đặc tả REST/gRPC contracts, OpenAPI spec, JSON Schemas và chuẩn hóa error format theo góc nhìn consumer.",
+      "file": "./agents/api-ux-designer.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7"]
+    }
+  ],
+  "mcp": {
+    "required": [
+      "sequentialthinking",
+      "context7"
+    ],
+    "optional": [
+      "penpot",
+      "figma",
+      "archify"
+    ]
+  }
+}
