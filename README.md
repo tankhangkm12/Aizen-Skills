@@ -1,9 +1,9 @@
-# Aizen Multi-Plugin Suite (v3.0)
+# Aizen Skills & Multi-Plugin Suite (v3.0)
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
 
-Hệ sinh thái Đa Plugin chuẩn mực cho AI coding agents: **Antigravity (Gemini CLI)** và **Claude Code**. 
+Hệ sinh thái Đa Plugin và Bộ kỹ năng chuẩn mực cho AI coding agents: **Antigravity (Gemini CLI)** và **Claude Code**.
 
 Khác với các bộ rules/skills truyền thống, Aizen v3.0 chuyển đổi thành một **Hệ sinh thái Đa Plugin (Multi-Plugin Suite)** tự chứa (self-contained), chuyên biệt hóa 100% cho cấp độ **Dự án (Project-level isolated)**, tuân thủ chặt chẽ nguyên tắc **SOLID (Đơn trách nhiệm SRP và Đóng/Mở OCP)**:
 * **Không làm ô nhiễm máy (Zero Global Pollution):** Toàn bộ tệp cấu hình, MCP và skills nằm trọn trong thư mục dự án (`.agents/` và `.claude/`).
@@ -21,6 +21,7 @@ Khác với các bộ rules/skills truyền thống, Aizen v3.0 chuyển đổi 
 - [Cách Sử dụng Slash Commands](#cách-sử-dụng-slash-commands)
 - [Tích hợp MCP Servers](#tích-hợp-mcp-servers)
 - [Cơ chế Mở rộng: Tạo Plugin Mới (OCP / SRP)](#cơ-chế-mở-rộng-tạo-plugin-mới-ocp--srp)
+- [Danh sách skill](#danh-sách-skill)
 - [Tài liệu Kiến trúc & Thiết kế](docs/architecture/README.md)
 - [Quy chuẩn Plugin](docs/aizen-plugin-standard.md)
 - [CLI](#cli)
@@ -32,7 +33,7 @@ Khác với các bộ rules/skills truyền thống, Aizen v3.0 chuyển đổi 
 
 | Plugin | Tên gọi | Danh sách Skills | Chuyên gia đảm nhận (`agents/`) |
 | :--- | :--- | :--- | :--- |
-| **Thiết kế** | `aizen-design` | `aizen-design`, `aizen-taste-uiux`, `aizen-database`, `aizen-prompt-architect`, `archify` | `system-architect` (HLD/LLD), `uiux-designer` (Penpot Canvas), `database-architect` (3NF/DDL), `api-ux-designer` |
+| **Thiết kế** | `aizen-design` | `aizen-design`, `aizen-database`, `aizen-prompt-architect`, `archify` | `system-architect` (HLD/LLD), `uiux-designer` (Penpot Canvas), `database-architect` (3NF/DDL), `api-ux-designer` |
 | **Lập trình & QA** | `aizen-code` | `aizen-build`, `aizen-backend`, `aizen-frontend`, `aizen-quality`, `aizen-infra` | `task-planner` (1-3 files/module), `backend-engineer` (Go Clean Arch), `frontend-engineer` (React/Playwright), `qa-tester`, `adversarial-reviewer`, `devops-engineer` |
 | **Học tập & R&D** | `aizen-learn` | `aizen-tech-learning`, `aizen-video-to-skill`, `aizen-skill-importer`, `aizen-skill-creator`, `aizen-skill-eval` | `tech-researcher` (Tech tree), `video-synthesizer` (YouTube to markdown), `skill-synthesizer`, `benchmark-evaluator` |
 | **Toàn trình Studio** | `aizen-full` | Tích hợp trọn vẹn cả 3 plugin trên vào một pipeline khép kín từ Idea -> Design -> Code -> Deploy | `full-coordinator` điều phối toàn bộ vòng đời dự án |
@@ -105,6 +106,38 @@ Bộ linter tự động kiểm tra tính tuân thủ:
 * Đầy đủ `plugin.json`, `workflow.md`, `agents/`, `mcp.template.json`.
 * Mỗi agent trong `agents/` có phân quyền A1-A4 rõ ràng.
 * Plugin mới tự động xuất hiện trong danh sách `aizen plugin list` và cài đặt được ngay qua `aizen install --plugin security`.
+
+---
+
+## Danh sách skill
+
+Bộ skill chia làm hai loại (theo `kind` trong `manifest.json`):
+
+- **entry** – skill bạn gọi (agent tự chọn theo `description`, hoặc `/<tên>`).
+- **pack** – kho kiến thức theo topic; không gọi trực tiếp, các entry tự nạp đúng file cần.
+
+| Skill | Dùng khi |
+|---|---|
+| [`aizen-build`](skills/aizen-build) | Mọi việc kỹ thuật trên dự án đang có: tính năng, sửa bug, refactor, từ ý tưởng/mô tả/issue tới code + test + commit + push. |
+| [`aizen-init`](skills/aizen-init) | Khởi tạo dự án backend cho team từ repo + tài liệu theo 11 bước có checkpoint, kết quả sạch và nhất quán. |
+| [`aizen-prompt-architect`](skills/aizen-prompt-architect) | Phỏng vấn bạn vài câu rồi viết prompt Aizen đủ trường dữ liệu (mục tiêu, tiêu chí xong, phạm vị, ràng buộc, tài liệu, phân quyền). |
+| [`aizen-skill-creator`](skills/aizen-skill-creator) | Tạo skill mới hoặc cải thiện skill có sẵn theo chuẩn Aizen: hỏi/gom yêu cầu -> viết SKILL.md -> tạo test -> chạy test. |
+| [`aizen-skill-importer`](skills/aizen-skill-importer) | Đưa tri thức bên ngoài vào Aizen: chép cả skill (ghi nguồn/bản quyền) hoặc phân tích repo/bài viết -> rút gọn thành pack gọn gàng. |
+| [`aizen-skill-eval`](skills/aizen-skill-eval) | Đánh giá một skill so với baseline: bộ eval (gồm negative control) + rubric + chạy thật + xuất bảng chấm điểm và gợi ý sửa. |
+| [`aizen-tech-learning`](skills/aizen-tech-learning) | Nghiên cứu sâu một công nghệ theo một workload: từ tầng ứng dụng tới thiết kế hệ thống, kèm prompt kiểm tra xem đã hiểu đúng chưa. |
+| [`aizen-video-to-skill`](skills/aizen-video-to-skill) | Biến video YouTube/file local thành skill (phụ đề -> hoặc whisper-cli) -> lọc ý chính -> tổng hợp -> tạo skill test được. |
+
+| Pack | Topic | Nội dung |
+|---|---|---|
+| `aizen-core` | `core` | Luật chung cho mọi skill: quyền A0-A4, evidence, quyết định, git local-only, code-quality. |
+| `aizen-design` | `discover`, `design` | phạm vi, onboard code cũ, SRS, HLD/LLD, API contract, threat model |
+| `aizen-backend` | `backend`, `api-ux` | nguyên tắc backend, kiến trúc, messaging (Kafka, RabbitMQ), S3, microservices |
+| `aizen-frontend` | `frontend`, `ui` | nguyên tắc frontend, React/Next (luật của Vercel), accessibility, kiểm tra visual |
+| `aizen-database` | `db` | schema, migration, concurrency, hiệu năng, HA/DR; PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch |
+| `aizen-quality` | `test`, `review` | chiến lược test, lens, review độc lập (blast radius, gating), verify báo cáo test |
+| `aizen-infra` | `infra` | pipeline + security gate, deploy/rollback, secrets, observability, sự cố; Docker, Podman |
+
+Agent tự chọn skill theo `description` trong `SKILL.md`; bạn cũng có thể gọi trực tiếp (Claude Code: `/<tên-skill>`).
 
 ---
 
