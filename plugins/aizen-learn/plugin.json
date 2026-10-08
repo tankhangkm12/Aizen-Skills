@@ -1,0 +1,55 @@
+{
+  "id": "aizen-learn",
+  "name": "Aizen Learn Plugin",
+  "version": "1.0.0",
+  "description": "Chuyên biệt cho Nghiên cứu công nghệ mới, Bóc tách video YouTube/bài giảng, Xây dựng cây tri thức (Tech Tree), Đồng bộ Notion và Tự động đóng gói/Benchmark kỹ năng AI.",
+  "domain": "learn",
+  "workflow": "./workflow.md",
+  "skills": [
+    "aizen-tech-learning",
+    "aizen-video-to-skill",
+    "aizen-skill-importer",
+    "aizen-skill-creator",
+    "aizen-skill-eval"
+  ],
+  "agents": [
+    {
+      "id": "tech-researcher",
+      "name": "Tech Researcher",
+      "responsibility": "Khảo sát và đào sâu các thư viện, framework, công nghệ mới, tổng hợp tài liệu chuyên sâu.",
+      "file": "./agents/tech-researcher.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7"]
+    },
+    {
+      "id": "video-synthesizer",
+      "name": "Video Synthesizer",
+      "responsibility": "Bóc tách transcript video YouTube, trích xuất cấu trúc và tổng hợp bài học thực chiến.",
+      "file": "./agents/video-synthesizer.md",
+      "tools": ["mcp:sequentialthinking", "youtube-parser"]
+    },
+    {
+      "id": "skill-synthesizer",
+      "name": "Skill Synthesizer",
+      "responsibility": "Đóng gói kiến thức thu thập được thành bộ kỹ năng chuẩn hóa (SKILL.md, manifest, references).",
+      "file": "./agents/skill-synthesizer.md",
+      "tools": ["mcp:sequentialthinking"]
+    },
+    {
+      "id": "benchmark-evaluator",
+      "name": "Benchmark Evaluator",
+      "responsibility": "Xây dựng kịch bản kiểm thử eval, đo lường độ chính xác và chấm điểm năng lực của skill.",
+      "file": "./agents/benchmark-evaluator.md",
+      "tools": ["mcp:sequentialthinking"]
+    }
+  ],
+  "mcp": {
+    "required": [
+      "sequentialthinking",
+      "context7"
+    ],
+    "optional": [
+      "notion",
+      "youtube-parser"
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "aizen-code",
+  "name": "Aizen Code Plugin",
+  "version": "1.0.0",
+  "description": "Chuyên biệt cho Kỹ nghệ phần mềm, Chia nhỏ Micro-modules (1-3 files), TDD/Acceptance test, Kiểm thử Frontend với Playwright MCP, Adversarial Review và CI/CD.",
+  "domain": "code",
+  "workflow": "./workflow.md",
+  "skills": [
+    "aizen-build",
+    "aizen-backend",
+    "aizen-frontend",
+    "aizen-quality",
+    "aizen-infra"
+  ],
+  "agents": [
+    {
+      "id": "task-planner",
+      "name": "Task Planner",
+      "responsibility": "Bẻ nhỏ bài toán thành các micro-modules (tối đa 1-3 files), cô lập write-set và xếp đợt sóng song song qua state.py waves.",
+      "file": "./agents/task-planner.md",
+      "tools": ["mcp:sequentialthinking", "state.py"]
+    },
+    {
+      "id": "backend-engineer",
+      "name": "Backend Engineer",
+      "responsibility": "Lập trình backend bằng Go/Clean Architecture, xử lý concurrency, database queries và gRPC/REST APIs.",
+      "file": "./agents/backend-engineer.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7"]
+    },
+    {
+      "id": "frontend-engineer",
+      "name": "Frontend Engineer",
+      "responsibility": "Lập trình React/Next.js theo bản thiết kế từ Penpot, tự kiểm tra giao diện qua Playwright MCP.",
+      "file": "./agents/frontend-engineer.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7", "mcp:playwright"]
+    },
+    {
+      "id": "qa-tester",
+      "name": "QA Tester",
+      "responsibility": "Viết acceptance tests Given/When/Then, tự động hóa Playwright E2E UI tests, kiểm thử biên và stress test.",
+      "file": "./agents/qa-tester.md",
+      "tools": ["mcp:sequentialthinking", "mcp:playwright"]
+    },
+    {
+      "id": "adversarial-reviewer",
+      "name": "Adversarial Reviewer",
+      "responsibility": "Phản biện độc lập, rà soát từng dòng diff path:line, kiểm tra lỗ hổng bảo mật và đối chiếu ảnh Playwright với thiết kế gốc.",
+      "file": "./agents/adversarial-reviewer.md",
+      "tools": ["mcp:sequentialthinking", "check.py"]
+    },
+    {
+      "id": "devops-engineer",
+      "name": "DevOps Engineer",
+      "responsibility": "Xây dựng Dockerfile tối ưu, Kubernetes manifests, cấu hình CI/CD pipelines và quản lý biến môi trường.",
+      "file": "./agents/devops-engineer.md",
+      "tools": ["mcp:sequentialthinking", "mcp:context7"]
+    }
+  ],
+  "mcp": {
+    "required": [
+      "sequentialthinking",
+      "context7",
+      "playwright"
+    ],
+    "optional": [
+      "git",
+      "filesystem"
+    ]
+  }
+}
