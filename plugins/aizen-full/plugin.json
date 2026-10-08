@@ -1,0 +1,48 @@
+{
+  "id": "aizen-full",
+  "name": "Aizen Full Studio Plugin",
+  "version": "1.0.0",
+  "description": "Bộ Plugin Toàn trình tích hợp đầy đủ cả 3 trụ cột (Design + Code + Learn). Kết nối liền mạch từ Khảo sát -> Kiến trúc Archify & UI Canvas Penpot -> Lập trình Micro-modular -> Kiểm thử Playwright E2E -> Review -> Deploy.",
+  "domain": "full",
+  "workflow": "./workflow.md",
+  "skills": [
+    "aizen-init",
+    "aizen-design",
+    "aizen-taste-uiux",
+    "aizen-database",
+    "aizen-prompt-architect",
+    "aizen-build",
+    "aizen-backend",
+    "aizen-frontend",
+    "aizen-quality",
+    "aizen-infra",
+    "aizen-tech-learning",
+    "aizen-video-to-skill",
+    "aizen-skill-creator",
+    "aizen-skill-eval",
+    "archify"
+  ],
+  "agents": [
+    {
+      "id": "full-coordinator",
+      "name": "Full Lifecycle Coordinator",
+      "responsibility": "Chỉ huy toàn bộ vòng đời phát triển dự án từ Discovery, Design, Code, QA đến bàn giao triển khai.",
+      "file": "./agents/full-coordinator.md",
+      "tools": ["mcp:sequentialthinking", "state.py", "guard.py"]
+    }
+  ],
+  "mcp": {
+    "required": [
+      "sequentialthinking",
+      "context7",
+      "playwright",
+      "penpot"
+    ],
+    "optional": [
+      "archify",
+      "figma",
+      "git",
+      "filesystem"
+    ]
+  }
+}
