@@ -1,7 +1,7 @@
 {
   "name": "aizen-skills",
-  "version": "2.2.0",
-  "description": "Aizen agent skill suite (entry skills + topic packs, shared core, pinned upstream knowledge) with auto-installation and live-sync for Claude Code, Antigravity / Gemini CLI, Cursor and Windsurf.",
+  "version": "3.0.0",
+  "description": "Aizen Multi-Plugin Suite: Modular plugins (Design, Code, Learn, Full) with specialized agents, canvas design (Penpot/Archify), Playwright UI testing, and Project-level isolation for Claude Code & Antigravity.",
   "main": "bin/cli.js",
   "bin": {
     "aizen": "./bin/cli.js",
@@ -12,34 +12,31 @@
     "install:skills": "node ./bin/cli.js install",
     "sync": "node ./bin/cli.js sync",
     "update:skills": "node ./bin/cli.js update",
-    "status": "node ./bin/cli.js status",
-    "test": "node ./tests/check-skills.js && node ./tests/check-scripts.js && node ./tests/test-installer.js && node ./tests/test-external.js",
-    "vendor": "node ./bin/vendor.js",
-    "external": "node ./bin/external.js"
+    "test": "node tests/check-skills.js && node tests/check-scripts.js && node tests/test-installer.js && node tests/test-external.js && node tests/test-plugins.js"
   },
   "keywords": [
     "antigravity",
-    "ai-agent",
-    "skills",
     "claude-code",
-    "cursor",
-    "windsurf",
-    "cline",
-    "roo-code",
-    "copilot"
+    "agent-skills",
+    "ai-agent",
+    "plugin",
+    "penpot",
+    "playwright",
+    "archify",
+    "context7",
+    "sequentialthinking"
   ],
-  "author": "Aizen Team",
+  "author": "tankhangkm12",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
   "files": [
     "bin",
+    "plugins",
     "skills",
     "plugin.json",
     "README.md",
-    "LICENSE",
-    "vendor.lock.json",
-    "externals.json"
+    "LICENSE"
   ]
 }
