@@ -110,6 +110,27 @@ function validatePlugin(pluginPath) {
     }
   }
 
+  // 5. Kiểm tra danh sách kỹ năng khai báo (skills) tồn tại thực tế
+  if (manifest.skills && Array.isArray(manifest.skills)) {
+    const skillsBase = path.join(rootDir, 'skills');
+    const externalsFile = path.join(rootDir, 'externals.json');
+    let externals = [];
+    try {
+      if (fs.existsSync(externalsFile)) {
+        externals = (JSON.parse(fs.readFileSync(externalsFile, 'utf8')).externals || []).map(e => e.name);
+      }
+    } catch (_) {}
+
+    for (const sk of manifest.skills) {
+      const skDir = path.join(skillsBase, sk);
+      const isCoreSkill = fs.existsSync(skDir) && fs.existsSync(path.join(skDir, 'SKILL.md'));
+      const isExternal = externals.includes(sk);
+      if (!isCoreSkill && !isExternal) {
+        errors.push(`Kỹ năng '${sk}' được khai báo trong plugin không tồn tại trong skills/ hoặc externals.json`);
+      }
+    }
+  }
+
   return {
     ok: errors.length === 0,
     errors,

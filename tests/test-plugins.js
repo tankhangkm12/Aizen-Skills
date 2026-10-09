@@ -62,6 +62,9 @@ try {
 
   // Kiểm tra thư mục đích của Antigravity và Claude Code
   assert(fs.existsSync(path.join(mockProjectDir, '.agents', 'skills')), 'Phải sinh .agents/skills');
+  assert(fs.existsSync(path.join(mockProjectDir, '.agents', 'skills.json')), 'Phải sinh .agents/skills.json cho Antigravity');
+  const agyJson = JSON.parse(fs.readFileSync(path.join(mockProjectDir, '.agents', 'skills.json'), 'utf8'));
+  assert(Array.isArray(agyJson.entries) && agyJson.entries.length > 0, '.agents/skills.json phải chứa entries');
   assert(fs.existsSync(path.join(mockProjectDir, '.claude', 'skills')), 'Phải sinh .claude/skills');
   assert(!fs.existsSync(path.join(mockProjectDir, '.cursor')), 'Tuyệt đối không sinh thư mục Cursor (.cursor)');
 

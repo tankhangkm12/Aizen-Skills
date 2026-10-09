@@ -244,6 +244,33 @@ function installProject(skills, projectDir = process.cwd(), plugin, verbose = tr
     }
   }
 
+  // Tương thích Antigravity / Gemini CLI Native JSON Discovery (khắc phục giới hạn Windows Junction không được duyệt)
+  try {
+    const agyDir = path.join(projectDir, '.agents');
+    fs.mkdirSync(agyDir, { recursive: true });
+    const agySkillsJson = path.join(agyDir, 'skills.json');
+
+    const groups = new Map();
+    for (const s of skills) {
+      const parent = path.dirname(s.path).replace(/\\/g, '/');
+      if (!groups.has(parent)) groups.set(parent, []);
+      groups.get(parent).push(path.basename(s.path));
+    }
+
+    const entries = [];
+    for (const [parentPath, skillNames] of groups.entries()) {
+      entries.push({
+        path: parentPath,
+        include_only: skillNames
+      });
+    }
+
+    fs.writeFileSync(agySkillsJson, JSON.stringify({ entries }, null, 2), 'utf8');
+    if (verbose) console.log(`  ✓ [Antigravity / Gemini CLI] Đã tạo .agents/skills.json (Native Loader)`);
+  } catch (err) {
+    if (verbose) console.warn(`  ! Không thể tạo .agents/skills.json: ${err.message}`);
+  }
+
   if (plugin) {
     setupProjectMcp(projectDir, plugin, verbose);
     generateSlashCommands(projectDir, plugin, verbose);
