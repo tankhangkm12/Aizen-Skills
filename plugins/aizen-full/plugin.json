@@ -6,9 +6,9 @@
   "domain": "full",
   "workflow": "./workflow.md",
   "skills": [
+    "aizen-core",
     "aizen-init",
     "aizen-design",
-    "aizen-taste-uiux",
     "aizen-database",
     "aizen-prompt-architect",
     "aizen-build",
@@ -20,6 +20,7 @@
     "aizen-video-to-skill",
     "aizen-skill-creator",
     "aizen-skill-eval",
+    "aizen-skill-importer",
     "archify"
   ],
   "agents": [
